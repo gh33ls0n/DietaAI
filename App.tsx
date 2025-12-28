@@ -27,17 +27,14 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Persistence
   useEffect(() => {
     if (profile) localStorage.setItem('user_profile', JSON.stringify(profile));
     if (mealPlan) localStorage.setItem('weekly_plan', JSON.stringify(mealPlan));
     localStorage.setItem('custom_meals', JSON.stringify(customMeals));
   }, [profile, mealPlan, customMeals]);
 
-  // Combined meals for swapping and browsing
   const allAvailableMeals = useMemo(() => [...MEAL_DATABASE, ...customMeals], [customMeals]);
 
-  // Calories Calculation
   const calculatedCalories = useMemo(() => {
     if (!profile) return 0;
     const { age, weight, height, gender, activityLevel, goal } = profile;
@@ -106,7 +103,7 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col">
       <Header onReset={handleReset} showReset={!!profile} />
       
-      <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl">
+      <main className="flex-grow container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-5xl">
         {!profile ? (
           <Onboarding onComplete={setProfile} />
         ) : (
@@ -128,9 +125,9 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <footer className="bg-white border-t border-slate-200 py-6 mt-12">
-        <div className="container mx-auto px-4 text-center text-slate-500 text-sm">
-          &copy; {new Date().getFullYear()} {APP_NAME}. Twoje zdrowie, Twój wybór.
+      <footer className="bg-white border-t border-slate-100 py-4 mt-8">
+        <div className="container mx-auto px-4 text-center text-slate-400 text-[10px] uppercase font-bold tracking-widest">
+          {APP_NAME}
         </div>
       </footer>
     </div>
