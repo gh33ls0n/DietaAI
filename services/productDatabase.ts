@@ -27,11 +27,13 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Szczypiorek", calories: 30, protein: 3, fats: 1, carbs: 4, unit: 'g' },
   { name: "Buraczki tarte", calories: 45, protein: 2, fats: 0, carbs: 10, unit: 'g' },
   { name: "Kukurydza konserwowa", calories: 86, protein: 3, fats: 1, carbs: 19, unit: 'g' },
+  { name: "Sałata lodowa", calories: 14, protein: 1, fats: 0, carbs: 3, unit: 'g' },
 
   // MIĘSO I RYBY
   { name: "Pierś z kurczaka", calories: 110, protein: 21, fats: 1, carbs: 0, unit: 'g' },
   { name: "Pierś z indyka", calories: 105, protein: 22, fats: 1, carbs: 0, unit: 'g' },
   { name: "Wołowina chuda", calories: 150, protein: 20, fats: 7, carbs: 0, unit: 'g' },
+  { name: "Wołowina mielona chuda", calories: 160, protein: 19, fats: 9, carbs: 0, unit: 'g' },
   { name: "Schab bez kości", calories: 120, protein: 22, fats: 3, carbs: 0, unit: 'g' },
   { name: "Mięso mielone z indyka", calories: 120, protein: 20, fats: 4, carbs: 0, unit: 'g' },
   { name: "Łosoś świeży", calories: 208, protein: 20, fats: 13, carbs: 0, unit: 'g' },
@@ -50,6 +52,7 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Jogurt naturalny", calories: 61, protein: 4, fats: 3, carbs: 5, unit: 'g' },
   { name: "Ser żółty gouda", calories: 350, protein: 25, fats: 27, carbs: 1, unit: 'g' },
   { name: "Ser Feta", calories: 264, protein: 14, fats: 21, carbs: 4, unit: 'g' },
+  { name: "Ser Mozzarella Light", calories: 160, protein: 19, fats: 9, carbs: 1, unit: 'g' },
   { name: "Mleko 2%", calories: 50, protein: 3, fats: 2, carbs: 5, unit: 'ml' },
 
   // ZBOŻOWE
@@ -64,13 +67,18 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Makaron spaghetti pełnoziarnisty", calories: 348, protein: 14, fats: 2, carbs: 66, unit: 'g' },
   { name: "Mąka pełnoziarnista", calories: 340, protein: 12, fats: 2, carbs: 68, unit: 'g' },
   { name: "Płatki owsiane", calories: 366, protein: 13, fats: 7, carbs: 59, unit: 'g' },
+  { name: "Bułka do burgera pełnoziarnista", calories: 260, protein: 9, fats: 4, carbs: 48, unit: 'g' },
+  { name: "Tortilla pełnoziarnista", calories: 290, protein: 8, fats: 7, carbs: 45, unit: 'g' },
 
-  // OWOCE
+  // OWOCE i ORZECHY
   { name: "Jabłko", calories: 52, protein: 0, fats: 0, carbs: 12, unit: 'g' },
   { name: "Banan", calories: 89, protein: 1, fats: 0, carbs: 21, unit: 'g' },
   { name: "Borówki", calories: 57, protein: 1, fats: 0, carbs: 12, unit: 'g' },
   { name: "Maliny", calories: 52, protein: 1, fats: 0, carbs: 12, unit: 'g' },
+  { name: "Truskawki", calories: 33, protein: 1, fats: 0, carbs: 8, unit: 'g' },
   { name: "Awokado", calories: 160, protein: 2, fats: 15, carbs: 9, unit: 'g' },
+  { name: "Orzechy włoskie", calories: 654, protein: 15, fats: 65, carbs: 14, unit: 'g' },
+  { name: "Migdały", calories: 579, protein: 21, fats: 50, carbs: 22, unit: 'g' },
 
   // INNE
   { name: "Oliwa z oliwek", calories: 884, protein: 0, fats: 100, carbs: 0, unit: 'ml' },
@@ -78,5 +86,6 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Masło orzechowe", calories: 588, protein: 25, fats: 50, carbs: 13, unit: 'g' },
   { name: "Hummus", calories: 166, protein: 8, fats: 10, carbs: 14, unit: 'g' },
   { name: "Musztarda", calories: 100, protein: 4, fats: 4, carbs: 8, unit: 'g' },
-  { name: "Passata pomidorowa", calories: 25, protein: 1, fats: 0, carbs: 5, unit: 'ml' }
+  { name: "Passata pomidorowa", calories: 25, protein: 1, fats: 0, carbs: 5, unit: 'ml' },
+  { name: "Ketchup bez cukru", calories: 60, protein: 1, fats: 0, carbs: 14, unit: 'g' }
 ];
