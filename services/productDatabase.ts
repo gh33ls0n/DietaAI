@@ -15,6 +15,9 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Brokuły", calories: 34, protein: 3, fats: 0, carbs: 7, unit: 'g' },
   { name: "Kalafior", calories: 25, protein: 2, fats: 0, carbs: 5, unit: 'g' },
   { name: "Marchew", calories: 41, protein: 1, fats: 0, carbs: 10, unit: 'g' },
+  { name: "Pietruszka (korzeń)", calories: 36, protein: 2, fats: 0, carbs: 9, unit: 'g' },
+  { name: "Seler (korzeń)", calories: 42, protein: 1, fats: 0, carbs: 9, unit: 'g' },
+  { name: "Kapusta pekińska", calories: 13, protein: 1, fats: 0, carbs: 3, unit: 'g' },
   { name: "Rzodkiewka", calories: 16, protein: 1, fats: 0, carbs: 3, unit: 'g' },
   { name: "Szpinak świeży", calories: 23, protein: 3, fats: 0, carbs: 4, unit: 'g' },
   { name: "Mix sałat", calories: 15, protein: 1, fats: 0, carbs: 2, unit: 'g' },
@@ -30,6 +33,7 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Pierś z indyka", calories: 105, protein: 22, fats: 1, carbs: 0, unit: 'g' },
   { name: "Wołowina chuda", calories: 150, protein: 20, fats: 7, carbs: 0, unit: 'g' },
   { name: "Schab bez kości", calories: 120, protein: 22, fats: 3, carbs: 0, unit: 'g' },
+  { name: "Mięso mielone z indyka", calories: 120, protein: 20, fats: 4, carbs: 0, unit: 'g' },
   { name: "Łosoś świeży", calories: 208, protein: 20, fats: 13, carbs: 0, unit: 'g' },
   { name: "Łosoś wędzony", calories: 160, protein: 22, fats: 8, carbs: 0, unit: 'g' },
   { name: "Dorsz świeży", calories: 82, protein: 18, fats: 1, carbs: 0, unit: 'g' },
@@ -45,6 +49,7 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Twarożek kanapkowy lekki", calories: 100, protein: 8, fats: 5, carbs: 4, unit: 'g' },
   { name: "Jogurt naturalny", calories: 61, protein: 4, fats: 3, carbs: 5, unit: 'g' },
   { name: "Ser żółty gouda", calories: 350, protein: 25, fats: 27, carbs: 1, unit: 'g' },
+  { name: "Ser Feta", calories: 264, protein: 14, fats: 21, carbs: 4, unit: 'g' },
   { name: "Mleko 2%", calories: 50, protein: 3, fats: 2, carbs: 5, unit: 'ml' },
 
   // ZBOŻOWE
@@ -52,6 +57,7 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Chleb graham", calories: 230, protein: 8, fats: 2, carbs: 46, unit: 'g' },
   { name: "Chleb żytni pełnoziarnisty", calories: 220, protein: 6, fats: 2, carbs: 45, unit: 'g' },
   { name: "Ryż basmati (suchy)", calories: 351, protein: 8, fats: 1, carbs: 77, unit: 'g' },
+  { name: "Ryż brązowy (suchy)", calories: 350, protein: 8, fats: 3, carbs: 72, unit: 'g' },
   { name: "Kasza gryczana (sucha)", calories: 343, protein: 13, fats: 3, carbs: 62, unit: 'g' },
   { name: "Kasza jaglana", calories: 350, protein: 11, fats: 3, carbs: 68, unit: 'g' },
   { name: "Makaron pełnoziarnisty", calories: 348, protein: 14, fats: 2, carbs: 66, unit: 'g' },

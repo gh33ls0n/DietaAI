@@ -2,7 +2,7 @@
 import { Meal } from "../types";
 
 export const MEAL_DATABASE: Meal[] = [
-  // --- KANAPKI I ŚNIADANIA NA ZIMNO (breakfast, snack1, dinner) ---
+  // --- OBECNE POSIŁKI (NIE KASOWAĆ!) ---
   {
     name: "Kanapki z szynką, serem i ogórkiem kiszonym",
     calories: 360, protein: 18, fats: 12, carbs: 45,
@@ -92,8 +92,6 @@ export const MEAL_DATABASE: Meal[] = [
     ],
     recipe: "Jajko ugotuj na twardo i pokrój w ćwiartki. Tuńczyka odsącz, ogórki pokrój w kostkę. Składniki wymieszaj z sałatą, dopraw pieprzem i opcjonalnie odrobiną jogurtu."
   },
-
-  // --- OBIADY (lunch) ---
   {
     name: "Pulpety z indyka w sosie koperkowym",
     calories: 520, protein: 36, fats: 14, carbs: 58,
@@ -179,8 +177,6 @@ export const MEAL_DATABASE: Meal[] = [
     ],
     recipe: "Mięso zmiel z cebulą, uformuj kotlety i upiecz w piekarniku. Ziemniaki ugnieć na purée. Podawaj z buraczkami."
   },
-
-  // --- PODWIECZORKI I PRZEKĄSKI (snack2) ---
   {
     name: "Skyr z borówkami i migdałami",
     calories: 230, protein: 22, fats: 6, carbs: 24,
@@ -214,5 +210,85 @@ export const MEAL_DATABASE: Meal[] = [
       { item: "Szczypiorek", amount: "1 łyżka" }
     ],
     recipe: "Wymieszaj składniki w miseczce."
+  },
+
+  // --- NOWE POSIŁKI (DODANE) ---
+  {
+    name: "Fit Kluski leniwe z jogurtem i cynamonem",
+    calories: 410, protein: 25, fats: 8, carbs: 55,
+    type: "breakfast",
+    ingredients: [
+      { item: "Twaróg chudy", amount: "200g" },
+      { item: "Jajko (rozmiar L)", amount: "1 szt" },
+      { item: "Mąka pełnoziarnista", amount: "4 łyżki" },
+      { item: "Jogurt naturalny", amount: "2 łyżki" },
+      { item: "Cynamon", amount: "szczypta" }
+    ],
+    recipe: "Twaróg rozgnieć, wymieszaj z jajkiem i mąką na jednolitą masę. Uformuj wałeczki, pokrój na ukos. Gotuj w osolonej wodzie 1-2 min od wypłynięcia. Podawaj z jogurtem i cynamonem."
+  },
+  {
+    name: "Ryba po grecku w wersji fit",
+    calories: 440, protein: 32, fats: 10, carbs: 48,
+    type: "lunch",
+    ingredients: [
+      { item: "Dorsz świeży", amount: "150g" },
+      { item: "Marchew", amount: "100g" },
+      { item: "Pietruszka (korzeń)", amount: "50g" },
+      { item: "Seler (korzeń)", amount: "50g" },
+      { item: "Passata pomidorowa", amount: "100ml" }
+    ],
+    recipe: "Warzywa zetrzyj na tarce i podduś z wodą i przyprawami. Dodaj passatę. Rybę upiecz w piekarniku w folii. Przykryj rybę gotową pierzynką warzywną."
+  },
+  {
+    name: "Gołąbki bez zawijania z indykiem",
+    calories: 490, protein: 34, fats: 12, carbs: 58,
+    type: "lunch",
+    ingredients: [
+      { item: "Mięso mielone z indyka", amount: "120g" },
+      { item: "Kapusta pekińska", amount: "150g" },
+      { item: "Ryż brązowy (suchy)", amount: "50g" },
+      { item: "Passata pomidorowa", amount: "100ml" }
+    ],
+    recipe: "Ryż ugotuj. Kapustę posiekaj i sparz. Wymieszaj mięso, ryż i kapustę. Uformuj owalne kotlety. Piecz w naczyniu żaroodpornym zalane passatą przez 40 min w 180 stopniach."
+  },
+  {
+    name: "Gulasz z indyka z kolorową papryką",
+    calories: 510, protein: 35, fats: 14, carbs: 60,
+    type: "lunch",
+    ingredients: [
+      { item: "Pierś z indyka", amount: "150g" },
+      { item: "Papryka czerwona", amount: "100g" },
+      { item: "Cebula biała", amount: "50g" },
+      { item: "Kasza gryczana (sucha)", amount: "60g" },
+      { item: "Oliwa z oliwek", amount: "1 łyżeczka" }
+    ],
+    recipe: "Indyka pokrój w kostkę, podsmaż na oliwie. Dodaj cebulę i paprykę. Podlej wodą i duś do miękkości. Podawaj z ugotowaną kaszą gryczaną."
+  },
+  {
+    name: "Zapiekanka makaronowa z brokułem i kurczakiem",
+    calories: 530, protein: 38, fats: 15, carbs: 62,
+    type: "lunch",
+    ingredients: [
+      { item: "Pierś z kurczaka", amount: "120g" },
+      { item: "Makaron pełnoziarnisty", amount: "70g" },
+      { item: "Brokuły", amount: "150g" },
+      { item: "Jogurt naturalny", amount: "3 łyżki" },
+      { item: "Czosnek", amount: "1 ząbek" }
+    ],
+    recipe: "Makaron i brokuł ugotuj al dente. Kurczaka podsmaż. Wszystko wymieszaj z sosem z jogurtu i czosnku. Zapiekaj 15 min w 180 stopniach."
+  },
+  {
+    name: "Sałatka jarzynowa fit z sosem jogurtowym",
+    calories: 280, protein: 12, fats: 8, carbs: 38,
+    type: "dinner",
+    ingredients: [
+      { item: "Marchew", amount: "100g" },
+      { item: "Pietruszka (korzeń)", amount: "50g" },
+      { item: "Ziemniaki", amount: "100g" },
+      { item: "Groszek konserwowy", amount: "2 łyżki" },
+      { item: "Jogurt naturalny", amount: "2 łyżki" },
+      { item: "Musztarda", amount: "1 łyżeczka" }
+    ],
+    recipe: "Ugotowane warzywa pokrój w kostkę. Wymieszaj z groszkiem, jogurtem i musztardą. Dopraw solą i pieprzem."
   }
 ];
