@@ -98,9 +98,9 @@ const Dashboard: React.FC<DashboardProps> = ({
                 mealPlan={mealPlan} 
                 allAvailableMeals={allAvailableMeals} 
                 onRegenerate={onGenerate} 
-                // Fix: changed handleUpdateMeal to onUpdateMeal to match prop name
                 onUpdateMeal={onUpdateMeal} 
                 onCopyDay={onCopyDay}
+                onAddCustomMeal={onAddCustomMeal}
               />
             ) : activeTab === 'shopping' && mealPlan ? (
               <ShoppingListView mealPlan={mealPlan} />

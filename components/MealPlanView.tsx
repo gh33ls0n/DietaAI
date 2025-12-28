@@ -9,10 +9,11 @@ interface MealPlanViewProps {
   onRegenerate: () => void;
   onUpdateMeal: (day: number, mealType: string, newMeal: Meal) => void;
   onCopyDay: (sourceDay: number, targetDays: number[]) => void;
+  onAddCustomMeal: (meal: Meal) => void;
 }
 
 const MealPlanView: React.FC<MealPlanViewProps> = ({ 
-  mealPlan, allAvailableMeals, onRegenerate, onUpdateMeal, onCopyDay 
+  mealPlan, allAvailableMeals, onRegenerate, onUpdateMeal, onCopyDay, onAddCustomMeal 
 }) => {
   const [selectedDay, setSelectedDay] = useState<number>(1);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
@@ -43,6 +44,29 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     onUpdateMeal(day, swappingMealType!, mealWithCorrectType);
     setSwappingMealType(null);
     setSwapSearch("");
+  };
+
+  const handleSaveToLibrary = (meal: Meal) => {
+    // Sprawdź czy już jest w bazie użytkownika (customMeals)
+    const alreadyInLibrary = allAvailableMeals.some(m => m.name === meal.name);
+    if (alreadyInLibrary) {
+      alert("To danie jest już w Twojej bazie!");
+      return;
+    }
+    onAddCustomMeal({ ...meal });
+    alert("Danie zostało zapisane w Twojej bazie inspiracji!");
+  };
+
+  const handleSaveAllDayToLibrary = () => {
+    let count = 0;
+    currentDayPlan.meals.forEach(meal => {
+      const alreadyInLibrary = allAvailableMeals.some(m => m.name === meal.name);
+      if (!alreadyInLibrary) {
+        onAddCustomMeal({ ...meal });
+        count++;
+      }
+    });
+    alert(`Zapisano ${count} nowych dań do Twojej bazy!`);
   };
 
   const handleCopyMealToNextDay = (meal: Meal) => {
@@ -98,7 +122,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
             </span>
           </button>
         ))}
-        <button onClick={onRegenerate} className="flex-shrink-0 lg:mt-4 p-2.5 sm:p-4 rounded-xl border-2 border-dashed border-slate-200 text-slate-400 hover:text-emerald-500 transition-all">
+        <button onClick={onRegenerate} title="Wygeneruj nowy jadłospis" className="flex-shrink-0 lg:mt-4 p-2.5 sm:p-4 rounded-xl border-2 border-dashed border-slate-200 text-slate-400 hover:text-emerald-500 transition-all">
           <Icons.Plus className="mx-auto" />
         </button>
       </div>
@@ -112,12 +136,21 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
               <p className="text-xl sm:text-3xl font-black text-emerald-400">{totals.calories} kcal</p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <button 
-                onClick={() => setIsCopyingDay(true)}
-                className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tighter flex items-center gap-1 transition-all"
-              >
-                <Icons.Copy className="w-3 h-3" /> Kopiuj ten dzień
-              </button>
+              <div className="flex gap-1">
+                <button 
+                  onClick={handleSaveAllDayToLibrary}
+                  title="Zarchiwizuj cały ten dzień w swojej bazie"
+                  className="bg-white/10 hover:bg-emerald-500 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tighter flex items-center gap-1 transition-all"
+                >
+                  <Icons.Save className="w-3 h-3" /> Zapisz dzień
+                </button>
+                <button 
+                  onClick={() => setIsCopyingDay(true)}
+                  className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tighter flex items-center gap-1 transition-all"
+                >
+                  <Icons.Copy className="w-3 h-3" /> Kopiuj dzień
+                </button>
+              </div>
               <div className="flex gap-3 sm:gap-6 text-center">
                 <div><span className="block text-[8px] opacity-40 uppercase font-black">B</span><span className="text-xs sm:text-base font-bold">{totals.protein}g</span></div>
                 <div><span className="block text-[8px] opacity-40 uppercase font-black">T</span><span className="text-xs sm:text-base font-bold">{totals.fats}g</span></div>
@@ -141,6 +174,13 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                    <h4 className="text-sm sm:text-lg font-bold text-slate-800 truncate">{meal.name}</h4>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-1.5">
+                  <button 
+                    onClick={() => handleSaveToLibrary(meal)} 
+                    title="Zapisz to danie w swojej bazie inspiracji"
+                    className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
+                  >
+                    <Icons.Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </button>
                   <button 
                     onClick={() => handleCopyMealToNextDay(meal)} 
                     title="Kopiuj na jutro"
