@@ -8,12 +8,17 @@ interface MealPlanViewProps {
   allAvailableMeals: Meal[];
   onRegenerate: () => void;
   onUpdateMeal: (day: number, mealType: string, newMeal: Meal) => void;
+  onCopyDay: (sourceDay: number, targetDays: number[]) => void;
 }
 
-const MealPlanView: React.FC<MealPlanViewProps> = ({ mealPlan, allAvailableMeals, onRegenerate, onUpdateMeal }) => {
+const MealPlanView: React.FC<MealPlanViewProps> = ({ 
+  mealPlan, allAvailableMeals, onRegenerate, onUpdateMeal, onCopyDay 
+}) => {
   const [selectedDay, setSelectedDay] = useState<number>(1);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [swappingMealType, setSwappingMealType] = useState<string | null>(null);
+  const [isCopyingDay, setIsCopyingDay] = useState(false);
+  const [copyTargetDays, setCopyTargetDays] = useState<number[]>([]);
   const [swapSearch, setSwapSearch] = useState("");
 
   const currentDayPlan = mealPlan.days.find(d => d.day === selectedDay) || mealPlan.days[0];
@@ -40,6 +45,28 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({ mealPlan, allAvailableMeals
     setSwapSearch("");
   };
 
+  const handleCopyMealToNextDay = (meal: Meal) => {
+    if (selectedDay < 7) {
+      onUpdateMeal(selectedDay + 1, meal.type, { ...meal });
+      alert(`Skopiowano posiłek na dzień ${selectedDay + 1}!`);
+    } else {
+      alert("Nie można kopiować poza 7 dzień.");
+    }
+  };
+
+  const handleApplyCopyDay = () => {
+    if (copyTargetDays.length > 0) {
+      onCopyDay(selectedDay, copyTargetDays);
+      setIsCopyingDay(false);
+      setCopyTargetDays([]);
+      alert("Dzień został skopiowany!");
+    }
+  };
+
+  const toggleTargetDay = (d: number) => {
+    setCopyTargetDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
+  };
+
   const swappableMeals = useMemo(() => {
     if (!swappingMealType) return [];
     const sharedTypes = ['breakfast', 'snack1', 'dinner'];
@@ -57,7 +84,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({ mealPlan, allAvailableMeals
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8">
-      {/* Sidebar Dni - Kompaktowy na mobile */}
+      {/* Sidebar Dni */}
       <div className="lg:col-span-3 flex lg:flex-col gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
         {mealPlan.days.map((dayPlan) => (
           <button
@@ -76,18 +103,26 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({ mealPlan, allAvailableMeals
         </button>
       </div>
 
-      {/* Lista Posiłków - Kompaktowa */}
+      {/* Lista Posiłków */}
       <div className="lg:col-span-9 space-y-3 sm:space-y-6">
-        <div className="bg-slate-900 rounded-2xl p-4 sm:p-6 text-white shadow-lg">
-          <div className="flex justify-between items-center">
+        <div className="bg-slate-900 rounded-2xl p-4 sm:p-6 text-white shadow-lg relative overflow-hidden">
+          <div className="flex justify-between items-center relative z-10">
             <div>
               <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest">Suma dnia</p>
               <p className="text-xl sm:text-3xl font-black text-emerald-400">{totals.calories} kcal</p>
             </div>
-            <div className="flex gap-3 sm:gap-6 text-center">
-              <div><span className="block text-[8px] opacity-40 uppercase font-black">B</span><span className="text-xs sm:text-base font-bold">{totals.protein}g</span></div>
-              <div><span className="block text-[8px] opacity-40 uppercase font-black">T</span><span className="text-xs sm:text-base font-bold">{totals.fats}g</span></div>
-              <div><span className="block text-[8px] opacity-40 uppercase font-black">W</span><span className="text-xs sm:text-base font-bold">{totals.carbs}g</span></div>
+            <div className="flex flex-col items-end gap-2">
+              <button 
+                onClick={() => setIsCopyingDay(true)}
+                className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tighter flex items-center gap-1 transition-all"
+              >
+                <Icons.Copy className="w-3 h-3" /> Kopiuj ten dzień
+              </button>
+              <div className="flex gap-3 sm:gap-6 text-center">
+                <div><span className="block text-[8px] opacity-40 uppercase font-black">B</span><span className="text-xs sm:text-base font-bold">{totals.protein}g</span></div>
+                <div><span className="block text-[8px] opacity-40 uppercase font-black">T</span><span className="text-xs sm:text-base font-bold">{totals.fats}g</span></div>
+                <div><span className="block text-[8px] opacity-40 uppercase font-black">W</span><span className="text-xs sm:text-base font-bold">{totals.carbs}g</span></div>
+              </div>
             </div>
           </div>
         </div>
@@ -105,15 +140,69 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({ mealPlan, allAvailableMeals
                    </div>
                    <h4 className="text-sm sm:text-lg font-bold text-slate-800 truncate">{meal.name}</h4>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <button onClick={() => setSwappingMealType(meal.type)} className="p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"><Icons.Swap className="w-4 h-4" /></button>
-                  <button onClick={() => setSelectedMeal(meal)} className="p-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"><Icons.ChefHat className="w-4 h-4" /></button>
+                <div className="flex items-center gap-1 sm:gap-1.5">
+                  <button 
+                    onClick={() => handleCopyMealToNextDay(meal)} 
+                    title="Kopiuj na jutro"
+                    className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
+                  >
+                    <Icons.Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setSwappingMealType(meal.type)} 
+                    title="Wymień"
+                    className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
+                  >
+                    <Icons.Swap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </button>
+                  <button 
+                    onClick={() => setSelectedMeal(meal)} 
+                    title="Zobacz przepis"
+                    className="p-2 sm:p-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"
+                  >
+                    <Icons.ChefHat className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Modal Kopiowania Dnia */}
+      {isCopyingDay && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsCopyingDay(false)}></div>
+          <div className="relative bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 p-6 space-y-6">
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-slate-800">Kopiuj Dzień {selectedDay}</h2>
+              <p className="text-xs text-slate-400 font-bold uppercase mt-1">Wybierz dni docelowe:</p>
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {[1, 2, 3, 4, 5, 6, 7].map(d => (
+                <button
+                  key={d}
+                  disabled={d === selectedDay}
+                  onClick={() => toggleTargetDay(d)}
+                  className={`p-3 rounded-xl font-black text-sm border-2 transition-all ${d === selectedDay ? 'bg-slate-50 border-slate-100 text-slate-200' : copyTargetDays.includes(d) ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-400 hover:border-emerald-200'}`}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button onClick={() => setIsCopyingDay(false)} className="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm">Anuluj</button>
+              <button 
+                onClick={handleApplyCopyDay} 
+                disabled={copyTargetDays.length === 0}
+                className="flex-1 py-3 bg-emerald-600 disabled:bg-slate-300 text-white font-bold rounded-xl text-sm shadow-lg shadow-emerald-200"
+              >
+                Kopiuj
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal Wymiany */}
       {swappingMealType && (

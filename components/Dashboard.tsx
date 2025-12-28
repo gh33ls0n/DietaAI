@@ -17,6 +17,7 @@ interface DashboardProps {
   error: string | null;
   onGenerate: () => void;
   onUpdateMeal: (day: number, mealType: string, newMeal: Meal) => void;
+  onCopyDay: (sourceDay: number, targetDays: number[]) => void;
   onUpdateProfile: (profile: UserProfile) => void;
   onAddCustomMeal: (meal: Meal) => void;
   onDeleteCustomMeal: (name: string) => void;
@@ -25,7 +26,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ 
   profile, mealPlan, allAvailableMeals, customMeals, calories, isLoading, error, 
-  onGenerate, onUpdateMeal, onUpdateProfile, onAddCustomMeal, onDeleteCustomMeal, onReset
+  onGenerate, onUpdateMeal, onCopyDay, onUpdateProfile, onAddCustomMeal, onDeleteCustomMeal, onReset
 }) => {
   const [activeTab, setActiveTab] = useState<'meals' | 'shopping' | 'inspirations' | 'settings'>('meals');
 
@@ -93,7 +94,14 @@ const Dashboard: React.FC<DashboardProps> = ({
 
           <div className="mt-2">
             {activeTab === 'meals' && mealPlan ? (
-              <MealPlanView mealPlan={mealPlan} allAvailableMeals={allAvailableMeals} onRegenerate={onGenerate} onUpdateMeal={onUpdateMeal} />
+              <MealPlanView 
+                mealPlan={mealPlan} 
+                allAvailableMeals={allAvailableMeals} 
+                onRegenerate={onGenerate} 
+                // Fix: changed handleUpdateMeal to onUpdateMeal to match prop name
+                onUpdateMeal={onUpdateMeal} 
+                onCopyDay={onCopyDay}
+              />
             ) : activeTab === 'shopping' && mealPlan ? (
               <ShoppingListView mealPlan={mealPlan} />
             ) : activeTab === 'inspirations' ? (

@@ -78,6 +78,23 @@ const App: React.FC = () => {
     setMealPlan({ days: updatedDays });
   };
 
+  const handleCopyDay = (sourceDayNum: number, targetDaysNums: number[]) => {
+    if (!mealPlan) return;
+    const sourceDay = mealPlan.days.find(d => d.day === sourceDayNum);
+    if (!sourceDay) return;
+
+    const updatedDays = mealPlan.days.map(d => {
+      if (targetDaysNums.includes(d.day)) {
+        return {
+          ...d,
+          meals: sourceDay.meals.map(m => ({ ...m }))
+        };
+      }
+      return d;
+    });
+    setMealPlan({ days: updatedDays });
+  };
+
   const handleAddCustomMeal = (meal: Meal) => {
     setCustomMeals(prev => [...prev, meal]);
   };
@@ -117,6 +134,7 @@ const App: React.FC = () => {
             error={error}
             onGenerate={handleGeneratePlan}
             onUpdateMeal={handleUpdateMeal}
+            onCopyDay={handleCopyDay}
             onUpdateProfile={handleUpdateProfile}
             onAddCustomMeal={handleAddCustomMeal}
             onDeleteCustomMeal={handleDeleteCustomMeal}
