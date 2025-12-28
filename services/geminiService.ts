@@ -1,18 +1,19 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 import { UserProfile, WeeklyPlan } from "../types";
+import { APP_NAME } from "../constants";
 
 export const generateMealPlan = async (profile: UserProfile, targetCalories: number): Promise<WeeklyPlan> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Jesteś profesjonalnym dietetykiem tworzącym plany w stylu Vitalia.pl. Stwórz jadłospis na 7 dni dla osoby o zapotrzebowaniu ${targetCalories} kcal.
+  const prompt = `Jesteś profesjonalnym dietetykiem tworzącym plany dla aplikacji ${APP_NAME}. Stwórz jadłospis na 7 dni dla osoby o zapotrzebowaniu ${targetCalories} kcal.
   
   OSTRZEŻENIE: Użytkownik nienawidzi soczewicy (LENTILS) - ABSOLUTNY ZAKAZ UŻYWANIA.
   
   ZASADY KONSTRUKCJI POSIŁKÓW:
   1. Śniadanie, II Śniadanie, Kolacja: Te posiłki MUSZĄ BYĆ KANAPKAMI (różne pieczywo: żytnie, grahams, bułki pełnoziarniste; różne dodatki: wędliny, sery, pasty jajeczne, ryby, twarożki, warzywa).
   2. WYJĄTEK NIEDZIELA: Dzień 7, śniadanie to obowiązkowo Jajecznica lub Jajka na miękko (z pieczywem).
-  3. Obiad: Jedyny ciepły, większy posiłek. Klasyki polskie w wersji fit (schab pieczony, drób, makaron, ryż z mięsem).
+  3. Obiad: Jedyny ciepły, większy posiłek. Klasyki polskie w wersji fit (schab pieczony, drób, makaron, ryż z mięsem, burgery wołowe fit, pizza fit na cienkim cieście).
   4. Podwieczorek (snack2): Lekka przekąska (jogurt, owoc, serek wiejski na słodko, orzechy).
   
   JEDNOSTKI I MIARY (BARDZO WAŻNE):

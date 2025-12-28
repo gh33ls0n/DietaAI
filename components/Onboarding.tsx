@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { UserProfile, Gender, ActivityLevel } from '../types';
-import { Icons } from '../constants';
+import { Icons, APP_NAME } from '../constants';
 
 interface OnboardingProps {
   onComplete: (profile: UserProfile) => void;
@@ -28,7 +28,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   return (
     <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
       <div className="bg-emerald-500 p-8 text-white text-center">
-        <h1 className="text-3xl font-bold mb-2">Witaj w VitaliAI</h1>
+        <h1 className="text-3xl font-bold mb-2">Witaj w {APP_NAME}</h1>
         <p className="opacity-90">Podaj kilka szczegółów, abyśmy mogli stworzyć Twój idealny jadłospis.</p>
       </div>
       

@@ -1,5 +1,5 @@
 {
-  "name": "DietaAI - Twój Inteligentny Jadłospis",
+  "name": "Dieta Gilsona - Twój Inteligentny Jadłospis",
   "description": "A comprehensive diet planning application that generates personalized 7-day meal plans and shopping lists using Gemini AI, with meal swapping capabilities.",
   "requestFramePermissions": []
 }

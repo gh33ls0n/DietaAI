@@ -1,11 +1,10 @@
 
 import React from 'react';
 
-export const APP_NAME = "DietaAI";
+export const APP_NAME = "Dieta Gilsona";
 
 /**
  * Icons object containing functional components for SVG icons.
- * Updated each icon to accept React.SVGProps<SVGSVGElement> to allow passing attributes like className.
  */
 export const Icons = {
   Apple: (props: React.SVGProps<SVGSVGElement>) => (

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { MEAL_DATABASE } from '../services/mealDatabase';
-import { Icons } from '../constants';
+import { Icons, APP_NAME } from '../constants';
 
 const InspirationsView: React.FC = () => {
   const getLabel = (type: string) => {
@@ -16,7 +16,7 @@ const InspirationsView: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Baza Posiłków</h2>
-          <p className="text-slate-500">Przeglądaj dania dostępne w DietaAI. Pamiętaj, że śniadania, II śniadania i kolacje są wymienne!</p>
+          <p className="text-slate-500">Przeglądaj dania dostępne w {APP_NAME}. Pamiętaj, że śniadania, II śniadania i kolacje są wymienne!</p>
         </div>
       </div>
 

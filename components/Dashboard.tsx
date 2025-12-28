@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { UserProfile, WeeklyPlan, Meal } from '../types';
-import { Icons } from '../constants';
+import { Icons, APP_NAME } from '../constants';
 import MealPlanView from './MealPlanView';
 import ShoppingListView from './ShoppingListView';
 import InspirationsView from './InspirationsView';
@@ -53,7 +53,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="mx-auto w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-emerald-500">
             <Icons.ChefHat />
           </div>
-          <h3 className="text-2xl font-bold text-emerald-900">Twój jadłospis DietaAI czeka</h3>
+          <h3 className="text-2xl font-bold text-emerald-900">Twój jadłospis {APP_NAME} czeka</h3>
           <p className="text-emerald-700 max-w-md mx-auto">Generujemy plan 5 posiłków dziennie zgodny z Twoimi wymaganiami.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <button 
@@ -78,7 +78,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="absolute inset-0 border-4 border-emerald-100 rounded-full"></div>
             <div className="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
-          <h3 className="text-xl font-bold text-slate-800">DietaAI przygotowuje plan...</h3>
+          <h3 className="text-xl font-bold text-slate-800">{APP_NAME} przygotowuje plan...</h3>
           <p className="text-slate-500 mt-2">To potrwa tylko chwilę.</p>
         </div>
       )}
