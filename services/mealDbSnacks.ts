@@ -2,7 +2,7 @@
 import { Meal } from "../types";
 
 export const SNACK_MEALS: Meal[] = [
-  // --- TWOJE WCZEŚNIEJSZE ---
+  // --- WCZEŚNIEJSZE BAZOWE ---
   {
     name: "Skyr z borówkami i migdałami",
     calories: 230, protein: 22, fats: 6, carbs: 24,
@@ -14,18 +14,17 @@ export const SNACK_MEALS: Meal[] = [
     recipe: "Wymieszaj wszystko w miseczce."
   },
   {
-    name: "Budyń jaglany z malinami",
-    calories: 240, protein: 8, fats: 5, carbs: 42,
+    name: "Serek wiejski z rzodkiewką i szczypiorkiem",
+    calories: 190, protein: 18, fats: 6, carbs: 12,
     type: "snack2",
     ingredients: [
-      { item: "Płatki owsiane", amount: "40g" },
-      { item: "Jogurt naturalny", amount: "100g" },
-      { item: "Maliny", amount: "50g" }
+      { item: "Serek wiejski lekki", amount: "150g" },
+      { item: "Rzodkiewka", amount: "3 szt" }
     ],
-    recipe: "Namoczone płatki owsiane wymieszaj z jogurtem i owocami."
+    recipe: "Wymieszaj posiekaną rzodkiewkę z serkiem."
   },
 
-  // --- NOWE KOKTAJLE RESPO ---
+  // --- KOKTAJLE RESPO (Strona 1-4) ---
   {
     name: "Koktajl 'Energia' (Banan, masło orzechowe, jogurt)",
     calories: 320, protein: 12, fats: 12, carbs: 45,
@@ -35,19 +34,19 @@ export const SNACK_MEALS: Meal[] = [
       { item: "Masło orzechowe", amount: "1 łyżka" },
       { item: "Jogurt naturalny", amount: "100g" }
     ],
-    recipe: "Zblenduj wszystkie składniki na gładką masę."
+    recipe: "Zblenduj na gładką masę."
   },
   {
-    name: "Zielone Smoothie 'Detoks' (Szpinak, jabłko, cytryna)",
-    calories: 180, protein: 4, fats: 2, carbs: 40,
+    name: "Zielony Koktajl z Gruszką i Pietruszką",
+    calories: 195, protein: 4, fats: 2, carbs: 42,
     type: "snack2",
     ingredients: [
-      { item: "Szpinak świeży", amount: "garść" },
-      { item: "Jabłko", amount: "1 szt" },
-      { item: "Sok z cytryny", amount: "1 łyżka" },
-      { item: "Miód", amount: "1 łyżeczka" }
+      { item: "Gruszka", amount: "1 szt" },
+      { item: "Pietruszka (natka)", amount: "1/2 pęczka" },
+      { item: "Banan", amount: "1/2 szt" },
+      { item: "Woda", amount: "100ml" }
     ],
-    recipe: "Zblenduj z odrobiną wody."
+    recipe: "Zblenduj natkę z owocami. Bogactwo witaminy C!"
   },
   {
     name: "Koktajl 'Różowa Moc' (Truskawki, burak, jabłko)",
@@ -58,10 +57,10 @@ export const SNACK_MEALS: Meal[] = [
       { item: "Burak gotowany", amount: "50g" },
       { item: "Jabłko", amount: "1 szt" }
     ],
-    recipe: "Zblenduj składniki z dodatkiem wody lub soku z cytryny."
+    recipe: "Burak i truskawki to genialne połączenie dla układu krwionośnego."
   },
   {
-    name: "Fit Snickers Shake (Banan, kakao, fistaszki)",
+    name: "Fit Snickers Shake",
     calories: 340, protein: 10, fats: 14, carbs: 48,
     type: "snack2",
     ingredients: [
@@ -70,10 +69,10 @@ export const SNACK_MEALS: Meal[] = [
       { item: "Masło orzechowe", amount: "1 łyżeczka" },
       { item: "Mleko 2%", amount: "150ml" }
     ],
-    recipe: "Zblenduj na wysokich obrotach."
+    recipe: "Zblenduj. Smakuje jak znany baton, a jest fit."
   },
   {
-    name: "Koktajl Mango Lassi Fit",
+    name: "Koktajl Mango Lassi Light",
     calories: 260, protein: 12, fats: 4, carbs: 45,
     type: "snack2",
     ingredients: [
@@ -81,18 +80,18 @@ export const SNACK_MEALS: Meal[] = [
       { item: "Skyr naturalny", amount: "100g" },
       { item: "Miód", amount: "1/2 łyżeczki" }
     ],
-    recipe: "Mango zblenduj ze skyrem. Możesz dodać szczyptę kardamonu."
+    recipe: "Zblenduj mango ze skyrem. Możesz dodać szczyptę kardamonu."
   },
   {
-    name: "Smoothie Jagodowe z Nasionami Chia",
-    calories: 230, protein: 8, fats: 6, carbs: 38,
+    name: "Zielona Moc 'Kiwi-Jarmuż'",
+    calories: 185, protein: 4, fats: 1, carbs: 44,
     type: "snack2",
     ingredients: [
-      { item: "Borówki", amount: "100g" },
-      { item: "Nasiona Chia", amount: "1 łyżka" },
-      { item: "Napój migdałowy", amount: "200ml" }
+      { item: "Kiwi", amount: "2 szt" },
+      { item: "Jarmuż", amount: "garść" },
+      { item: "Jabłko", amount: "1/2 szt" }
     ],
-    recipe: "Chia namocz wcześniej lub zblenduj od razu z owocami i napojem."
+    recipe: "Orzeźwiający, lekko kwaśny koktajl oczyszczający."
   },
   {
     name: "Koktajl 'Szarlotka' (Jabłko, płatki, cynamon)",
@@ -101,42 +100,198 @@ export const SNACK_MEALS: Meal[] = [
     ingredients: [
       { item: "Jabłko", amount: "1 szt" },
       { item: "Płatki owsiane", amount: "2 łyżki" },
-      { item: "Jogurt naturalny", amount: "100g" }
+      { item: "Jogurt naturalny", amount: "100g" },
+      { item: "Cynamon", amount: "szczypta" }
     ],
-    recipe: "Jabłko zblenduj z płatkami i dużą ilością cynamonu."
+    recipe: "Gęsty i sycący koktajl o smaku ciasta z jabłkami."
   },
   {
-    name: "Zielona Moc 'Jarmuż-Ananas'",
-    calories: 210, protein: 4, fats: 1, carbs: 50,
+    name: "Smoothie 'Antyoksydant' (Jagody, chia, napój migdałowy)",
+    calories: 230, protein: 7, fats: 8, carbs: 36,
     type: "snack2",
     ingredients: [
-      { item: "Ananas", amount: "100g" },
-      { item: "Jarmuż", amount: "garść" },
-      { item: "Banan", amount: "1/2 szt" }
+      { item: "Borówki", amount: "100g" },
+      { item: "Nasiona Chia", amount: "1 łyżka" },
+      { item: "Napój migdałowy", amount: "200ml" }
     ],
-    recipe: "Zblenduj z wodą kokosową lub zwykłą wodą."
+    recipe: "Zblenduj. Chia doda kwasów Omega-3."
   },
   {
-    name: "Czekoladowa Wiśnia Fit Shake",
-    calories: 250, protein: 18, fats: 5, carbs: 38,
+    name: "Koktajl 'Złote Mleko' (Pomarańcza, kurkuma, imbir)",
+    calories: 160, protein: 3, fats: 1, carbs: 38,
+    type: "snack2",
+    ingredients: [
+      { item: "Pomarańcza", amount: "1 szt" },
+      { item: "Imbir świeży", amount: "1 cm" },
+      { item: "Banan", amount: "1/2 szt" }
+    ],
+    recipe: "Koktajl odpornościowy. Dodaj szczyptę kurkumy przed blendowaniem."
+  },
+  {
+    name: "Czekoladowy Shake z Twarogiem i Maliniami",
+    calories: 290, protein: 24, fats: 6, carbs: 38,
     type: "snack2",
     ingredients: [
       { item: "Maliny", amount: "100g" },
-      { item: "Kakao", amount: "1 łyżka" },
-      { item: "Twaróg chudy", amount: "50g" },
-      { item: "Mleko 2%", amount: "100ml" }
+      { item: "Twaróg chudy", amount: "80g" },
+      { item: "Mleko 2%", amount: "100ml" },
+      { item: "Kakao", amount: "1 łyżka" }
     ],
-    recipe: "Twaróg nada koktajlowi kremową konsystencję i dużo białka."
+    recipe: "Wysokobiałkowy shake o konsystencji musu."
   },
   {
-    name: "Tropikalne Odświeżenie (Mango, Kokos)",
-    calories: 270, protein: 3, fats: 14, carbs: 36,
+    name: "Smoothie 'Tropikalny Raj' (Ananas, kokos)",
+    calories: 275, protein: 3, fats: 12, carbs: 42,
     type: "snack2",
     ingredients: [
-      { item: "Mango", amount: "100g" },
-      { item: "Napój migdałowy", amount: "150ml" },
+      { item: "Ananas", amount: "150g" },
+      { item: "Napój owsiany", amount: "150ml" },
       { item: "Wiórki kokosowe", amount: "1 łyżka" }
     ],
-    recipe: "Idealny na upalne dni. Zblenduj z lodem."
+    recipe: "Słodki i egzotyczny. Idealny na drugie śniadanie lub deser."
+  },
+  {
+    name: "Shake 'Kawowy Budzik'",
+    calories: 210, protein: 18, fats: 4, carbs: 28,
+    type: "snack2",
+    ingredients: [
+      { item: "Skyr naturalny", amount: "100g" },
+      { item: "Banan", amount: "1/2 szt" },
+      { item: "Kawa espresso", amount: "30ml" }
+    ],
+    recipe: "Zblenduj kawę z bananem i skyrem. Energia od rana!"
+  },
+  {
+    name: "Smoothie z Brzoskwini i Migdałów",
+    calories: 245, protein: 6, fats: 10, carbs: 36,
+    type: "snack2",
+    ingredients: [
+      { item: "Brzoskwinia", amount: "1 szt" },
+      { item: "Napój migdałowy", amount: "200ml" },
+      { item: "Masło orzechowe", amount: "1 łyżeczka" }
+    ],
+    recipe: "Aksamitne smoothie o delikatnym smaku."
+  },
+  {
+    name: "Zielone Smoothie 'Oczyszczenie' (Szpinak, ogórek, cytryna)",
+    calories: 140, protein: 4, fats: 1, carbs: 32,
+    type: "snack2",
+    ingredients: [
+      { item: "Szpinak świeży", amount: "garść" },
+      { item: "Ogórek", amount: "1/2 szt" },
+      { item: "Jabłko", amount: "1 szt" },
+      { item: "Sok z cytryny", amount: "2 łyżki" }
+    ],
+    recipe: "Najlżejszy z koktajli, świetnie nawadnia."
+  },
+  {
+    name: "Koktajl 'Bounty' Fit (Kakao, kokos, banan)",
+    calories: 310, protein: 5, fats: 14, carbs: 46,
+    type: "snack2",
+    ingredients: [
+      { item: "Banan", amount: "1 szt" },
+      { item: "Wiórki kokosowe", amount: "2 łyżki" },
+      { item: "Kakao", amount: "1 łyżeczka" },
+      { item: "Woda", amount: "100ml" }
+    ],
+    recipe: "Smakuje jak deser, dostarcza dobrych tłuszczy."
+  },
+  {
+    name: "Smoothie 'Zimowe' (Pomarańcza, banan, imbir)",
+    calories: 195, protein: 3, fats: 1, carbs: 48,
+    type: "snack2",
+    ingredients: [
+      { item: "Pomarańcza", amount: "1 szt" },
+      { item: "Banan", amount: "1/2 szt" },
+      { item: "Imbir świeży", amount: "1 cm" }
+    ],
+    recipe: "Rozgrzewające i pełne witaminy C."
+  },
+  {
+    name: "Shake 'Jagodowy Sernik'",
+    calories: 260, protein: 22, fats: 4, carbs: 38,
+    type: "snack2",
+    ingredients: [
+      { item: "Borówki", amount: "80g" },
+      { item: "Twaróg chudy", amount: "100g" },
+      { item: "Jogurt naturalny", amount: "50g" }
+    ],
+    recipe: "Bardzo gęsty, można jeść łyżeczką jak deser."
+  },
+  {
+    name: "Koktajl 'Letnie Orzeźwienie' (Arbuz, mięta, limonka)",
+    calories: 120, protein: 2, fats: 1, carbs: 30,
+    type: "snack2",
+    ingredients: [
+      { item: "Jabłko", amount: "1 szt" },
+      { item: "Sok z cytryny", amount: "2 łyżki" }
+    ],
+    recipe: "Lekka baza owocowa z dużą ilością świeżej mięty."
+  },
+  {
+    name: "Smoothie 'Aksamitne Awokado'",
+    calories: 290, protein: 5, fats: 18, carbs: 34,
+    type: "snack2",
+    ingredients: [
+      { item: "Awokado", amount: "1/2 szt" },
+      { item: "Banan", amount: "1/2 szt" },
+      { item: "Napój sojowy", amount: "150ml" }
+    ],
+    recipe: "Kremowe, sycące, bogate w zdrowe kwasy tłuszczowe."
+  },
+  {
+    name: "Koktajl 'Dynia & Jabłko' (Smak Jesieni)",
+    calories: 220, protein: 4, fats: 2, carbs: 50,
+    type: "snack2",
+    ingredients: [
+      { item: "Jabłko", amount: "1 szt" },
+      { item: "Marchew", amount: "100g" },
+      { item: "Cynamon", amount: "1 łyżeczka" }
+    ],
+    recipe: "Słodki koktajl warzywno-owocowy z korzenną nutą."
+  },
+  {
+    name: "Smoothie z Kiwi i Mango",
+    calories: 190, protein: 3, fats: 1, carbs: 46,
+    type: "snack2",
+    ingredients: [
+      { item: "Kiwi", amount: "1 szt" },
+      { item: "Mango", amount: "80g" },
+      { item: "Woda kokosowa", amount: "150ml" }
+    ],
+    recipe: "Egzotyczna bomba witaminowa."
+  },
+  {
+    name: "Shake 'Moc Daktyli' (Banan, daktyle, orzechy)",
+    calories: 360, protein: 8, fats: 12, carbs: 62,
+    type: "snack2",
+    ingredients: [
+      { item: "Banan", amount: "1 szt" },
+      { item: "Daktyle suszone", amount: "2 szt" },
+      { item: "Napój migdałowy", amount: "200ml" }
+    ],
+    recipe: "Bardzo słodki, naturalnie energetyczny przed treningiem."
+  },
+  {
+    name: "Koktajl 'Zielona Gruszka'",
+    calories: 175, protein: 3, fats: 1, carbs: 42,
+    type: "snack2",
+    ingredients: [
+      { item: "Gruszka", amount: "1 szt" },
+      { item: "Szpinak świeży", amount: "garść" },
+      { item: "Napój owsiany", amount: "100ml" }
+    ],
+    recipe: "Delikatny, kremowy koktajl o stonowanym smaku."
+  },
+  {
+    name: "Smoothie 'Burak & Malina'",
+    calories: 180, protein: 4, fats: 1, carbs: 42,
+    type: "snack2",
+    ingredients: [
+      { item: "Maliny", amount: "100g" },
+      { item: "Burak gotowany", amount: "50g" },
+      { item: "Sok z cytryny", amount: "1 łyżka" }
+    ],
+    recipe: "Piękny kolor i niesamowity smak malin przełamany burakiem."
   }
 ];
