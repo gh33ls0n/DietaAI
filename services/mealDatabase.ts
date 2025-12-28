@@ -24,10 +24,9 @@ export const MEAL_DATABASE: Meal[] = [
       { item: "Jajko (rozmiar L)", amount: "2 szt" },
       { item: "Pomidor", amount: "200g" },
       { item: "Cebula biała", amount: "30g" },
-      { item: "Oliwa z oliwek", amount: "1 łyżeczka" },
-      { item: "Czosnek", amount: "1 ząbek" }
+      { item: "Oliwa z oliwek", amount: "1 łyżeczka" }
     ],
-    recipe: "Na patelni zeszklij cebulę i czosnek. Dodaj pomidory, smaż aż zmiękną, wbij jajka i duś pod przykryciem."
+    recipe: "Zeszklij cebulę, dodaj pomidory, smaż aż zmiękną. Wbij jajka i duś pod przykryciem."
   },
   {
     name: "Fit Placuszki z jabłkiem i cynamonem",
@@ -35,132 +34,129 @@ export const MEAL_DATABASE: Meal[] = [
     type: "breakfast",
     ingredients: [
       { item: "Jabłko", amount: "150g" },
-      { item: "Jajko (rozmiar L)", amount: "1 szt" },
+      { item: "Jajko", amount: "1 szt" },
       { item: "Skyr naturalny", amount: "50g" },
       { item: "Mąka pełnoziarnista", amount: "3 łyżki" }
     ],
-    recipe: "Jabłko zetrzyj, wymieszaj z jajkiem, skyrem i mąką. Smaż na suchej patelni."
+    recipe: "Jabłko zetrzyj, wymieszaj z resztą. Smaż na suchej patelni."
   },
+
+  // --- NOWOŚCI RESPO (STRONY 1-12) ---
   {
-    name: "Pasta jajeczna ze szczypiorkiem",
-    calories: 340, protein: 19, fats: 22, carbs: 14,
+    name: "Kanapka z pastą z tuńczyka i kukurydzy",
+    calories: 340, protein: 28, fats: 8, carbs: 42,
     type: "breakfast",
     ingredients: [
-      { item: "Jajko (rozmiar L)", amount: "2 szt" },
-      { item: "Jogurt naturalny", amount: "1 łyżka" },
-      { item: "Szczypiorek", amount: "2 łyżki" }
+      { item: "Chleb graham", amount: "2 kromki" },
+      { item: "Tuńczyk (puszka w sosie wł.)", amount: "80g" },
+      { item: "Kukurydza konserwowa", amount: "2 łyżki" },
+      { item: "Jogurt naturalny", amount: "1 łyżka" }
     ],
-    recipe: "Jajka ugotuj, posiekaj i wymieszaj z jogurtem oraz szczypiorkiem. Podawaj z chlebem żytnim."
+    recipe: "Tuńczyka wymieszaj z kukurydzą i jogurtem. Dopraw pieprzem. Nałóż na chleb."
   },
   {
-    name: "Grzanki z awokado i jajkiem sadzonym",
-    calories: 420, protein: 16, fats: 22, carbs: 38,
+    name: "Kanapka z pastą z białej fasoli i suszonymi pomidorami",
+    calories: 380, protein: 16, fats: 14, carbs: 52,
+    type: "dinner",
+    ingredients: [
+      { item: "Chleb żytni pełnoziarnisty", amount: "2 kromki" },
+      { item: "Fasola biała (puszka)", amount: "100g" },
+      { item: "Pomidory suszone (odsączone)", amount: "3 szt" },
+      { item: "Czosnek", amount: "1/2 ząbka" }
+    ],
+    recipe: "Fasolę zblenduj z suszonymi pomidorami i czosnkiem. Posmaruj pieczywo."
+  },
+  {
+    name: "Kanapka Caprese z zielonym pesto",
+    calories: 390, protein: 20, fats: 18, carbs: 44,
+    type: "breakfast",
+    ingredients: [
+      { item: "Chleb graham", amount: "2 kromki" },
+      { item: "Ser Mozzarella Light", amount: "60g" },
+      { item: "Pomidor", amount: "1 szt" },
+      { item: "Pesto zielone", amount: "1 łyżeczka" }
+    ],
+    recipe: "Chleb posmaruj pesto. Ułóż plastry mozzarelli i pomidora."
+  },
+  {
+    name: "Kanapka na słodko: Twarożek z dżemem truskawkowym",
+    calories: 310, protein: 24, fats: 3, carbs: 48,
+    type: "snack1",
+    ingredients: [
+      { item: "Chleb żytni pełnoziarnisty", amount: "2 kromki" },
+      { item: "Twaróg chudy", amount: "100g" },
+      { item: "Jogurt naturalny", amount: "1 łyżka" },
+      { item: "Dżem truskawkowy (niskosłodzony)", amount: "2 łyżeczki" }
+    ],
+    recipe: "Twaróg wymieszaj z jogurtem na gładką masę. Posmaruj chleb, na wierzch dodaj dżem."
+  },
+  {
+    name: "Kanapka PB&J Fit (Masło orzechowe i dżem)",
+    calories: 420, protein: 14, fats: 18, carbs: 56,
+    type: "breakfast",
+    ingredients: [
+      { item: "Chleb graham", amount: "2 kromki" },
+      { item: "Masło orzechowe", amount: "1.5 łyżki" },
+      { item: "Dżem truskawkowy (niskosłodzony)", amount: "1 łyżka" }
+    ],
+    recipe: "Jedną kromkę posmaruj masłem orzechowym, drugą dżemem. Złóż razem."
+  },
+  {
+    name: "Kanapka z jajkiem, majonezem light i kiełkami",
+    calories: 350, protein: 18, fats: 16, carbs: 38,
+    type: "breakfast",
+    ingredients: [
+      { item: "Chleb żytni pełnoziarnisty", amount: "2 kromki" },
+      { item: "Jajko (rozmiar L)", amount: "1 szt" },
+      { item: "Majonez Light", amount: "1 łyżeczka" },
+      { item: "Kiełki rzodkiewki", amount: "garść" }
+    ],
+    recipe: "Jajko ugotuj na twardo. Chleb posmaruj majonezem, ułóż plastry jajka i posyp kiełkami."
+  },
+  {
+    name: "Kanapka z serem Camembert Light i żurawiną",
+    calories: 380, protein: 22, fats: 14, carbs: 45,
+    type: "dinner",
+    ingredients: [
+      { item: "Chleb graham", amount: "2 kromki" },
+      { item: "Ser Camembert Light", amount: "60g" },
+      { item: "Rukola", amount: "garść" }
+    ],
+    recipe: "Na chlebie ułóż rukolę, plastry camemberta i odrobinę żurawiny (lub dżemu)."
+  },
+  {
+    name: "Pasta z awokado (Guacamole) i jajko",
+    calories: 410, protein: 16, fats: 22, carbs: 38,
     type: "breakfast",
     ingredients: [
       { item: "Chleb żytni", amount: "2 kromki" },
       { item: "Awokado", amount: "1/2 szt" },
       { item: "Jajko", amount: "1 szt" }
     ],
-    recipe: "Awokado rozgnieć na chlebie, połóż usmażone jajko."
-  },
-  {
-    name: "Fit Kluski leniwe z jogurtem",
-    calories: 410, protein: 25, fats: 8, carbs: 55,
-    type: "breakfast",
-    ingredients: [
-      { item: "Twaróg chudy", amount: "200g" },
-      { item: "Jajko (rozmiar L)", amount: "1 szt" },
-      { item: "Mąka pełnoziarnista", amount: "4 łyżki" }
-    ],
-    recipe: "Zagnieć twaróg z jajkiem i mąką. Gotuj 2 min od wypłynięcia."
-  },
-
-  // --- NOWOŚCI RESPO (Śniadania / Kolacje) ---
-  {
-    name: "Kanapka z hummusem i pieczoną papryką",
-    calories: 390, protein: 14, fats: 16, carbs: 48,
-    type: "breakfast",
-    ingredients: [
-      { item: "Chleb żytni pełnoziarnisty", amount: "2 kromki" },
-      { item: "Hummus", amount: "3 łyżki" },
-      { item: "Papryka czerwona", amount: "100g" },
-      { item: "Rukola", amount: "garść" }
-    ],
-    recipe: "Paprykę upiecz w piekarniku (można użyć też świeżej). Chleb posmaruj hummusem, połóż rukolę i paprykę."
-  },
-  {
-    name: "Kanapka Caprese Fit",
-    calories: 370, protein: 22, fats: 14, carbs: 42,
-    type: "dinner",
-    ingredients: [
-      { item: "Chleb graham", amount: "2 kromki" },
-      { item: "Ser Mozzarella Light", amount: "60g" },
-      { item: "Pomidor", amount: "1 szt" },
-      { item: "Bazylia świeża", amount: "kilka liści" }
-    ],
-    recipe: "Chleb obłóż plastrami mozzarelli i pomidora. Posyp świeżą bazylią."
+    recipe: "Awokado rozgnieć z sokiem z cytryny i czosnkiem. Połóż na chlebie z jajkiem sadzonym."
   },
   {
     name: "Kanapka z wędzonym pstrągiem i ogórkiem",
-    calories: 350, protein: 26, fats: 10, carbs: 38,
+    calories: 330, protein: 26, fats: 8, carbs: 36,
     type: "dinner",
     ingredients: [
       { item: "Chleb żytni", amount: "2 kromki" },
       { item: "Pstrąg wędzony", amount: "60g" },
-      { item: "Ogórek", amount: "1/2 szt" },
-      { item: "Szczypiorek", amount: "1 łyżka" }
+      { item: "Ogórek", amount: "1/2 szt" }
     ],
-    recipe: "Rybę rozdrobnij widelcem, ułóż na pieczywie z plastrami ogórka i szczypiorkiem."
-  },
-  {
-    name: "Kanapka na słodko z masłem orzechowym i bananem",
-    calories: 410, protein: 12, fats: 18, carbs: 54,
-    type: "breakfast",
-    ingredients: [
-      { item: "Chleb graham", amount: "2 kromki" },
-      { item: "Masło orzechowe", amount: "1.5 łyżki" },
-      { item: "Banan", amount: "1/2 szt" }
-    ],
-    recipe: "Pieczywo posmaruj masłem orzechowym, ułóż plastry banana."
-  },
-  {
-    name: "Kanapka z jajkiem sadzonym i szpinakiem",
-    calories: 380, protein: 18, fats: 16, carbs: 40,
-    type: "breakfast",
-    ingredients: [
-      { item: "Chleb żytni", amount: "2 kromki" },
-      { item: "Jajko (rozmiar L)", amount: "1 szt" },
-      { item: "Szpinak świeży", amount: "garść" },
-      { item: "Oliwa z oliwek", amount: "1 łyżeczka" }
-    ],
-    recipe: "Szpinak podduś na oliwie z czosnkiem. Jajko usmaż sadzone. Nałóż szpinak i jajko na chleb."
-  },
-  {
-    name: "Twarożek z rzodkiewką i szczypiorkiem (Respo)",
-    calories: 320, protein: 24, fats: 8, carbs: 36,
-    type: "dinner",
-    ingredients: [
-      { item: "Twaróg chudy", amount: "150g" },
-      { item: "Jogurt naturalny", amount: "2 łyżki" },
-      { item: "Rzodkiewka", amount: "4 szt" },
-      { item: "Szczypiorek", amount: "2 łyżki" },
-      { item: "Chleb graham", amount: "1 kromka" }
-    ],
-    recipe: "Twaróg wymieszaj z jogurtem, posiekaną rzodkiewką i szczypiorkiem. Zjedz z pieczywem."
+    recipe: "Rybę rozdrobnij, wymieszaj ze szczypiorkiem. Nałóż na pieczywo z plastrami ogórka."
   },
 
-  // --- OBIADY (lunch) ---
+  // --- OBIADY (lunch - ZACHOWANE WCZEŚNIEJSZE) ---
   {
     name: "Burger Wołowy Fit z batatami",
     calories: 580, protein: 38, fats: 18, carbs: 65,
     type: "lunch",
     ingredients: [
       { item: "Wołowina mielona chuda", amount: "150g" },
-      { item: "Bułka do burgera pełnoziarnista", amount: "1 szt" },
-      { item: "Bataty", amount: "150g" },
-      { item: "Sałata lodowa", amount: "2 liście" }
+      { item: "Bataty", amount: "150g" }
     ],
-    recipe: "Mięso grilluj bez tłuszczu. Bataty upiecz w 200st. Złóż burgera z warzywami i ketchupem bez cukru."
+    recipe: "Mięso grilluj. Bataty upiecz. Podawaj w bułce pełnoziarnistej z warzywami."
   },
   {
     name: "Pizza Fit na cienkim cieście",
@@ -168,11 +164,9 @@ export const MEAL_DATABASE: Meal[] = [
     type: "lunch",
     ingredients: [
       { item: "Mąka pełnoziarnista", amount: "80g" },
-      { item: "Ser Mozzarella Light", amount: "60g" },
-      { item: "Passata pomidorowa", amount: "50ml" },
-      { item: "Szynka drobiowa", amount: "3 plastry" }
+      { item: "Ser Mozzarella Light", amount: "60g" }
     ],
-    recipe: "Zrób ciasto z mąki i wody. Rozwałkuj cienko, nałóż passatę, ser i szynkę. Piecz 10 min w 220st."
+    recipe: "Zrób spód z mąki i wody. Piecz z dodatkami 10 min w 220st."
   },
   {
     name: "Pulpety z indyka w sosie koperkowym",
@@ -180,10 +174,9 @@ export const MEAL_DATABASE: Meal[] = [
     type: "lunch",
     ingredients: [
       { item: "Pierś z indyka", amount: "150g" },
-      { item: "Ziemniaki", amount: "200g" },
-      { item: "Koper świeży", amount: "1/2 pęczka" }
+      { item: "Ziemniaki", amount: "200g" }
     ],
-    recipe: "Uformuj pulpety, gotuj w wywarze. Dodaj jogurt i koper do sosu. Podawaj z ziemniakami."
+    recipe: "Pulpety ugotuj w wywarze. Sos zrób na bazie jogurtu i kopru."
   },
   {
     name: "Ryba po grecku w wersji lekkiej",
@@ -191,8 +184,7 @@ export const MEAL_DATABASE: Meal[] = [
     type: "lunch",
     ingredients: [
       { item: "Dorsz świeży", amount: "150g" },
-      { item: "Marchew", amount: "100g" },
-      { item: "Passata pomidorowa", amount: "100ml" }
+      { item: "Marchew", amount: "100g" }
     ],
     recipe: "Rybę upiecz. Warzywa zetrzyj i podduś z passatą. Przykryj rybę warzywami."
   },
@@ -202,10 +194,9 @@ export const MEAL_DATABASE: Meal[] = [
     type: "lunch",
     ingredients: [
       { item: "Mięso mielone z indyka", amount: "120g" },
-      { item: "Kapusta pekińska", amount: "150g" },
       { item: "Ryż brązowy (suchy)", amount: "50g" }
     ],
-    recipe: "Wymieszaj mięso, ryż i posiekaną kapustę. Uformuj kotlety i piecz w sosie pomidorowym."
+    recipe: "Wymieszaj składniki, uformuj kotlety i piecz w sosie pomidorowym."
   },
   {
     name: "Gulasz z indyka z papryką",
@@ -213,54 +204,9 @@ export const MEAL_DATABASE: Meal[] = [
     type: "lunch",
     ingredients: [
       { item: "Pierś z indyka", amount: "150g" },
-      { item: "Papryka czerwona", amount: "100g" },
       { item: "Kasza gryczana (sucha)", amount: "60g" }
     ],
-    recipe: "Indyka i paprykę podduś na łyżeczce oliwy. Podawaj z ugotowaną kaszą."
-  },
-  {
-    name: "Zapiekanka z brokułem i kurczakiem",
-    calories: 530, protein: 38, fats: 15, carbs: 62,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "120g" },
-      { item: "Makaron pełnoziarnisty", amount: "70g" },
-      { item: "Brokuły", amount: "150g" }
-    ],
-    recipe: "Makaron i brokuł ugotuj. Wymieszaj z kurczakiem i jogurtem. Zapiekaj 15 min."
-  },
-  {
-    name: "Spaghetti Bolognese z indykiem",
-    calories: 540, protein: 32, fats: 14, carbs: 65,
-    type: "lunch",
-    ingredients: [
-      { item: "Makaron spaghetti pełnoziarnisty", amount: "70g" },
-      { item: "Mięso mielone z indyka", amount: "120g" },
-      { item: "Passata pomidorowa", amount: "150ml" }
-    ],
-    recipe: "Mięso podsmaż z czosnkiem, dodaj passatę. Wymieszaj z makaronem."
-  },
-  {
-    name: "Kotlety mielone z indyka z purée",
-    calories: 515, protein: 34, fats: 15, carbs: 56,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z indyka", amount: "120g" },
-      { item: "Ziemniaki", amount: "200g" },
-      { item: "Buraczki tarte", amount: "100g" }
-    ],
-    recipe: "Uformuj kotlety i upiecz. Podawaj z purée ziemniaczanym i buraczkami."
-  },
-  {
-    name: "Pieczona dorada z cytryną",
-    calories: 460, protein: 32, fats: 18, carbs: 42,
-    type: "lunch",
-    ingredients: [
-      { item: "Dorada (świeża)", amount: "150g" },
-      { item: "Ziemniaki", amount: "150g" },
-      { item: "Pomidorki koktajlowe", amount: "100g" }
-    ],
-    recipe: "Rybę upiecz z cytryną i ziołami. Podawaj z ziemniakami."
+    recipe: "Indyka i paprykę duś w małej ilości wody. Podawaj z kaszą."
   },
   {
     name: "Schab pieczony z rozmarynem",
@@ -268,75 +214,31 @@ export const MEAL_DATABASE: Meal[] = [
     type: "lunch",
     ingredients: [
       { item: "Schab bez kości", amount: "130g" },
-      { item: "Ziemniaki", amount: "150g" },
-      { item: "Marchew", amount: "100g" }
+      { item: "Ziemniaki", amount: "150g" }
     ],
-    recipe: "Upiecz schab z warzywami w naczyniu żaroodpornym."
+    recipe: "Upiecz schab z ziemniakami i marchewką w naczyniu żaroodpornym."
   },
 
-  // --- PODWIECZORKI (snack2 - wszystkie 7 opcji) ---
+  // --- PODWIECZORKI (snack2) ---
   {
     name: "Skyr z borówkami i migdałami",
     calories: 230, protein: 22, fats: 6, carbs: 24,
     type: "snack2",
     ingredients: [
       { item: "Skyr naturalny", amount: "150g" },
-      { item: "Borówki", amount: "garść" },
-      { item: "Migdały", amount: "10 szt" }
+      { item: "Borówki", amount: "garść" }
     ],
-    recipe: "Wymieszaj składniki w miseczce."
+    recipe: "Wymieszaj i zjedz."
   },
   {
     name: "Budyń jaglany z malinami",
     calories: 240, protein: 8, fats: 5, carbs: 42,
     type: "snack2",
     ingredients: [
-      { item: "Kasza jaglana", amount: "40g" },
       { item: "Mleko 2%", amount: "100ml" },
       { item: "Maliny", amount: "50g" }
     ],
-    recipe: "Kaszę ugotuj, zblenduj z mlekiem i owocami."
-  },
-  {
-    name: "Serek wiejski z rzodkiewką",
-    calories: 190, protein: 18, fats: 6, carbs: 12,
-    type: "snack2",
-    ingredients: [
-      { item: "Serek wiejski lekki", amount: "150g" },
-      { item: "Rzodkiewka", amount: "3 szt" }
-    ],
-    recipe: "Wymieszaj rzodkiewkę z serkiem."
-  },
-  {
-    name: "Bananowe placuszki (2 składniki)",
-    calories: 260, protein: 12, fats: 10, carbs: 32,
-    type: "snack2",
-    ingredients: [
-      { item: "Banan", amount: "1 szt" },
-      { item: "Jajko (rozmiar L)", amount: "1 szt" }
-    ],
-    recipe: "Rozgnieć banana, wymieszaj z jajkiem, smaż na suchej patelni."
-  },
-  {
-    name: "Marchewka w słupkach z hummusem",
-    calories: 210, protein: 7, fats: 11, carbs: 22,
-    type: "snack2",
-    ingredients: [
-      { item: "Marchew", amount: "150g" },
-      { item: "Hummus", amount: "3 łyżki" }
-    ],
-    recipe: "Marchewkę pokrój, maczaj w hummusie."
-  },
-  {
-    name: "Koktajl truskawkowy z owsem",
-    calories: 220, protein: 10, fats: 4, carbs: 38,
-    type: "snack2",
-    ingredients: [
-      { item: "Truskawki", amount: "100g" },
-      { item: "Jogurt naturalny", amount: "150g" },
-      { item: "Płatki owsiane", amount: "2 łyżki" }
-    ],
-    recipe: "Zblenduj wszystkie składniki."
+    recipe: "Zblenduj ugotowaną kaszę jaglaną z mlekiem i owocami."
   },
   {
     name: "Garść orzechów i jabłko",
@@ -346,30 +248,6 @@ export const MEAL_DATABASE: Meal[] = [
       { item: "Orzechy włoskie", amount: "30g" },
       { item: "Jabłko", amount: "1 szt" }
     ],
-    recipe: "Szybka i zdrowa przekąska."
-  },
-
-  // --- KOLACJE (dinner / extra) ---
-  {
-    name: "Sałatka z tuńczykiem i jajkiem",
-    calories: 310, protein: 28, fats: 12, carbs: 18,
-    type: "dinner",
-    ingredients: [
-      { item: "Tuńczyk (puszka)", amount: "100g" },
-      { item: "Jajko (rozmiar L)", amount: "1 szt" },
-      { item: "Mix sałat", amount: "garść" }
-    ],
-    recipe: "Wymieszaj składniki, dopraw sokiem z cytryny."
-  },
-  {
-    name: "Sałatka jarzynowa fit",
-    calories: 280, protein: 12, fats: 8, carbs: 38,
-    type: "dinner",
-    ingredients: [
-      { item: "Marchew", amount: "100g" },
-      { item: "Ziemniaki", amount: "100g" },
-      { item: "Jogurt naturalny", amount: "2 łyżki" }
-    ],
-    recipe: "Warzywa ugotuj, pokrój w kostkę i wymieszaj z jogurtem."
+    recipe: "Szybka przekąska."
   }
 ];
