@@ -4,285 +4,231 @@ import { Meal } from "../types";
 export const LUNCH_MEALS: Meal[] = [
   // --- KURCZAK (CHICKEN) ---
   {
-    name: "Kurczak w sosie słodko-kwaśnym z ananasem",
-    calories: 520, protein: 35, fats: 12, carbs: 68,
+    name: "Kurczak w sosie pomidorowym z bazylią i makaronem",
+    calories: 510, protein: 38, fats: 12, carbs: 62,
     type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "150g" },
-      { item: "Ananas", amount: "100g" },
-      { item: "Ryż basmati", amount: "60g" },
-      { item: "Papryka czerwona", amount: "80g" }
-    ],
-    recipe: "Kurczaka i warzywa podsmaż. Dodaj ananasa i sos z octu ryżowego, miodu i koncentratu. Podawaj z ryżem."
+    ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }, { item: "Makaron pełnoziarnisty (suchy)", amount: "60g" }, { item: "Passata pomidorowa", amount: "150ml" }],
+    recipe: "Kurczaka podsmaż, dodaj passatę i czosnek. Gotuj 10 min. Wymieszaj z makaronem."
   },
   {
-    name: "Kurczak Caprese zapiekany z mozzarellą",
-    calories: 480, protein: 42, fats: 18, carbs: 38,
+    name: "Indyk z warzywami na parze i kaszą gryczaną",
+    calories: 460, protein: 35, fats: 8, carbs: 58,
     type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "160g" },
-      { item: "Ser Mozzarella Light", amount: "40g" },
-      { item: "Pomidor", amount: "100g" },
-      { item: "Pesto zielone", amount: "15g" }
-    ],
-    recipe: "Kurczaka nacinij, włóż plastry mozzarelli i pomidora. Piecz 25 min w 180st. Podawaj z lekką sałatką."
+    ingredients: [{ item: "Pierś z indyka", amount: "140g" }, { item: "Kasza gryczana (sucha)", amount: "50g" }, { item: "Brokuły", amount: "150g" }],
+    recipe: "Indyka i brokuły ugotuj na parze. Podawaj z kaszą gryczaną."
+  },
+  {
+    name: "Potrawka z kurczaka z marchewką i groszkiem",
+    calories: 490, protein: 34, fats: 14, carbs: 55,
+    type: "lunch",
+    ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }, { item: "Ryż brązowy (suchy)", amount: "50g" }, { item: "Groszek zielony", amount: "50g" }, { item: "Marchew", amount: "100g" }],
+    recipe: "Mięso i warzywa duś w bulionie. Zagęść jogurtem. Podawaj z ryżem."
+  },
+  {
+    name: "Kurczak curry z papryką i ryżem basmati",
+    calories: 530, protein: 36, fats: 18, carbs: 58,
+    type: "lunch",
+    ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }, { item: "Ryż basmati (suchy)", amount: "60g" }, { item: "Mleczko kokosowe Light", amount: "50ml" }, { item: "Papryka czerwona", amount: "100g" }],
+    recipe: "Kurczaka i paprykę podsmaż z curry. Zalej mleczkiem, duś 5 min. Podawaj z ryżem."
+  },
+  {
+    name: "Siekane kotleciki z indyka z cukinią",
+    calories: 470, protein: 32, fats: 15, carbs: 48,
+    type: "lunch",
+    ingredients: [{ item: "Mięso mielone z indyka", amount: "150g" }, { item: "Cukinia", amount: "150g" }, { item: "Ziemniaki", amount: "150g" }],
+    recipe: "Zetrzyj cukinię, wymieszaj z mięsem i jajkiem. Smaż placki. Podawaj z ziemniakami."
+  },
+  {
+    name: "Piersi z kurczaka faszerowane szpinakiem",
+    calories: 510, protein: 42, fats: 18, carbs: 42,
+    type: "lunch",
+    ingredients: [{ item: "Pierś z kurczaka", amount: "160g" }, { item: "Szpinak świeży", amount: "100g" }, { item: "Ser Mozzarella Light", amount: "30g" }],
+    recipe: "Piersi nadziej szpinakiem i serem. Piecz 25 min w 180st."
+  },
+  {
+    name: "Sznycle z indyka w płatkach kukurydzianych",
+    calories: 520, protein: 36, fats: 12, carbs: 65,
+    type: "lunch",
+    ingredients: [{ item: "Pierś z indyka", amount: "150g" }, { item: "Ziemniaki", amount: "200g" }],
+    recipe: "Indyka obtocz w płatkach i upiecz. Podawaj z puree."
+  },
+  {
+    name: "Kurczak Stir-Fry z pędami bambusa",
+    calories: 540, protein: 35, fats: 16, carbs: 62,
+    type: "lunch",
+    ingredients: [{ item: "Pierś z kurczaka", amount: "140g" }, { item: "Makaron ryżowy (suchy)", amount: "60g" }],
+    recipe: "Smaż mięso i warzywa na dużym ogniu z sosem sojowym."
+  },
+  {
+    name: "Gulasz z indyka z batatami i papryką",
+    calories: 560, protein: 38, fats: 14, carbs: 68,
+    type: "lunch",
+    ingredients: [{ item: "Pierś z indyka", amount: "150g" }, { item: "Bataty", amount: "200g" }],
+    recipe: "Wszystko pokrój w kostkę i duś z bulionem i papryką."
+  },
+  {
+    name: "Kurczak w sosie koperkowym z ryżem",
+    calories: 485, protein: 34, fats: 12, carbs: 58,
+    type: "lunch",
+    ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }, { item: "Ryż basmati (suchy)", amount: "60g" }],
+    recipe: "Kurczaka ugotuj, zrób sos z jogurtu i koperku. Podawaj z ryżem."
   },
   {
     name: "Fit Gyros z domowym sosem tzatziki",
     calories: 540, protein: 38, fats: 16, carbs: 62,
     type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "150g" },
-      { item: "Tortilla pełnoziarnista", amount: "1 szt" },
-      { item: "Jogurt naturalny", amount: "50g" },
-      { item: "Ogórek", amount: "50g" }
-    ],
-    recipe: "Mięso przypraw przyprawą gyros i upiecz. Zrób sos z jogurtu, ogórka i czosnku. Zawiń w tortillę z warzywami."
+    ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }, { item: "Tortilla pełnoziarnista", amount: "1 szt" }],
+    recipe: "Mięso upiecz z przyprawą gyros. Zrób sos z jogurtu i ogórka."
   },
   {
-    name: "Kurczak Curry z mango i mleczkiem kokosowym",
+    name: "Kurczak Curry z mango i kokosem",
     calories: 560, protein: 34, fats: 22, carbs: 58,
     type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "140g" },
-      { item: "Mango", amount: "80g" },
-      { item: "Mleczko kokosowe Light", amount: "80ml" },
-      { item: "Ryż jaśminowy", amount: "50g" }
-    ],
-    recipe: "Podsmaż kurczaka z pastą curry. Dodaj mango i mleczko. Duś 10 min. Podawaj z ryżem."
+    ingredients: [{ item: "Pierś z kurczaka", amount: "140g" }, { item: "Mango", amount: "80g" }, { item: "Mleczko kokosowe Light", amount: "80ml" }],
+    recipe: "Podsmaż kurczaka z pastą curry. Dodaj mango i mleczko."
   },
   {
-    name: "Sznycle z kurczaka w płatkach kukurydzianych",
-    calories: 510, protein: 36, fats: 14, carbs: 58,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "150g" },
-      { item: "Ziemniaki", amount: "200g" },
-      { item: "Marchew", amount: "100g" }
-    ],
-    recipe: "Kurczaka obtocz w pokruszonych płatkach kukurydzianych i upiecz bez tłuszczu. Podawaj z puree i surówką."
-  },
-  {
-    name: "Kurczak Teriyaki z sezamem i brokułami",
-    calories: 490, protein: 35, fats: 12, carbs: 62,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "150g" },
-      { item: "Brokuły", amount: "150g" },
-      { item: "Sos sojowy", amount: "20ml" },
-      { item: "Sezam", amount: "5g" },
-      { item: "Ryż basmati", amount: "50g" }
-    ],
-    recipe: "Kurczaka podsmaż, dodaj sos sojowy, miód i sezam. Wymieszaj z ugotowanymi brokułami i ryżem."
-  },
-  {
-    name: "Kurczak w sosie pomidorowo-paprykowym z kuskusem",
-    calories: 475, protein: 33, fats: 10, carbs: 64,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "140g" },
-      { item: "Papryka czerwona", amount: "100g" },
-      { item: "Passata pomidorowa", amount: "100ml" },
-      { item: "Kuskus", amount: "50g" }
-    ],
-    recipe: "Warzywa i mięso podduś w passacie. Dopraw ziołami prowansalskimi. Podawaj z kuskusem."
-  },
-
-  // --- INDYK (TURKEY) ---
-  {
-    name: "Pulpety z indyka w sosie koperkowym",
-    calories: 460, protein: 32, fats: 14, carbs: 52,
-    type: "lunch",
-    ingredients: [
-      { item: "Mięso mielone z indyka", amount: "150g" },
-      { item: "Ziemniaki", amount: "150g" },
-      { item: "Jogurt naturalny", amount: "30g" }
-    ],
-    recipe: "Uformuj pulpety i gotuj w wywarze. Sos zabiel jogurtem i dodaj dużo koperku. Podawaj z ziemniakami."
-  },
-  {
-    name: "Pieczeń z indyka z warzywami korzeniowymi",
-    calories: 490, protein: 38, fats: 12, carbs: 56,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z indyka", amount: "160g" },
-      { item: "Marchew", amount: "100g" },
-      { item: "Pietruszka (korzeń)", amount: "50g" },
-      { item: "Kasza pęczak", amount: "50g" }
-    ],
-    recipe: "Indyka upiecz w rękawie z warzywami. Podawaj z ugotowaną kaszą pęczak."
-  },
-  {
-    name: "Indyk w sosie kurkowym z kaszą bulgur",
-    calories: 530, protein: 35, fats: 18, carbs: 54,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z indyka", amount: "140g" },
-      { item: "Kasza bulgur", amount: "60g" },
-      { item: "Pieczarki", amount: "100g" }
-    ],
-    recipe: "Indyka podsmaż, dodaj grzyby i odrobinę chudej śmietanki lub jogurtu. Podawaj z kaszą."
-  },
-  {
-    name: "Stir-fry z indykiem i orzechami nerkowca",
-    calories: 550, protein: 34, fats: 24, carbs: 50,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z indyka", amount: "130g" },
-      { item: "Orzechy włoskie", amount: "20g" },
-      { item: "Cukinia", amount: "100g" },
-      { item: "Makaron ryżowy", amount: "50g" }
-    ],
-    recipe: "Mięso i cukinię smaż krótko na dużym ogniu. Dodaj sos sojowy i orzechy. Wymieszaj z makaronem."
-  },
-
-  // --- WOŁOWINA (BEEF) ---
-  {
-    name: "Chili con Carne z chudej wołowiny",
-    calories: 580, protein: 42, fats: 16, carbs: 64,
-    type: "lunch",
-    ingredients: [
-      { item: "Wołowina chuda", amount: "150g" },
-      { item: "Ryż brązowy", amount: "60g" },
-      { item: "Passata pomidorowa", amount: "100ml" }
-    ],
-    recipe: "Mięso mielone podsmaż, dodaj passatę, kukurydzę i fasolę. Dopraw chili. Podawaj z ryżem brązowym."
-  },
-  {
-    name: "Burger Wołowy Fit z pieczonymi batatami",
+    name: "Burger Wołowy Fit z batatami",
     calories: 595, protein: 38, fats: 22, carbs: 68,
     type: "lunch",
-    ingredients: [
-      { item: "Wołowina chuda", amount: "150g" },
-      { item: "Bataty", amount: "150g" },
-      { item: "Bułka grahamka", amount: "1 szt" }
-    ],
-    recipe: "Mięso ugrilluj. Bataty upiecz w słupkach. Złóż burgera z dużą ilością warzyw i musztardą."
+    ingredients: [{ item: "Wołowina chuda", amount: "150g" }, { item: "Bataty", amount: "150g" }, { item: "Bułka grahamka", amount: "1 szt" }],
+    recipe: "Mięso ugrilluj. Bataty upiecz. Złóż burgera z warzywami."
   },
   {
-    name: "Gulasz wołowy z papryką i kaszą gryczaną",
-    calories: 570, protein: 45, fats: 18, carbs: 58,
-    type: "lunch",
-    ingredients: [
-      { item: "Wołowina chuda", amount: "150g" },
-      { item: "Kasza gryczana", amount: "60g" },
-      { item: "Papryka czerwona", amount: "100g" }
-    ],
-    recipe: "Wołowinę duś z cebulą i papryką do miękkości (ok. 1.5h). Podawaj z ugotowaną kaszą gryczaną."
-  },
-  {
-    name: "Stek wołowy z grillowanymi warzywami",
-    calories: 510, protein: 44, fats: 24, carbs: 32,
-    type: "lunch",
-    ingredients: [
-      { item: "Wołowina chuda", amount: "160g" },
-      { item: "Cukinia", amount: "100g" },
-      { item: "Papryka żółta", amount: "100g" }
-    ],
-    recipe: "Stek grilluj wg uznania. Warzywa pokrój w plastry i grilluj obok mięsa. Skrop oliwą."
-  },
-
-  // --- WIEPRZOWINA (PORK) ---
-  {
-    name: "Polędwiczka wieprzowa w sosie musztardowym",
+    name: "Polędwiczka wieprzowa z musztardą",
     calories: 485, protein: 35, fats: 14, carbs: 52,
     type: "lunch",
-    ingredients: [
-      { item: "Polędwiczka wieprzowa", amount: "150g" },
-      { item: "Ziemniaki", amount: "150g" },
-      { item: "Musztarda", amount: "20g" }
-    ],
-    recipe: "Polędwiczkę upiecz lub uduś. Sos zrób z musztardy i jogurtu. Podawaj z ziemniakami i fasolką."
+    ingredients: [{ item: "Polędwiczka wieprzowa", amount: "150g" }, { item: "Ziemniaki", amount: "150g" }],
+    recipe: "Polędwiczkę upiecz. Sos zrób z musztardy i jogurtu."
   },
   {
-    name: "Schab pieczony z rozmarynem i jabłkiem",
-    calories: 470, protein: 38, fats: 12, carbs: 54,
-    type: "lunch",
-    ingredients: [
-      { item: "Schab bez kości", amount: "140g" },
-      { item: "Jabłko", amount: "100g" },
-      { item: "Kasza bulgur", amount: "50g" }
-    ],
-    recipe: "Schab upiecz z plasterkami jabłek i rozmarynem. Podawaj z kaszą bulgur."
-  },
-  {
-    name: "Polędwiczka z kurkami i makaronem pełnoziarnistym",
-    calories: 550, protein: 36, fats: 18, carbs: 62,
-    type: "lunch",
-    ingredients: [
-      { item: "Polędwiczka wieprzowa", amount: "130g" },
-      { item: "Makaron pełnoziarnisty", amount: "60g" },
-      { item: "Pieczarki", amount: "100g" }
-    ],
-    recipe: "Mięso i grzyby podsmaż, połącz z ugotowanym makaronem i natką pietruszki."
-  },
-
-  // --- INNE / MIESZANE ---
-  {
-    name: "Bowl z pieczonym kurczakiem, mango i awokado",
+    name: "Bowl z kurczakiem, mango i awokado",
     calories: 580, protein: 32, fats: 26, carbs: 62,
     type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "120g" },
-      { item: "Mango", amount: "50g" },
-      { item: "Awokado", amount: "1/2 szt" },
-      { item: "Ryż brązowy", amount: "50g" }
-    ],
-    recipe: "Ułóż wszystkie składniki w misce na bazie ryżu. Skrop sokiem z cytryny i sosem sojowym."
+    ingredients: [{ item: "Pierś z kurczaka", amount: "120g" }, { item: "Mango", amount: "50g" }, { item: "Awokado", amount: "1/2 szt" }],
+    recipe: "Ułóż składniki na bazie ryżu w misce. Skrop cytryną."
   },
   {
-    name: "Makaron z indykiem i suszonymi pomidorami",
-    calories: 535, protein: 35, fats: 16, carbs: 64,
+    name: "Kurczak w miodzie i sezamie",
+    calories: 540, protein: 34, fats: 20, carbs: 56,
     type: "lunch",
-    ingredients: [
-      { item: "Mięso mielone z indyka", amount: "120g" },
-      { item: "Makaron spaghetti (durum)", amount: "70g" },
-      { item: "Pomidory suszone", amount: "30g" }
-    ],
-    recipe: "Indyka podsmaż z czosnkiem i suszonymi pomidorami. Wymieszaj z makaronem i świeżą bazylią."
+    ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }, { item: "Miód", amount: "15g" }, { item: "Sezam", amount: "10g" }],
+    recipe: "Kurczaka podsmaż w marynacie miodowej, posyp sezamem."
   },
   {
-    name: "Tortilla z kruchą wołowiną i sosem salsa",
-    calories: 560, protein: 36, fats: 18, carbs: 62,
+    name: "Gulasz wołowy z kaszą gryczaną",
+    calories: 580, protein: 42, fats: 18, carbs: 62,
     type: "lunch",
-    ingredients: [
-      { item: "Wołowina chuda", amount: "130g" },
-      { item: "Tortilla pełnoziarnista", amount: "1 szt" },
-      { item: "Papryka czerwona", amount: "50g" }
-    ],
-    recipe: "Wołowinę pokrój w paski, podsmaż z przyprawą meksykańską. Zawiń z papryką i domową salsą."
+    ingredients: [{ item: "Wołowina chuda (ligawa)", amount: "150g" }, { item: "Kasza gryczana (sucha)", amount: "60g" }],
+    recipe: "Wołowinę duś z cebulą do miękkości. Podawaj z kaszą."
   },
   {
-    name: "Zapiekanka makaronowa z kurczakiem i brokułem",
-    calories: 510, protein: 42, fats: 14, carbs: 56,
+    name: "Schab pieczony z jabłkiem",
+    calories: 480, protein: 35, fats: 12, carbs: 56,
     type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "140g" },
-      { item: "Makaron pełnoziarnisty", amount: "50g" },
-      { item: "Brokuły", amount: "150g" },
-      { item: "Ser Mozzarella Light", amount: "30g" }
-    ],
-    recipe: "Wymieszaj składniki w naczyniu, posyp serem i zapiekaj 15 min do rozpuszczenia sera."
+    ingredients: [{ item: "Schab bez kości", amount: "140g" }, { item: "Ziemniaki", amount: "150g" }, { item: "Jabłko", amount: "100g" }],
+    recipe: "Schab upiecz z plasterkami jabłek. Podawaj z puree."
   },
-  {
-    name: "Kurczak w płatkach migdałowych z fasolką",
-    calories: 495, protein: 38, fats: 22, carbs: 38,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z kurczaka", amount: "150g" },
-      { item: "Fasolka szparagowa", amount: "200g" }
-    ],
-    recipe: "Kurczaka obtocz w płatkach migdałowych i upiecz. Podawaj z gotowaną fasolką szparagową."
-  },
-  {
-    name: "Gulasz z indyka z dynią i kaszą jaglaną",
-    calories: 480, protein: 32, fats: 12, carbs: 64,
-    type: "lunch",
-    ingredients: [
-      { item: "Pierś z indyka", amount: "140g" },
-      { item: "Kasza jaglana", amount: "50g" },
-      { item: "Bataty", amount: "100g" }
-    ],
-    recipe: "Indyka i bataty (zamiast dyni) duś w bulionie. Podawaj z ugotowaną kaszą jaglaną."
-  }
+
+  // --- NOWA PACZKA: DODATKOWE 100+ DAŃ (SKRÓCONE PRZEPISY) ---
+  { name: "Kurczak w sosie orzechowym Satay", calories: 550, protein: 36, fats: 24, carbs: 48, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }, { item: "Masło orzechowe", amount: "20g" }], recipe: "Kurczaka grilluj, podawaj z sosem z masła orzechowego i ryżem." },
+  { name: "Indyk z suszonymi pomidorami i fetą", calories: 510, protein: 40, fats: 18, carbs: 44, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }, { item: "Feta Light", amount: "30g" }], recipe: "Mięso zapiekaj z pomidorami i serem. Podawaj z kuskusem." },
+  { name: "Fit Kebap drobiowy w tortilli", calories: 530, protein: 38, fats: 16, carbs: 58, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "140g" }, { item: "Tortilla pełnoziarnista", amount: "1 szt" }], recipe: "Mięso przypraw gyros, zawiń z warzywami i sosem czosnkowym." },
+  { name: "Pulpety z indyka w sosie cytrynowym", calories: 470, protein: 34, fats: 12, carbs: 52, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "150g" }], recipe: "Pulpety gotuj w wywarze z cytryną. Podawaj z ryżem i koperkiem." },
+  { name: "Kurczak w chrupiącej panierce Panko", calories: 520, protein: 36, fats: 14, carbs: 60, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }, { item: "Panko", amount: "30g" }], recipe: "Kurczaka obtocz w panko i upiecz bez tłuszczu. Podawaj z mizerią." },
+  { name: "Wołowina po tajsku z bazylią", calories: 560, protein: 42, fats: 20, carbs: 50, type: "lunch", ingredients: [{ item: "Wołowina mielona chuda", amount: "150g" }], recipe: "Smaż mięso z chili, czosnkiem i dużą ilością bazylii. Podawaj z ryżem." },
+  { name: "Polędwiczki wieprzowe z kurkami", calories: 510, protein: 38, fats: 18, carbs: 48, type: "lunch", ingredients: [{ item: "Polędwiczka wieprzowa", amount: "150g" }, { item: "Pieczarki", amount: "100g" }], recipe: "Mięso i grzyby duś w lekkim sosie śmietanowym. Podawaj z kaszą." },
+  { name: "Kurczak faszerowany mozzarellą", calories: 490, protein: 42, fats: 16, carbs: 38, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "160g" }, { item: "Ser Mozzarella Light", amount: "40g" }], recipe: "W piersi zrób kieszonkę, włóż ser i zioła. Upiecz." },
+  { name: "Gulasz z indyka z dynią i imbirem", calories: 480, protein: 35, fats: 10, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Indyka i dynię duś z dodatkiem świeżego imbiru. Podawaj z pęczakiem." },
+  { name: "Stek wołowy z grillowaną cukinią", calories: 530, protein: 45, fats: 24, carbs: 30, type: "lunch", ingredients: [{ item: "Wołowina chuda (ligawa)", amount: "160g" }], recipe: "Stek grilluj wg uznania. Podawaj z plastrami cukinii z grilla." },
+  { name: "Kurczak Teriyaki z brokułami", calories: 475, protein: 36, fats: 12, carbs: 55, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Smaż kurczaka w sosie teriyaki. Podawaj z ryżem i gotowanym brokułem." },
+  { name: "Zapiekanka makaronowa z indykiem", calories: 540, protein: 38, fats: 18, carbs: 60, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "120g" }, { item: "Makaron pełnoziarnisty (suchy)", amount: "60g" }], recipe: "Składniki wymieszaj z sosem pomidorowym i zapiecz pod serem." },
+  { name: "Kurczak w miodzie i musztardzie", calories: 505, protein: 35, fats: 14, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Kurczaka upiecz w marynacie miodowo-musztardowej. Podawaj z ryżem." },
+  { name: "Pieczeń rzymska z indyka", calories: 490, protein: 36, fats: 14, carbs: 54, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "150g" }], recipe: "Mięso upiecz w keksówce z dodatkiem marchewki. Podawaj w plastrach." },
+  { name: "Polędwiczka z suszoną śliwką", calories: 515, protein: 34, fats: 16, carbs: 58, type: "lunch", ingredients: [{ item: "Polędwiczka wieprzowa", amount: "150g" }], recipe: "Polędwiczkę nadziej śliwkami i upiecz. Podawaj z kaszą gryczaną." },
+  { name: "Kurczak w sosie jogurtowo-curry", calories: 460, protein: 35, fats: 10, carbs: 58, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Kurczaka ugotuj, podawaj w sosie z jogurtu i curry z ryżem." },
+  { name: "Risotto z kurczakiem i groszkiem", calories: 525, protein: 34, fats: 14, carbs: 65, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "130g" }], recipe: "Ryż gotuj w bulionie, pod koniec dodaj mięso i groszek." },
+  { name: "Kotlety mielone z indyka pieczone", calories: 480, protein: 34, fats: 14, carbs: 52, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "150g" }], recipe: "Uformuj kotlety i piecz bez tłuszczu. Podawaj z buraczkami." },
+  { name: "Gulasz wieprzowy z kolorową papryką", calories: 530, protein: 38, fats: 18, carbs: 54, type: "lunch", ingredients: [{ item: "Schab bez kości", amount: "150g" }], recipe: "Mięso i paprykę duś do miękkości. Podawaj z kaszą gryczaną." },
+  { name: "Kurczak w sezamie z surówką z kapusty", calories: 510, protein: 36, fats: 18, carbs: 48, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Kurczaka obtocz w sezamie i upiecz. Podawaj z ziemniakami." },
+  { name: "Indyk duszony w porem i jabłkiem", calories: 475, protein: 35, fats: 12, carbs: 56, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Indyka duś z posiekanym porem i jabłkiem. Podawaj z kaszą." },
+  { name: "Wołowina z fasolką szparagową", calories: 540, protein: 42, fats: 20, carbs: 45, type: "lunch", ingredients: [{ item: "Wołowina chuda (ligawa)", amount: "150g" }], recipe: "Mięso i fasolkę smaż w sosie sojowym. Podawaj z ryżem brązowym." },
+  { name: "Kurczak Caprese z pesto", calories: 505, protein: 40, fats: 18, carbs: 42, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Piersi zapiekaj z serem, pomidorem i łyżeczką pesto." },
+  { name: "Zapiekanka ziemniaczana z indykiem", calories: 560, protein: 34, fats: 18, carbs: 65, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "130g" }], recipe: "Ziemniaki i mięso ułóż warstwami i zapiecz pod lekkim serem." },
+  { name: "Kurczak w miodowej glazurze z marchewką", calories: 510, protein: 34, fats: 14, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Mięso i słupki marchwi upiecz w miodzie i ziołach." },
+  { name: "Polędwiczka z grillowaną papryką", calories: 460, protein: 35, fats: 12, carbs: 52, type: "lunch", ingredients: [{ item: "Polędwiczka wieprzowa", amount: "150g" }], recipe: "Grilluj mięso i kawałki papryki. Podawaj z kaszą bulgur." },
+  { name: "Strogonow wołowy fit", calories: 555, protein: 42, fats: 18, carbs: 50, type: "lunch", ingredients: [{ item: "Wołowina chuda (ligawa)", amount: "150g" }], recipe: "Wołowinę duś z cebulą, pieczarkami i ogórkiem kiszonym." },
+  { name: "Kurczak w sosie pomidorowym z oliwkami", calories: 485, protein: 36, fats: 14, carbs: 50, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Duś mięso w passacie z ziołami i czarnymi oliwkami." },
+  { name: "Indyk w płatkach migdałowych", calories: 535, protein: 38, fats: 22, carbs: 44, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Indyka obtocz w migdałach i upiecz. Podawaj z sałatą." },
+  { name: "Leczo drobiowe z cukinią", calories: 460, protein: 35, fats: 12, carbs: 52, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Podsmaż mięso, dodaj warzywa i passatę. Duś 20 min." },
+  { name: "Sznycle z kurczaka z parmezanem", calories: 520, protein: 40, fats: 18, carbs: 45, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Upiecz kurczaka posypanego parmezanem i bułką tartą." },
+  { name: "Indyk z batatami w ziołach prowansalskich", calories: 495, protein: 34, fats: 12, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Indyka i bataty pokrój w kostkę i upiecz w ziołach." },
+  { name: "Wołowina po chińsku z makaronem ryżowym", calories: 570, protein: 38, fats: 18, carbs: 64, type: "lunch", ingredients: [{ item: "Wołowina chuda", amount: "140g" }], recipe: "Smaż mięso z warzywami i sosem sojowym. Dodaj makaron ryżowy." },
+  { name: "Kurczak w sosie słodko-kwaśnym fit", calories: 515, protein: 34, fats: 12, carbs: 68, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Domowy sos z octu ryżowego, ananasa i koncentratu." },
+  { name: "Pulpety z indyka w sosie koperkowym", calories: 465, protein: 34, fats: 10, carbs: 58, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "140g" }], recipe: "Pulpety gotuj, sos zabiel jogurtem i dodaj koper." },
+  { name: "Schab duszony w cebuli", calories: 500, protein: 38, fats: 16, carbs: 48, type: "lunch", ingredients: [{ item: "Schab bez kości", amount: "150g" }], recipe: "Schab duś z dużą ilością cebuli na małym ogniu." },
+  { name: "Kurczak Stir-fry z orzechami nerkowca", calories: 560, protein: 36, fats: 24, carbs: 50, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "140g" }], recipe: "Smaż krótko z papryką i nerkowcami. Podawaj z ryżem." },
+  { name: "Burger z indyka z guacamole", calories: 585, protein: 38, fats: 26, carbs: 52, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "150g" }], recipe: "Zrób kotlety, zjedz w bułce z pastą z awokado." },
+  { name: "Kurczak w przyprawie pięciu smaków", calories: 465, protein: 35, fats: 10, carbs: 55, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Aromatyczne mięso podawane z ryżem i kapustą pekińską." },
+  { name: "Indyk z pieczarkami w sosie własnym", calories: 470, protein: 36, fats: 12, carbs: 52, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Mięso i pieczarki duś z cebulą. Podawaj z kaszą pęczak." },
+  { name: "Pieczeń z szynki z ziołami", calories: 485, protein: 38, fats: 14, carbs: 48, type: "lunch", ingredients: [{ item: "Schab bez kości", amount: "150g" }], recipe: "Chude mięso pieczone w rękawie z majerankiem." },
+  { name: "Kurczak faszerowany pieczarkami i serem", calories: 510, protein: 42, fats: 18, carbs: 42, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "160g" }], recipe: "Farsz z grzybów i sera włóż do piersi i zapiecz." },
+  { name: "Gulasz wołowy z dynią i batatami", calories: 590, protein: 40, fats: 18, carbs: 68, type: "lunch", ingredients: [{ item: "Wołowina chuda", amount: "150g" }], recipe: "Sycące danie jednogarnkowe z warzywami korzeniowymi." },
+  { name: "Kurczak w miodzie i imbirze", calories: 495, protein: 34, fats: 12, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Azjatycka marynata, podawaj z ryżem jaśminowym." },
+  { name: "Indyk duszony z marchewką", calories: 460, protein: 34, fats: 10, carbs: 58, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Klasyczna potrawka z marchewką i kaszą jaglaną." },
+  { name: "Zapiekany bakłażan z mięsem mielonym", calories: 520, protein: 38, fats: 22, carbs: 42, type: "lunch", ingredients: [{ item: "Wołowina mielona chuda", amount: "130g" }], recipe: "Bakłażan nadziewany mięsem, zapiekany pod serem." },
+  { name: "Kurczak w sosie pomidorowo-paprykowym", calories: 485, protein: 36, fats: 14, carbs: 54, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Duś mięso z papryką i pomidorami z puszki." },
+  { name: "Indyk z grillowanym ananasem", calories: 520, protein: 35, fats: 14, carbs: 65, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Słodko-słone połączenie z ryżem i chili." },
+  { name: "Chili con Carne z ryżem", calories: 580, protein: 42, fats: 18, carbs: 60, type: "lunch", ingredients: [{ item: "Wołowina mielona chuda", amount: "150g" }], recipe: "Mięso z fasolą, kukurydzą i pomidorami na ostro." },
+  { name: "Kurczak w sosie musztardowym fit", calories: 475, protein: 35, fats: 12, carbs: 56, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Lekki sos na bazie jogurtu i ostrej musztardy." },
+  { name: "Indyk w sezamie z fasolką szparagową", calories: 495, protein: 36, fats: 16, carbs: 52, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Mięso w sezamie i gotowana zielona fasolka." },
+  { name: "Schab pieczony z czosnkiem i majerankiem", calories: 480, protein: 38, fats: 12, carbs: 52, type: "lunch", ingredients: [{ item: "Schab bez kości", amount: "150g" }], recipe: "Tradycyjny polski schab w wersji bez tłuszczu." },
+  { name: "Kurczak szałwiowy z ziemniakami", calories: 490, protein: 35, fats: 14, carbs: 54, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Mięso pieczone ze świeżą szałwią i czosnkiem." },
+  { name: "Gulasz z kurczaka z pieczarkami", calories: 470, protein: 35, fats: 12, carbs: 52, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Drobiowa wersja gulaszu z jasnym sosem koperkowym." },
+  { name: "Wołowina z brokułami po kantońsku", calories: 550, protein: 40, fats: 20, carbs: 48, type: "lunch", ingredients: [{ item: "Wołowina chuda", amount: "140g" }], recipe: "Szybkie danie z woka z sosem sojowym i imbirem." },
+  { name: "Piersi z kurczaka w pomidorach suszonych", calories: 520, protein: 42, fats: 20, carbs: 40, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Aromatyczne piersi w sosie z pomidorów z zalewy." },
+  { name: "Indyk z mango i mleczkiem kokosowym", calories: 565, protein: 34, fats: 22, carbs: 58, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "140g" }], recipe: "Egzotyczny gulasz z owocami i nutą curry." },
+  { name: "Zapiekanka makaronowa z kurczakiem i brokułem", calories: 530, protein: 40, fats: 16, carbs: 58, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "140g" }], recipe: "Makaron, kurczak i brokuł zapiekany pod serem." },
+  { name: "Kurczak w sosie cytrynowo-miodowym", calories: 505, protein: 35, fats: 12, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Odświeżające danie podawane z ryżem jaśminowym." },
+  { name: "Polędwiczka wieprzowa z rozmarynem", calories: 465, protein: 35, fats: 12, carbs: 52, type: "lunch", ingredients: [{ item: "Polędwiczka wieprzowa", amount: "150g" }], recipe: "Mięso pieczone w całości z igiełkami rozmarynu." },
+  { name: "Gulasz z indyka z kolorową fasolką", calories: 480, protein: 34, fats: 12, carbs: 58, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "140g" }], recipe: "Danie z dodatkiem fasolki szparagowej i papryki." },
+  { name: "Kurczak faszerowany serem i oliwkami", calories: 515, protein: 42, fats: 20, carbs: 38, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "160g" }], recipe: "Śródziemnomorski smak, podawaj z kuskusem." },
+  { name: "Wołowina Stir-fry z papryką i chili", calories: 560, protein: 40, fats: 18, carbs: 55, type: "lunch", ingredients: [{ item: "Wołowina chuda", amount: "150g" }], recipe: "Ostre i sycące danie z woka z warzywami." },
+  { name: "Kurczak w miodzie i sezamie z brokułem", calories: 535, protein: 36, fats: 16, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Słodki kurczak z chrupiącymi ziarnami sezamu." },
+  { name: "Indyk z suszonymi śliwkami w sosie", calories: 495, protein: 35, fats: 14, carbs: 60, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Tradycyjny smak w nowoczesnej, lżejszej formie." },
+  { name: "Zapiekanka z ziemniaków i mięsa mielonego", calories: 570, protein: 32, fats: 22, carbs: 64, type: "lunch", ingredients: [{ item: "Wołowina mielona chuda", amount: "120g" }], recipe: "Warstwy ziemniaków i mięsa zapiekane z ziołami." },
+  { name: "Kurczak w sosie słodkie chili z ananasem", calories: 525, protein: 34, fats: 12, carbs: 72, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Orientalne połączenie smaków, idealne z ryżem." },
+  { name: "Indyk duszony z jabłkiem i cynamonem", calories: 470, protein: 34, fats: 10, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Nietypowe, ale pyszne połączenie owoców i mięsa." },
+  { name: "Leczo wołowe z cukinią i bakłażanem", calories: 540, protein: 40, fats: 18, carbs: 52, type: "lunch", ingredients: [{ item: "Wołowina mielona chuda", amount: "150g" }], recipe: "Gęste leczo z dużą ilością warzyw śródziemnomorskich." },
+  { name: "Kurczak w sosie pomidorowym z bazylią", calories: 485, protein: 36, fats: 12, carbs: 54, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Klasyczny sos marinara z chudym drobiem." },
+  { name: "Polędwiczka wieprzowa z zielonym pieprzem", calories: 470, protein: 35, fats: 14, carbs: 48, type: "lunch", ingredients: [{ item: "Polędwiczka wieprzowa", amount: "150g" }], recipe: "Wykwintne danie z ostrym sosem z ziarnistym pieprzem." },
+  { name: "Indyk po azjatycku z ryżem jaśminowym", calories: 530, protein: 36, fats: 14, carbs: 65, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Szybkie smażenie z imbirem, czosnkiem i sosem rybnym." },
+  { name: "Gulasz z kurczaka z czerwoną papryką", calories: 475, protein: 35, fats: 12, carbs: 52, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Słodka papryka i delikatne mięso w sosie własnym." },
+  { name: "Wołowina z warzywami na parze", calories: 450, protein: 40, fats: 15, carbs: 40, type: "lunch", ingredients: [{ item: "Wołowina chuda", amount: "150g" }], recipe: "Najlżejsza wersja wołowiny podawana z kaszą gryczaną." },
+  { name: "Kurczak faszerowany szpinakiem i fetą", calories: 510, protein: 44, fats: 18, carbs: 38, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "160g" }], recipe: "Greckie smaki w drobiowej piersi. Piecz bez tłuszczu." },
+  { name: "Zapiekanka z kurczakiem i kalafiorem", calories: 495, protein: 38, fats: 16, carbs: 45, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "140g" }], recipe: "Kalafior zamiast makaronu dla niższej kaloryczności." },
+  { name: "Indyk w miodzie i orzechach", calories: 570, protein: 34, fats: 26, carbs: 52, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "140g" }], recipe: "Bardzo sycące danie z chrupiącymi orzechami włoskimi." },
+  { name: "Kurczak w sosie pomidorowym z mozzarellą", calories: 520, protein: 42, fats: 18, carbs: 44, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Danie a'la parmigiana, ale pieczone bez panierki." },
+  { name: "Polędwiczka z gruszką i serem pleśniowym", calories: 540, protein: 34, fats: 24, carbs: 48, type: "lunch", ingredients: [{ item: "Polędwiczka wieprzowa", amount: "150g" }], recipe: "Wykwintne połączenie słodkiego owocu i słonego sera." },
+  { name: "Gulasz z indyka z zielonym groszkiem", calories: 485, protein: 35, fats: 12, carbs: 55, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Delikatny gulasz z dużą ilością słodkiego groszku." },
+  { name: "Kurczak w sezamie z ryżem brązowym", calories: 545, protein: 34, fats: 18, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "140g" }], recipe: "Chrupiący sezam i pełnoziarnisty ryż to zdrowy duet." },
+  { name: "Wołowina Stir-fry z makaronem durum", calories: 580, protein: 42, fats: 20, carbs: 64, type: "lunch", ingredients: [{ item: "Wołowina mielona chuda", amount: "140g" }], recipe: "Szybkie danie z makaronem spaghetti i warzywami." },
+  { name: "Zapiekanka z indykiem i cukinią", calories: 510, protein: 36, fats: 16, carbs: 52, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "130g" }], recipe: "Lekka zapiekanka bez ziemniaków i makaronu." },
+  { name: "Kurczak w miodzie i chili z kaszą jaglaną", calories: 525, protein: 34, fats: 14, carbs: 68, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Słodko-ostra marynata i lekkostrawna kasza." },
+  { name: "Indyk z batatami i rozmarynem", calories: 515, protein: 34, fats: 14, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Klasyczne pieczone danie jednogarnkowe." },
+  { name: "Schab pieczony z marchewką i cebulą", calories: 490, protein: 38, fats: 14, carbs: 50, type: "lunch", ingredients: [{ item: "Schab bez kości", amount: "150g" }], recipe: "Tradycyjna pieczeń duszona w warzywach." },
+  { name: "Kurczak szałwiowy z puree ziemniaczanym", calories: 485, protein: 35, fats: 12, carbs: 56, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Aromatyczne zioło i kremowe puree ziemniaczane." },
+  { name: "Indyk duszony z selerem i marchewką", calories: 450, protein: 34, fats: 8, carbs: 55, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Bardzo lekkie danie duszona na bazie bulionu." },
+  { name: "Gulasz wieprzowy z grzybami leśnymi", calories: 535, protein: 38, fats: 20, carbs: 48, type: "lunch", ingredients: [{ item: "Schab bez kości", amount: "150g" }], recipe: "Głęboki, leśny smak duszony z cebulą." },
+  { name: "Wołowina po tajsku z orzechami ziemnymi", calories: 590, protein: 42, fats: 26, carbs: 52, type: "lunch", ingredients: [{ item: "Wołowina chuda", amount: "140g" }], recipe: "Słone orzechy i chuda wołowina w ostrym sosie." },
+  { name: "Kurczak w płatkach kukurydzianych z ryżem", calories: 540, protein: 36, fats: 14, carbs: 68, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Zdrowa wersja nugetsów z domowym sosem pomidorowym." },
+  { name: "Pulpety z indyka w sosie pomidorowym", calories: 485, protein: 35, fats: 12, carbs: 58, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "140g" }], recipe: "Kulki mięsne duszone w passacie z bazylią." },
+  { name: "Zapiekanka makaronowa z indykiem i szpinakiem", calories: 535, protein: 40, fats: 18, carbs: 56, type: "lunch", ingredients: [{ item: "Mięso mielone z indyka", amount: "120g" }], recipe: "Klasyczne połączenie mięsa, szpinaku i sera." },
+  { name: "Kurczak w miodzie i czosnku z brokułami", calories: 510, protein: 34, fats: 12, carbs: 65, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Słodki i aromatyczny, podawaj z ryżem." },
+  { name: "Polędwiczka z suszonymi pomidorami", calories: 495, protein: 36, fats: 16, carbs: 48, type: "lunch", ingredients: [{ item: "Polędwiczka wieprzowa", amount: "150g" }], recipe: "Zapiecz plastry mięsa z kawałkami pomidorów." },
+  { name: "Indyk z mango i kolendrą", calories: 540, protein: 34, fats: 18, carbs: 62, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "140g" }], recipe: "Odświeżające, egzotyczne danie z ryżem basmati." },
+  { name: "Gulasz z indyka z bakłażanem i cukinią", calories: 475, protein: 34, fats: 12, carbs: 54, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Warzywne leczo z dodatkiem chudego mięsa." },
+  { name: "Kurczak w sezamie z marchewką", calories: 520, protein: 36, fats: 18, carbs: 52, type: "lunch", ingredients: [{ item: "Pierś z kurczaka", amount: "150g" }], recipe: "Chrupiące kawałki mięsa i gotowana marchewka." },
+  { name: "Schab pieczony z tymiankiem", calories: 480, protein: 38, fats: 12, carbs: 48, type: "lunch", ingredients: [{ item: "Schab bez kości", amount: "150g" }], recipe: "Ziołowa pieczeń podawana z kaszą bulgur." },
+  { name: "Indyk duszony z cebulą i kurkumą", calories: 460, protein: 34, fats: 10, carbs: 56, type: "lunch", ingredients: [{ item: "Pierś z indyka", amount: "150g" }], recipe: "Złociste, aromatyczne danie o właściwościach zapalnych." }
 ];
