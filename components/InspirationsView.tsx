@@ -26,16 +26,24 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({ customMeals, onAddC
     ingredients: [{ item: '', amount: '' }]
   });
 
-  // Auto-calculate totals whenever ingredients change
+  // Reaktywne przeliczanie sumy kalorii i makro na podstawie składników
   useEffect(() => {
     const ings = newMeal.ingredients || [];
     const totals = ings.reduce((acc, ing) => {
-      return {
-        cal: acc.cal + (ing.calories || 0),
-        p: acc.p + (ing.protein || 0),
-        f: acc.f + (ing.fats || 0),
-        c: acc.c + (ing.carbs || 0),
-      };
+      // Szukamy produktu w bazie (niewrażliwe na wielkość liter)
+      const weight = parseFloat(ing.amount);
+      const product = PRODUCT_DATABASE.find(p => p.name.toLowerCase() === ing.item.toLowerCase());
+      
+      if (product && !isNaN(weight)) {
+        const ratio = weight / 100;
+        return {
+          cal: acc.cal + (product.calories * ratio),
+          p: acc.p + (product.protein * ratio),
+          f: acc.f + (product.fats * ratio),
+          c: acc.c + (product.carbs * ratio),
+        };
+      }
+      return acc;
     }, { cal: 0, p: 0, f: 0, c: 0 });
 
     setNewMeal(prev => ({
@@ -49,69 +57,25 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({ customMeals, onAddC
 
   const filteredProducts = useMemo(() => {
     if (!searchQuery.query) return [];
+    const q = searchQuery.query.toLowerCase();
     return PRODUCT_DATABASE.filter(p => 
-      p.name.toLowerCase().includes(searchQuery.query.toLowerCase())
+      p.name.toLowerCase().includes(q)
     ).slice(0, 8);
   }, [searchQuery.query]);
 
   const handleSelectProduct = (product: Product, index: number) => {
     const updated = [...(newMeal.ingredients || [])];
-    const amount = updated[index].amount;
-    
     updated[index] = { ...updated[index], item: product.name };
-    
-    // Przelicz od razu po wyborze, jeśli podano ilość
-    const weight = parseFloat(amount);
-    if (!isNaN(weight)) {
-      const ratio = weight / 100;
-      updated[index].calories = product.calories * ratio;
-      updated[index].protein = product.protein * ratio;
-      updated[index].fats = product.fats * ratio;
-      updated[index].carbs = product.carbs * ratio;
-    }
-
     setNewMeal(prev => ({ ...prev, ingredients: updated }));
     setSearchQuery({ index: -1, query: '' });
   };
 
   const handleUpdateIngredient = (index: number, field: keyof Ingredient, value: string) => {
     const updated = [...(newMeal.ingredients || [])];
-    const currentIng = updated[index];
+    updated[index] = { ...updated[index], [field]: value };
     
     if (field === 'item') {
-      currentIng.item = value;
       setSearchQuery({ index, query: value });
-      
-      // Próbuj dopasować w locie, jeśli użytkownik wpisał całą nazwę
-      const exactProduct = PRODUCT_DATABASE.find(p => p.name.toLowerCase() === value.toLowerCase());
-      if (exactProduct) {
-        const weight = parseFloat(currentIng.amount);
-        if (!isNaN(weight)) {
-          const ratio = weight / 100;
-          currentIng.calories = exactProduct.calories * ratio;
-          currentIng.protein = exactProduct.protein * ratio;
-          currentIng.fats = exactProduct.fats * ratio;
-          currentIng.carbs = exactProduct.carbs * ratio;
-        }
-      } else {
-        // Resetuj makro jeśli produkt nie istnieje
-        currentIng.calories = 0;
-        currentIng.protein = 0;
-        currentIng.fats = 0;
-        currentIng.carbs = 0;
-      }
-    } else if (field === 'amount') {
-      currentIng.amount = value;
-      const weight = parseFloat(value);
-      const product = PRODUCT_DATABASE.find(p => p.name.toLowerCase() === currentIng.item.toLowerCase());
-      
-      if (product && !isNaN(weight)) {
-        const ratio = weight / 100;
-        currentIng.calories = product.calories * ratio;
-        currentIng.protein = product.protein * ratio;
-        currentIng.fats = product.fats * ratio;
-        currentIng.carbs = product.carbs * ratio;
-      }
     }
     
     setNewMeal(prev => ({ ...prev, ingredients: updated }));
@@ -148,11 +112,11 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({ customMeals, onAddC
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Baza Posiłków</h2>
-          <p className="text-slate-500 text-sm">Przeglądaj dania lub dodaj własne z automatycznym kalkulatorem Excel.</p>
+          <h2 className="text-2xl font-bold text-slate-800">Moja Baza Posiłków</h2>
+          <p className="text-slate-500 text-sm">Dodaj swoje ulubione dania. Składniki zostaną przeliczone automatycznie.</p>
         </div>
         <button onClick={() => setIsAdding(true)} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all active:scale-95">
-          <Icons.Plus /> Dodaj własny posiłek
+          <Icons.Plus /> Stwórz własne danie
         </button>
       </div>
 
@@ -161,27 +125,27 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({ customMeals, onAddC
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsAdding(false)}></div>
           <div className="relative bg-white w-full max-w-3xl rounded-3xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <h2 className="text-xl font-bold text-slate-800">Nowy Posiłek</h2>
+              <h2 className="text-xl font-bold text-slate-800">Nowy Posiłek (Kalkulator)</h2>
               <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-slate-100 rounded-full"><Icons.Plus className="rotate-45" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-400 uppercase">Nazwa Twojego dania</label>
+                  <label className="text-xs font-bold text-slate-400 uppercase">Nazwa dania</label>
                   <input required placeholder="np. Leczo z cukinii" value={newMeal.name} onChange={e => setNewMeal({...newMeal, name: e.target.value})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none" />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-400 uppercase">Gdzie w jadłospisie?</label>
+                  <label className="text-xs font-bold text-slate-400 uppercase">Kategoria</label>
                   <select value={newMeal.type} onChange={e => setNewMeal({...newMeal, type: e.target.value as any})} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none">
                     <option value="breakfast">Śniadanie / Kolacja</option>
-                    <option value="lunch">Obiad (ciepły)</option>
-                    <option value="snack2">Podwieczorek / Słodkie</option>
+                    <option value="lunch">Obiad</option>
+                    <option value="snack2">Przekąska / Deser</option>
                   </select>
                 </div>
               </div>
 
-              <div className="bg-slate-800 p-6 rounded-2xl text-white">
-                <p className="text-[10px] font-bold opacity-40 uppercase mb-4 text-center tracking-widest">Wartości odżywcze całości</p>
+              <div className="bg-slate-900 p-6 rounded-2xl text-white shadow-inner">
+                <p className="text-[10px] font-bold opacity-40 uppercase mb-4 text-center tracking-widest">Suma wartości odżywczych</p>
                 <div className="flex justify-around text-center">
                   <div><span className="block text-[10px] font-bold opacity-60 uppercase mb-1">Kcal</span><span className="text-2xl font-black text-emerald-400">{newMeal.calories}</span></div>
                   <div><span className="block text-[10px] font-bold opacity-60 uppercase mb-1">B (g)</span><span className="text-xl font-bold">{newMeal.protein}</span></div>
@@ -191,7 +155,7 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({ customMeals, onAddC
               </div>
 
               <div className="space-y-4">
-                <label className="text-xs font-bold text-slate-400 uppercase">Składniki (wpisz np. "Cukinia")</label>
+                <label className="text-xs font-bold text-slate-400 uppercase">Składniki (np. Cukinia, Kurczak)</label>
                 {newMeal.ingredients?.map((ing, idx) => {
                   const isMatch = PRODUCT_DATABASE.some(p => p.name.toLowerCase() === ing.item.toLowerCase());
                   return (
@@ -200,13 +164,13 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({ customMeals, onAddC
                         <div className="flex-grow">
                           <div className="relative">
                             <input 
-                              placeholder="Szukaj produktu..." 
+                              placeholder="Produkt..." 
                               value={ing.item} 
                               onChange={e => handleUpdateIngredient(idx, 'item', e.target.value)} 
-                              className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-2xl text-sm outline-none transition-all ${isMatch ? 'border-emerald-100 focus:border-emerald-500' : 'border-slate-100 focus:border-emerald-500'}`} 
+                              className={`w-full px-4 py-3 bg-slate-50 border-2 rounded-2xl text-sm outline-none transition-all ${isMatch ? 'border-emerald-100 bg-emerald-50/30' : 'border-slate-100 focus:border-emerald-500'}`} 
                             />
                             {isMatch && (
-                              <div className="absolute right-3 top-3.5 text-emerald-500" title="Produkt rozpoznany!">
+                              <div className="absolute right-3 top-3.5 text-emerald-500 animate-in fade-in zoom-in">
                                 <Icons.Check className="w-4 h-4" />
                               </div>
                             )}
@@ -225,6 +189,7 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({ customMeals, onAddC
                         <div className="w-24 relative">
                           <input 
                             placeholder="Waga" 
+                            type="number"
                             value={ing.amount} 
                             onChange={e => handleUpdateIngredient(idx, 'amount', e.target.value)} 
                             className="w-full px-3 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl text-sm outline-none focus:border-emerald-500" 
@@ -238,40 +203,33 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({ customMeals, onAddC
                     </div>
                   );
                 })}
-                <button type="button" onClick={handleAddIngredientRow} className="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-bold py-2 px-4 rounded-xl flex items-center gap-1 transition-all"><Icons.Plus className="w-3 h-3"/> Dodaj kolejny składnik</button>
+                <button type="button" onClick={handleAddIngredientRow} className="text-emerald-600 text-xs font-bold py-2 px-4 rounded-xl flex items-center gap-1 hover:bg-emerald-50 transition-all"><Icons.Plus className="w-3 h-3"/> Dodaj składnik</button>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-bold text-slate-400 uppercase">Twój przepis (krótko)</label>
-                <textarea placeholder="np. Cukinię pokroić w kostkę, dusić z pomidorami..." value={newMeal.recipe} onChange={e => setNewMeal({...newMeal, recipe: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl min-h-[100px] text-sm focus:border-emerald-500 outline-none" />
+                <label className="text-xs font-bold text-slate-400 uppercase">Opis / Przepis</label>
+                <textarea placeholder="Jak przygotować to danie?" value={newMeal.recipe} onChange={e => setNewMeal({...newMeal, recipe: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-2xl min-h-[100px] text-sm focus:border-emerald-500 outline-none" />
               </div>
 
-              <button type="submit" disabled={!newMeal.name || (newMeal.calories || 0) <= 0} className="w-full bg-emerald-600 disabled:bg-slate-300 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-emerald-700 transition-all active:scale-95">Zapisz w swojej bazie</button>
+              <button type="submit" disabled={!newMeal.name || (newMeal.calories || 0) <= 0} className="w-full bg-emerald-600 disabled:bg-slate-300 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-emerald-700 transition-all active:scale-95">Zapisz w moich posiłkach</button>
             </form>
           </div>
         </div>
       )}
 
-      {/* User's Custom Meals Section */}
+      {/* Wyświetlanie własnych posiłków */}
       {customMeals.length > 0 && (
         <section className="space-y-4">
-          <h3 className="text-lg font-bold text-slate-700 flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> Twoje własne posiłki</h3>
+          <h3 className="text-lg font-bold text-slate-700">Moje dania</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {customMeals.map((meal, idx) => (
               <div key={idx} className="bg-white rounded-3xl border-2 border-emerald-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow group relative">
                 <button onClick={() => onDeleteCustomMeal(meal.name)} className="absolute top-2 right-2 p-2 bg-white/80 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-full z-10 transition-colors"><Icons.Plus className="rotate-45 w-4 h-4" /></button>
-                <div className="h-24 bg-emerald-50 flex items-center justify-center text-emerald-300"><Icons.ChefHat className="w-10 h-10" /></div>
+                <div className="h-20 bg-emerald-50 flex items-center justify-center text-emerald-200"><Icons.ChefHat className="w-8 h-8" /></div>
                 <div className="p-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest bg-emerald-100 px-2 py-1 rounded-md">WŁASNY</span>
-                    <span className="font-bold text-slate-700 text-sm">{meal.calories} kcal</span>
-                  </div>
+                  <span className="text-[9px] font-bold text-emerald-600 uppercase bg-emerald-100 px-2 py-1 rounded mb-2 inline-block">WŁASNE</span>
                   <h3 className="text-lg font-bold text-slate-800 mb-2 truncate">{meal.name}</h3>
-                  <div className="flex gap-2">
-                    <span className="text-[10px] font-bold text-slate-500 px-2 py-1 bg-slate-50 rounded-lg">B: {meal.protein}g</span>
-                    <span className="text-[10px] font-bold text-slate-500 px-2 py-1 bg-slate-50 rounded-lg">T: {meal.fats}g</span>
-                    <span className="text-[10px] font-bold text-slate-500 px-2 py-1 bg-slate-50 rounded-lg">W: {meal.carbs}g</span>
-                  </div>
+                  <p className="text-sm font-bold text-slate-400">{meal.calories} kcal</p>
                 </div>
               </div>
             ))}
@@ -280,28 +238,13 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({ customMeals, onAddC
       )}
 
       <hr className="border-slate-100" />
-
-      {/* Main Database Section */}
-      <h3 className="text-lg font-bold text-slate-700">Standardowa baza posiłków</h3>
+      
+      <h3 className="text-lg font-bold text-slate-700">Standardowe inspiracje</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {MEAL_DATABASE.map((meal, idx) => (
-          <div key={idx} className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow group">
-            <div className="h-32 bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white relative overflow-hidden">
-               <div className="absolute inset-0 opacity-20 group-hover:scale-110 transition-transform duration-500"><Icons.Apple className="w-full h-full scale-150 rotate-12" /></div>
-               <div className="z-10 bg-white/20 backdrop-blur-md p-3 rounded-full"><Icons.ChefHat /></div>
-            </div>
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest bg-emerald-50 px-2 py-1 rounded-md">BAZA {APP_NAME}</span>
-                <span className="font-bold text-slate-700 text-sm">{meal.calories} kcal</span>
-              </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-4 truncate">{meal.name}</h3>
-              <div className="flex flex-wrap gap-2">
-                  {meal.ingredients?.slice(0, 3).map((ing, i) => (
-                    <span key={i} className="text-[11px] bg-slate-100 text-slate-600 px-2 py-1 rounded-lg">{ing.item}</span>
-                  ))}
-              </div>
-            </div>
+        {MEAL_DATABASE.slice(0, 6).map((meal, idx) => (
+          <div key={idx} className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden p-6 opacity-60">
+            <h3 className="text-sm font-bold text-slate-800 mb-1 truncate">{meal.name}</h3>
+            <span className="text-xs text-slate-400">{meal.calories} kcal</span>
           </div>
         ))}
       </div>
