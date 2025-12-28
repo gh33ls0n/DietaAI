@@ -6,6 +6,7 @@ import Header from './components/Header';
 import Onboarding from './components/Onboarding';
 import Dashboard from './components/Dashboard';
 import { generateMealPlan } from './services/geminiService';
+import { MEAL_DATABASE } from './services/mealDatabase';
 
 const App: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(() => {
@@ -18,6 +19,11 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : null;
   });
 
+  const [customMeals, setCustomMeals] = useState<Meal[]>(() => {
+    const saved = localStorage.getItem('custom_meals');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -25,7 +31,11 @@ const App: React.FC = () => {
   useEffect(() => {
     if (profile) localStorage.setItem('user_profile', JSON.stringify(profile));
     if (mealPlan) localStorage.setItem('weekly_plan', JSON.stringify(mealPlan));
-  }, [profile, mealPlan]);
+    localStorage.setItem('custom_meals', JSON.stringify(customMeals));
+  }, [profile, mealPlan, customMeals]);
+
+  // Combined meals for swapping and browsing
+  const allAvailableMeals = useMemo(() => [...MEAL_DATABASE, ...customMeals], [customMeals]);
 
   // Calories Calculation
   const calculatedCalories = useMemo(() => {
@@ -71,6 +81,14 @@ const App: React.FC = () => {
     setMealPlan({ days: updatedDays });
   };
 
+  const handleAddCustomMeal = (meal: Meal) => {
+    setCustomMeals(prev => [...prev, meal]);
+  };
+
+  const handleDeleteCustomMeal = (mealName: string) => {
+    setCustomMeals(prev => prev.filter(m => m.name !== mealName));
+  };
+
   const handleUpdateProfile = (newProfile: UserProfile) => {
     setProfile(newProfile);
   };
@@ -95,12 +113,16 @@ const App: React.FC = () => {
           <Dashboard 
             profile={profile} 
             mealPlan={mealPlan} 
+            allAvailableMeals={allAvailableMeals}
+            customMeals={customMeals}
             calories={calculatedCalories}
             isLoading={isLoading}
             error={error}
             onGenerate={handleGeneratePlan}
             onUpdateMeal={handleUpdateMeal}
             onUpdateProfile={handleUpdateProfile}
+            onAddCustomMeal={handleAddCustomMeal}
+            onDeleteCustomMeal={handleDeleteCustomMeal}
             onReset={handleReset}
           />
         )}

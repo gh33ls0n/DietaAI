@@ -10,17 +10,22 @@ import SettingsView from './SettingsView';
 interface DashboardProps {
   profile: UserProfile;
   mealPlan: WeeklyPlan | null;
+  allAvailableMeals: Meal[];
+  customMeals: Meal[];
   calories: number;
   isLoading: boolean;
   error: string | null;
   onGenerate: () => void;
   onUpdateMeal: (day: number, mealType: string, newMeal: Meal) => void;
   onUpdateProfile: (profile: UserProfile) => void;
+  onAddCustomMeal: (meal: Meal) => void;
+  onDeleteCustomMeal: (name: string) => void;
   onReset: () => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
-  profile, mealPlan, calories, isLoading, error, onGenerate, onUpdateMeal, onUpdateProfile, onReset
+  profile, mealPlan, allAvailableMeals, customMeals, calories, isLoading, error, 
+  onGenerate, onUpdateMeal, onUpdateProfile, onAddCustomMeal, onDeleteCustomMeal, onReset
 }) => {
   const [activeTab, setActiveTab] = useState<'meals' | 'shopping' | 'inspirations' | 'settings'>('meals');
 
@@ -48,7 +53,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </section>
 
-      {!mealPlan && !isLoading && activeTab !== 'settings' && (
+      {!mealPlan && !isLoading && activeTab !== 'settings' && activeTab !== 'inspirations' && (
         <div className="bg-emerald-50 border-2 border-emerald-100 p-12 rounded-3xl text-center space-y-4">
           <div className="mx-auto w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center text-emerald-500">
             <Icons.ChefHat />
@@ -96,11 +101,11 @@ const Dashboard: React.FC<DashboardProps> = ({
 
           <div className="mt-6">
             {activeTab === 'meals' && mealPlan ? (
-              <MealPlanView mealPlan={mealPlan} onRegenerate={onGenerate} onUpdateMeal={onUpdateMeal} />
+              <MealPlanView mealPlan={mealPlan} allAvailableMeals={allAvailableMeals} onRegenerate={onGenerate} onUpdateMeal={onUpdateMeal} />
             ) : activeTab === 'shopping' && mealPlan ? (
               <ShoppingListView mealPlan={mealPlan} />
             ) : activeTab === 'inspirations' ? (
-              <InspirationsView />
+              <InspirationsView customMeals={customMeals} onAddCustomMeal={onAddCustomMeal} onDeleteCustomMeal={onDeleteCustomMeal} />
             ) : activeTab === 'settings' ? (
               <SettingsView profile={profile} onUpdateProfile={onUpdateProfile} onReset={onReset} />
             ) : (

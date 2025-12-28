@@ -25,6 +25,19 @@ export interface UserProfile {
 export interface Ingredient {
   item: string;
   amount: string;
+  calories?: number;
+  protein?: number;
+  fats?: number;
+  carbs?: number;
+}
+
+export interface Product {
+  name: string;
+  calories: number; // per 100g
+  protein: number;  // per 100g
+  fats: number;     // per 100g
+  carbs: number;    // per 100g
+  unit: 'g' | 'ml' | 'szt';
 }
 
 export interface Meal {
