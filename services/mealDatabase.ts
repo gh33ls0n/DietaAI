@@ -17,6 +17,32 @@ export const MEAL_DATABASE: Meal[] = [
     recipe: "Chleb posmaruj masłem. Ułóż szynkę, ser i pokrojonego w plastry ogórka."
   },
   {
+    name: "Szakszuka z pomidorami i cebulką",
+    calories: 320, protein: 18, fats: 20, carbs: 15,
+    type: "breakfast",
+    ingredients: [
+      { item: "Jajko (rozmiar L)", amount: "2 szt" },
+      { item: "Pomidor", amount: "200g" },
+      { item: "Cebula biała", amount: "30g" },
+      { item: "Oliwa z oliwek", amount: "1 łyżeczka" },
+      { item: "Czosnek", amount: "1 ząbek" }
+    ],
+    recipe: "Na patelni zeszklij cebulę i czosnek. Dodaj pokrojone pomidory i smaż aż zmiękną. Wbij jajka, przykryj patelnię i czekaj, aż białka się zetną, a żółtka pozostaną płynne."
+  },
+  {
+    name: "Fit Placuszki z jabłkiem i cynamonem",
+    calories: 380, protein: 15, fats: 10, carbs: 55,
+    type: "breakfast",
+    ingredients: [
+      { item: "Jabłko", amount: "150g" },
+      { item: "Jajko (rozmiar L)", amount: "1 szt" },
+      { item: "Skyr naturalny", amount: "50g" },
+      { item: "Mąka pełnoziarnista", amount: "3 łyżki" },
+      { item: "Cynamon", amount: "szczypta" }
+    ],
+    recipe: "Jabłko zetrzyj na tarce o grubych oczkach. Wymieszaj z jajkiem, skyrem i mąką. Smaż małe placuszki na suchej patelni teflonowej do zrumienienia."
+  },
+  {
     name: "Kanapki z wędzonym łososiem i twarożkiem",
     calories: 380, protein: 22, fats: 14, carbs: 40,
     type: "breakfast",
@@ -28,6 +54,18 @@ export const MEAL_DATABASE: Meal[] = [
       { item: "Sok z cytryny", amount: "kilka kropel" }
     ],
     recipe: "Chleb posmaruj twarożkiem, połóż łososia, skrop cytryną i posyp koperkiem."
+  },
+  {
+    name: "Pasta jajeczna ze szczypiorkiem",
+    calories: 340, protein: 19, fats: 22, carbs: 14,
+    type: "breakfast",
+    ingredients: [
+      { item: "Jajko (rozmiar L)", amount: "2 szt" },
+      { item: "Jogurt naturalny", amount: "1 łyżka" },
+      { item: "Szczypiorek", amount: "2 łyżki" },
+      { item: "Musztarda", amount: "1 łyżeczka" }
+    ],
+    recipe: "Jajka ugotuj na twardo, posiekaj drobno lub rozgnieć widelcem. Wymieszaj z jogurtem, musztardą i posiekanym szczypiorkiem. Podawaj z pieczywem żytnim."
   },
   {
     name: "Grzanki z awokado i jajkiem sadzonym",
@@ -42,89 +80,83 @@ export const MEAL_DATABASE: Meal[] = [
     recipe: "Awokado rozgnieć na chlebie. Na patelni przygotuj jajko sadzone i połóż na wierzch."
   },
   {
-    name: "Kanapki z mozzarellą i pomidorem (Caprese)",
-    calories: 390, protein: 18, fats: 16, carbs: 44,
-    type: "breakfast",
+    name: "Sałatka z tuńczykiem i jajkiem",
+    calories: 310, protein: 28, fats: 12, carbs: 18,
+    type: "dinner",
     ingredients: [
-      { item: "Bułka grahamka", amount: "1 szt" },
-      { item: "Mozzarella light", amount: "1/2 kulki" },
-      { item: "Pomidor", amount: "1/2 szt" },
-      { item: "Pesto bazyliowe", amount: "1 łyżeczka" }
+      { item: "Tuńczyk (puszka)", amount: "100g" },
+      { item: "Jajko (rozmiar L)", amount: "1 szt" },
+      { item: "Kukurydza konserwowa", amount: "2 łyżki" },
+      { item: "Ogórek kiszony", amount: "2 szt" },
+      { item: "Mix sałat", amount: "garść" }
     ],
-    recipe: "Bułkę przekrój, posmaruj pesto. Ułóż plastry sera i pomidora, udekoruj bazylią."
-  },
-  {
-    name: "Kanapki z pastą z makreli i cebulką",
-    calories: 410, protein: 20, fats: 18, carbs: 42,
-    type: "breakfast",
-    ingredients: [
-      { item: "Chleb pełnoziarnisty", amount: "2 kromki" },
-      { item: "Makrela wędzona", amount: "60g" },
-      { item: "Twaróg chudy", amount: "30g" },
-      { item: "Cebula biała", amount: "1/4 szt" }
-    ],
-    recipe: "Makrelę wymieszaj z twarogiem i cebulą. Nałóż na pieczywo."
-  },
-  {
-    name: "Kanapki z serem camembert i żurawiną",
-    calories: 405, protein: 15, fats: 17, carbs: 48,
-    type: "breakfast",
-    ingredients: [
-      { item: "Chleb żytni", amount: "2 kromki" },
-      { item: "Ser Camembert", amount: "40g" },
-      { item: "Żurawina do mięs", amount: "2 łyżeczki" },
-      { item: "Orzechy włoskie", amount: "2 szt" }
-    ],
-    recipe: "Na chlebie ułóż plastry sera, dodaj żurawinę i pokruszone orzechy."
-  },
-  {
-    name: "Kanapki z hummusem i suszonymi pomidorami",
-    calories: 375, protein: 12, fats: 15, carbs: 46,
-    type: "breakfast",
-    ingredients: [
-      { item: "Chleb wieloziarnisty", amount: "2 kromki" },
-      { item: "Hummus", amount: "3 łyżki" },
-      { item: "Suszone pomidory", amount: "3 szt" }
-    ],
-    recipe: "Chleb posmaruj hummusem, połóż pomidory i ulubione kiełki."
-  },
-  {
-    name: "Kanapki z pastą jajeczną i szczypiorkiem",
-    calories: 390, protein: 16, fats: 18, carbs: 42,
-    type: "breakfast",
-    ingredients: [
-      { item: "Chleb grahams", amount: "2 kromki" },
-      { item: "Jajko ugotowane", amount: "1 szt" },
-      { item: "Majonez lekki", amount: "1 łyżeczka" },
-      { item: "Szczypiorek", amount: "1 łyżka" }
-    ],
-    recipe: "Jajko rozgnieć, wymieszaj z majonezem i szczypiorkiem. Nałóż na chleb."
-  },
-  {
-    name: "Kanapki z pieczonym indykiem i żurawiną",
-    calories: 365, protein: 24, fats: 9, carbs: 46,
-    type: "breakfast",
-    ingredients: [
-      { item: "Bułka grahamka", amount: "1 szt" },
-      { item: "Pierś z indyka pieczona", amount: "60g" },
-      { item: "Dżem z żurawiny", amount: "1 łyżeczka" }
-    ],
-    recipe: "Bułkę przekrój, ułóż sałatę, indyka i posmaruj żurawiną."
-  },
-  {
-    name: "Twarożek ze szczypiorkiem na żytnim",
-    calories: 340, protein: 22, fats: 8, carbs: 45,
-    type: "breakfast",
-    ingredients: [
-      { item: "Chleb żytni", amount: "2 kromki" },
-      { item: "Twaróg chudy", amount: "100g" },
-      { item: "Jogurt naturalny", amount: "2 łyżki" },
-      { item: "Rzodkiewka i szczypiorek", amount: "do smaku" }
-    ],
-    recipe: "Twaróg wymieszaj z jogurtem i warzywami. Nałóż na pieczywo."
+    recipe: "Jajko ugotuj na twardo i pokrój w ćwiartki. Tuńczyka odsącz, ogórki pokrój w kostkę. Składniki wymieszaj z sałatą, dopraw pieprzem i opcjonalnie odrobiną jogurtu."
   },
 
   // --- OBIADY (lunch) ---
+  {
+    name: "Pulpety z indyka w sosie koperkowym",
+    calories: 520, protein: 36, fats: 14, carbs: 58,
+    type: "lunch",
+    ingredients: [
+      { item: "Pierś z indyka", amount: "150g" },
+      { item: "Koper świeży", amount: "1/2 pęczka" },
+      { item: "Ziemniaki", amount: "200g" },
+      { item: "Mąka pełnoziarnista", amount: "1 łyżka" },
+      { item: "Jogurt naturalny", amount: "2 łyżki" }
+    ],
+    recipe: "Mięso zmiel, uformuj pulpety i gotuj w bulionie warzywnym. Wyjmij mięso, do wywaru dodaj posiekany koper i jogurt wymieszany z mąką. Zagotuj. Podawaj z ziemniakami."
+  },
+  {
+    name: "Kurczak w sosie szpinakowym z makaronem",
+    calories: 540, protein: 38, fats: 16, carbs: 62,
+    type: "lunch",
+    ingredients: [
+      { item: "Pierś z kurczaka", amount: "120g" },
+      { item: "Szpinak świeży", amount: "100g" },
+      { item: "Makaron pełnoziarnisty", amount: "70g" },
+      { item: "Czosnek", amount: "1 ząbek" },
+      { item: "Twarożek kanapkowy lekki", amount: "30g" }
+    ],
+    recipe: "Kurczaka pokrój w kostkę i podsmaż na oliwie z czosnkiem. Dodaj szpinak i duś aż zwiędnie. Dodaj twarożek dla kremowej konsystencji. Wymieszaj z ugotowanym makaronem."
+  },
+  {
+    name: "Schab pieczony z rozmarynem i warzywami",
+    calories: 490, protein: 35, fats: 15, carbs: 52,
+    type: "lunch",
+    ingredients: [
+      { item: "Schab bez kości", amount: "130g" },
+      { item: "Marchew", amount: "100g" },
+      { item: "Ziemniaki", amount: "150g" },
+      { item: "Oliwa z oliwek", amount: "1 łyżka" }
+    ],
+    recipe: "Mięso natrzyj rozmarynem i czosnkiem. Warzywa pokrój w słupki. Wszystko umieść w naczyniu żaroodpornym, skrop oliwą i piecz ok. 40 minut w 180 stopniach."
+  },
+  {
+    name: "Pieczona dorada z cytryną i pomidorkami",
+    calories: 460, protein: 32, fats: 18, carbs: 42,
+    type: "lunch",
+    ingredients: [
+      { item: "Dorada (świeża)", amount: "150g" },
+      { item: "Pomidorki koktajlowe", amount: "100g" },
+      { item: "Ziemniaki", amount: "150g" },
+      { item: "Cytryna", amount: "3 plastry" }
+    ],
+    recipe: "Rybę oczyść, do środka włóż cytrynę. Ułóż w formie z ziemniakami i pomidorkami. Piecz w 200 stopniach przez 20-25 minut."
+  },
+  {
+    name: "Leczo z cukinii i indyka",
+    calories: 480, protein: 30, fats: 12, carbs: 55,
+    type: "lunch",
+    ingredients: [
+      { item: "Pierś z indyka", amount: "120g" },
+      { item: "Cukinia", amount: "200g" },
+      { item: "Papryka czerwona", amount: "100g" },
+      { item: "Passata pomidorowa", amount: "150ml" },
+      { item: "Kasza gryczana (sucha)", amount: "50g" }
+    ],
+    recipe: "Mięso i warzywa pokrój w kostkę. Podsmaż mięso, dodaj paprykę i cukinię. Zalej passatą i duś do miękkości. Podawaj z ugotowaną kaszą."
+  },
   {
     name: "Spaghetti Bolognese z indykiem",
     calories: 540, protein: 32, fats: 14, carbs: 65,
@@ -137,153 +169,15 @@ export const MEAL_DATABASE: Meal[] = [
     recipe: "Mięso podsmaż, dodaj passatę. Duś 10 min. Wymieszaj z ugotowanym makaronem."
   },
   {
-    name: "Spaghetti Carbonara w wersji fit",
-    calories: 550, protein: 28, fats: 18, carbs: 62,
-    type: "lunch",
-    ingredients: [
-      { item: "Makaron spaghetti", amount: "70g" },
-      { item: "Szynka dojrzewająca", amount: "30g" },
-      { item: "Jajko", amount: "1 szt" },
-      { item: "Parmezan", amount: "2 łyżki" }
-    ],
-    recipe: "Gorący makaron wymieszaj z roztrzepanym jajkiem i serem poza ogniem."
-  },
-  {
-    name: "Leczo warzywne z kiełbasą drobiową",
-    calories: 490, protein: 25, fats: 18, carbs: 55,
-    type: "lunch",
-    ingredients: [
-      { item: "Cukinia", amount: "1/2 szt" },
-      { item: "Papryka", amount: "1 szt" },
-      { item: "Kiełbasa drobiowa", amount: "80g" },
-      { item: "Kasza pęczak", amount: "50g" }
-    ],
-    recipe: "Warzywa i kiełbasę podduś w garnku. Podawaj z ugotowaną kaszą."
-  },
-  {
-    name: "Gulasz z szynki z kaszą gryczaną",
-    calories: 560, protein: 38, fats: 16, carbs: 60,
-    type: "lunch",
-    ingredients: [
-      { item: "Szynka wieprzowa", amount: "130g" },
-      { item: "Kasza gryczana", amount: "50g" },
-      { item: "Ogórek kiszony", amount: "2 szt" }
-    ],
-    recipe: "Mięso i warzywa duś do miękkości. Podawaj z kaszą i ogórkiem."
-  },
-  {
-    name: "Kurczak po chińsku z warzywami (Stir-fry)",
-    calories: 530, protein: 35, fats: 10, carbs: 72,
-    type: "lunch",
-    ingredients: [
-      { item: "Ryż basmati", amount: "60g" },
-      { item: "Kurczak", amount: "120g" },
-      { item: "Mieszanka warzyw chińska", amount: "200g" }
-    ],
-    recipe: "Smaż kurczaka z warzywami na dużym ogniu z sosem sojowym. Podawaj z ryżem."
-  },
-  {
-    name: "Fit Burger Wołowy z batatami",
-    calories: 585, protein: 39, fats: 21, carbs: 64,
-    type: "lunch",
-    ingredients: [
-      { item: "Bułka pełnoziarnista", amount: "1 szt" },
-      { item: "Wołowina mielona chuda", amount: "150g" },
-      { item: "Batat", amount: "150g" }
-    ],
-    recipe: "Mięso ugrilluj, batata upiecz w słupkach. Złóż burgera z warzywami."
-  },
-  {
-    name: "Pizza fit na cienkim cieście z szynką",
-    calories: 550, protein: 33, fats: 17, carbs: 69,
-    type: "lunch",
-    ingredients: [
-      { item: "Spód pełnoziarnisty", amount: "1/2 szt" },
-      { item: "Mozzarella light", amount: "50g" },
-      { item: "Szynka drobiowa", amount: "3 plastry" }
-    ],
-    recipe: "Na spód nałóż passatę, ser i szynkę. Piecz 10 min w 220st."
-  },
-  {
     name: "Kotlety mielone z indyka z purée ziemniaczanym",
     calories: 515, protein: 34, fats: 15, carbs: 56,
     type: "lunch",
     ingredients: [
-      { item: "Mięso mielone z indyka", amount: "120g" },
+      { item: "Pierś z indyka", amount: "120g" },
       { item: "Ziemniaki", amount: "200g" },
       { item: "Buraczki tarte", amount: "100g" }
     ],
-    recipe: "Kotlety upiecz w piekarniku. Ziemniaki ugnieć na purée. Podawaj z buraczkami."
-  },
-  {
-    name: "Schabowy w otrębach, ziemniaki i mizeria",
-    calories: 560, protein: 38, fats: 18, carbs: 59,
-    type: "lunch",
-    ingredients: [
-      { item: "Schab bez kości", amount: "130g" },
-      { item: "Ziemniaki", amount: "200g" },
-      { item: "Ogórek świeży", amount: "1 szt" }
-    ],
-    recipe: "Schab panieruj w jajku i otrębach, upiecz. Podawaj z ziemniakami i mizerią."
-  },
-
-  // --- OBIADY (lunch) - RYBY ---
-  {
-    name: "Pieczony łosoś z koperkiem i ziemniakami",
-    calories: 520, protein: 34, fats: 18, carbs: 54,
-    type: "lunch",
-    ingredients: [
-      { item: "Łosoś świeży filet", amount: "150g" },
-      { item: "Ziemniaki", amount: "200g" },
-      { item: "Koper", amount: "1/2 pęczka" },
-      { item: "Cytryna", amount: "2 plastry" }
-    ],
-    recipe: "Łososia upiecz w 180st (15 min). Podawaj z ugotowanymi ziemniakami z koperkiem."
-  },
-  {
-    name: "Dorsz świeży z pary, ryż i brokuły",
-    calories: 480, protein: 30, fats: 10, carbs: 65,
-    type: "lunch",
-    ingredients: [
-      { item: "Dorsz filet", amount: "150g" },
-      { item: "Ryż jaśminowy", amount: "60g" },
-      { item: "Brokuły", amount: "150g" }
-    ],
-    recipe: "Dorsza i brokuły ugotuj na parze. Podawaj z ryżem i cytryną."
-  },
-  {
-    name: "Pstrąg pieczony w folii z czosnkiem",
-    calories: 495, protein: 35, fats: 14, carbs: 52,
-    type: "lunch",
-    ingredients: [
-      { item: "Pstrąg patroszony", amount: "1 szt" },
-      { item: "Ziemniaki pieczone", amount: "200g" },
-      { item: "Czosnek i zioła", amount: "do smaku" }
-    ],
-    recipe: "Rybę nafaszeruj czosnkiem i upiecz w folii (25 min). Podawaj z ziemniakami."
-  },
-  {
-    name: "Miruna w panierce z otrębów z kaszą",
-    calories: 510, protein: 32, fats: 12, carbs: 68,
-    type: "lunch",
-    ingredients: [
-      { item: "Miruna filet", amount: "140g" },
-      { item: "Otręby owsiane", amount: "2 łyżki" },
-      { item: "Kasza gryczana", amount: "50g" }
-    ],
-    recipe: "Rybę panieruj w jajku i otrębach, upiecz bez tłuszczu. Podawaj z kaszą."
-  },
-  {
-    name: "Łosoś Teriyaki z fasolką szparagową",
-    calories: 550, protein: 36, fats: 20, carbs: 58,
-    type: "lunch",
-    ingredients: [
-      { item: "Łosoś filet", amount: "150g" },
-      { item: "Sos Teriyaki", amount: "2 łyżki" },
-      { item: "Ryż biały", amount: "50g" },
-      { item: "Fasolka szparagowa", amount: "150g" }
-    ],
-    recipe: "Łososia upiecz w sosie. Podawaj z ryżem i gotowaną fasolką."
+    recipe: "Mięso zmiel z cebulą, uformuj kotlety i upiecz w piekarniku. Ziemniaki ugnieć na purée. Podawaj z buraczkami."
   },
 
   // --- PODWIECZORKI I PRZEKĄSKI (snack2) ---
@@ -299,15 +193,16 @@ export const MEAL_DATABASE: Meal[] = [
     recipe: "Składniki wymieszaj w miseczce."
   },
   {
-    name: "Sałatka owocowa z orzechami",
-    calories: 210, protein: 4, fats: 8, carbs: 32,
+    name: "Budyń jaglany z malinami",
+    calories: 240, protein: 8, fats: 5, carbs: 42,
     type: "snack2",
     ingredients: [
-      { item: "Jabłko", amount: "1/2 szt" },
-      { item: "Pomarańcza", amount: "1/2 szt" },
-      { item: "Orzechy włoskie", amount: "3 szt" }
+      { item: "Kasza jaglana", amount: "40g" },
+      { item: "Mleko 2%", amount: "100ml" },
+      { item: "Maliny", amount: "50g" },
+      { item: "Banan", amount: "1/2 szt" }
     ],
-    recipe: "Owoce pokrój w kostkę i posyp orzechami."
+    recipe: "Kaszę ugotuj na miękko. Zblenduj z mlekiem i bananem na gładki krem. Podawaj z malinami."
   },
   {
     name: "Serek wiejski z rzodkiewką i szczypiorkiem",
@@ -319,79 +214,5 @@ export const MEAL_DATABASE: Meal[] = [
       { item: "Szczypiorek", amount: "1 łyżka" }
     ],
     recipe: "Wymieszaj składniki w miseczce."
-  },
-  {
-    name: "Smoothie truskawkowo-bananowe",
-    calories: 220, protein: 8, fats: 3, carbs: 38,
-    type: "snack2",
-    ingredients: [
-      { item: "Maślanka", amount: "200ml" },
-      { item: "Truskawki", amount: "100g" },
-      { item: "Banan", amount: "1/2 szt" }
-    ],
-    recipe: "Zblenduj wszystkie składniki."
-  },
-  {
-    name: "Banan z masłem orzechowym",
-    calories: 260, protein: 6, fats: 12, carbs: 34,
-    type: "snack2",
-    ingredients: [
-      { item: "Banan", amount: "1 szt" },
-      { item: "Masło orzechowe 100%", amount: "1 łyżka" }
-    ],
-    recipe: "Banana pokrój w plastry i posmaruj masłem orzechowym."
-  },
-  {
-    name: "Marchewki w słupkach z hummusem",
-    calories: 180, protein: 6, fats: 10, carbs: 18,
-    type: "snack2",
-    ingredients: [
-      { item: "Marchewka", amount: "2 szt" },
-      { item: "Hummus", amount: "2 łyżki" }
-    ],
-    recipe: "Marchewkę pokrój w słupki i maczaj w hummusie."
-  },
-  {
-    name: "Pudding chia z malinami",
-    calories: 220, protein: 8, fats: 10, carbs: 28,
-    type: "snack2",
-    ingredients: [
-      { item: "Nasiona chia", amount: "2 łyżki" },
-      { item: "Napój migdałowy", amount: "150ml" },
-      { item: "Maliny", amount: "garść" }
-    ],
-    recipe: "Chia namocz w napoju na noc. Podawaj z malinami."
-  },
-  {
-    name: "Kefir z otrębami i cynamonem",
-    calories: 160, protein: 9, fats: 4, carbs: 22,
-    type: "snack2",
-    ingredients: [
-      { item: "Kefir", amount: "250ml" },
-      { item: "Otręby owsiane", amount: "2 łyżki" },
-      { item: "Cynamon", amount: "szczypta" }
-    ],
-    recipe: "Wymieszaj otręby z kefirem i posyp cynamonem."
-  },
-  {
-    name: "Wafle ryżowe z twarożkiem i dżemem",
-    calories: 195, protein: 12, fats: 3, carbs: 30,
-    type: "snack2",
-    ingredients: [
-      { item: "Wafle ryżowe", amount: "2 szt" },
-      { item: "Twaróg chudy", amount: "50g" },
-      { item: "Dżem bez cukru", amount: "2 łyżeczki" }
-    ],
-    recipe: "Wafle posmaruj twarożkiem i dodaj dżem."
-  },
-  {
-    name: "Orzechy nerkowca i suszone morele",
-    calories: 245, protein: 5, fats: 16, carbs: 22,
-    type: "snack2",
-    ingredients: [
-      { item: "Orzechy nerkowca", amount: "20g" },
-      { item: "Morele suszone", amount: "3 szt" }
-    ],
-    recipe: "Szybka przekąska do ręki."
   }
 ];
