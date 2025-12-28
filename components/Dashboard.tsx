@@ -15,6 +15,7 @@ interface DashboardProps {
   calories: number;
   isLoading: boolean;
   error: string | null;
+  cloudId: string | null;
   onGenerate: () => void;
   onUpdateMeal: (day: number, mealType: string, newMeal: Meal) => void;
   onCopyDay: (sourceDay: number, targetDays: number[]) => void;
@@ -22,11 +23,12 @@ interface DashboardProps {
   onAddCustomMeal: (meal: Meal) => void;
   onDeleteCustomMeal: (name: string) => void;
   onReset: () => void;
+  onSetCloudId: (id: string) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
-  profile, mealPlan, allAvailableMeals, customMeals, calories, isLoading, error, 
-  onGenerate, onUpdateMeal, onCopyDay, onUpdateProfile, onAddCustomMeal, onDeleteCustomMeal, onReset
+  profile, mealPlan, allAvailableMeals, customMeals, calories, isLoading, error, cloudId,
+  onGenerate, onUpdateMeal, onCopyDay, onUpdateProfile, onAddCustomMeal, onDeleteCustomMeal, onReset, onSetCloudId
 }) => {
   const [activeTab, setActiveTab] = useState<'meals' | 'shopping' | 'inspirations' | 'settings'>('meals');
 
@@ -107,7 +109,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             ) : activeTab === 'inspirations' ? (
               <InspirationsView customMeals={customMeals} onAddCustomMeal={onAddCustomMeal} onDeleteCustomMeal={onDeleteCustomMeal} />
             ) : activeTab === 'settings' ? (
-              <SettingsView profile={profile} onUpdateProfile={onUpdateProfile} onReset={onReset} />
+              <SettingsView profile={profile} cloudId={cloudId} onUpdateProfile={onUpdateProfile} onReset={onReset} onSetCloudId={onSetCloudId} />
             ) : (
               <div className="text-center py-10">Brak danych.</div>
             )}

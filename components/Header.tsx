@@ -5,9 +5,10 @@ import { Icons, APP_NAME } from '../constants';
 interface HeaderProps {
   onReset: () => void;
   showReset: boolean;
+  syncStatus?: 'synced' | 'syncing' | 'error';
 }
 
-const Header: React.FC<HeaderProps> = ({ onReset, showReset }) => {
+const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus }) => {
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 h-12 sm:h-16 flex items-center justify-between">
@@ -15,16 +16,26 @@ const Header: React.FC<HeaderProps> = ({ onReset, showReset }) => {
           <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-500 rounded-lg sm:rounded-xl flex items-center justify-center text-white">
             <Icons.Apple className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
-          <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-800">
-            {APP_NAME}
-          </span>
+          <div className="flex flex-col -space-y-1">
+            <span className="text-lg sm:text-xl font-bold tracking-tight text-slate-800">
+              {APP_NAME}
+            </span>
+            {syncStatus && (
+              <div className="flex items-center gap-1">
+                <div className={`w-1.5 h-1.5 rounded-full ${syncStatus === 'synced' ? 'bg-emerald-500' : syncStatus === 'syncing' ? 'bg-amber-400 animate-pulse' : 'bg-red-500'}`}></div>
+                <span className="text-[8px] font-black uppercase text-slate-400">
+                  {syncStatus === 'synced' ? 'Zsynchronizowano' : syncStatus === 'syncing' ? 'Zapisywanie...' : 'Błąd połączenia'}
+                </span>
+              </div>
+            )}
+          </div>
         </div>
         
         {showReset && (
           <button 
             onClick={onReset}
             className="text-slate-400 hover:text-red-500 transition-colors p-2"
-            title="Resetuj ustawienia"
+            title="Ustawienia / Reset"
           >
             <Icons.Settings className="w-5 h-5" />
           </button>
