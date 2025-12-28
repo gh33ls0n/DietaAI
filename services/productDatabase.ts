@@ -29,9 +29,9 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Ananas", calories: 50, protein: 1, fats: 0, carbs: 13, unit: 'g' },
   { name: "Mango", calories: 60, protein: 1, fats: 0, carbs: 15, unit: 'g' },
   { name: "Awokado", calories: 160, protein: 2, fats: 15, carbs: 9, unit: 'g' },
-  { name: "Jabłko", calories: 52, protein: 0, fats: 0, carbs: 14, unit: 'g' },
+  { name: "Pomidory suszone", calories: 213, protein: 14, fats: 14, carbs: 12, unit: 'g' },
 
-  // MIĘSO
+  // MIĘSO I RYBY
   { name: "Pierś z kurczaka", calories: 110, protein: 21, fats: 1, carbs: 0, unit: 'g' },
   { name: "Udo z kurczaka bez skóry", calories: 120, protein: 19, fats: 5, carbs: 0, unit: 'g' },
   { name: "Pierś z indyka", calories: 105, protein: 22, fats: 1, carbs: 0, unit: 'g' },
@@ -40,35 +40,20 @@ export const PRODUCT_DATABASE: Product[] = [
   { name: "Polędwiczka wieprzowa", calories: 110, protein: 21, fats: 2, carbs: 0, unit: 'g' },
   { name: "Schab bez kości", calories: 120, protein: 22, fats: 3, carbs: 0, unit: 'g' },
   { name: "Mięso mielone z indyka", calories: 120, protein: 20, fats: 4, carbs: 0, unit: 'g' },
-  { name: "Boczek wędzony chudy", calories: 280, protein: 18, fats: 22, carbs: 1, unit: 'g' },
-  { name: "Szynka drobiowa", calories: 100, protein: 18, fats: 2, carbs: 1, unit: 'g' },
 
-  // ZBOŻOWE I KASZE
+  // ZBOŻOWE
   { name: "Ryż basmati (suchy)", calories: 350, protein: 8, fats: 1, carbs: 78, unit: 'g' },
-  { name: "Ryż brązowy (suchy)", calories: 350, protein: 7, fats: 3, carbs: 75, unit: 'g' },
   { name: "Kasza gryczana (sucha)", calories: 340, protein: 12, fats: 3, carbs: 70, unit: 'g' },
   { name: "Kasza bulgur (sucha)", calories: 340, protein: 12, fats: 2, carbs: 76, unit: 'g' },
   { name: "Kasza pęczak (sucha)", calories: 350, protein: 10, fats: 2, carbs: 75, unit: 'g' },
-  { name: "Kasza jaglana (sucha)", calories: 350, protein: 11, fats: 3, carbs: 70, unit: 'g' },
   { name: "Makaron pełnoziarnisty (suchy)", calories: 350, protein: 14, fats: 3, carbs: 65, unit: 'g' },
-  { name: "Makaron spaghetti (durum)", calories: 360, protein: 12, fats: 1, carbs: 75, unit: 'g' },
-  { name: "Tortilla pełnoziarnista", calories: 290, protein: 9, fats: 7, carbs: 45, unit: 'g' },
-  { name: "Bułka grahamka", calories: 250, protein: 9, fats: 3, carbs: 48, unit: 'g' },
-  { name: "Mąka pełnoziarnista", calories: 340, protein: 13, fats: 2, carbs: 62, unit: 'g' },
-  { name: "Panko", calories: 360, protein: 12, fats: 2, carbs: 72, unit: 'g' },
+  { name: "Kuskus (suchy)", calories: 360, protein: 13, fats: 1, carbs: 72, unit: 'g' },
 
-  // INNE
+  // NABIAŁ I TŁUSZCZE
   { name: "Oliwa z oliwek", calories: 884, protein: 0, fats: 100, carbs: 0, unit: 'ml' },
-  { name: "Olej rzepakowy", calories: 884, protein: 0, fats: 100, carbs: 0, unit: 'ml' },
-  { name: "Mleczko kokosowe Light", calories: 75, protein: 1, fats: 7, carbs: 2, unit: 'ml' },
-  { name: "Passata pomidorowa", calories: 30, protein: 2, fats: 0, carbs: 5, unit: 'ml' },
-  { name: "Koncentrat pomidorowy", calories: 95, protein: 5, fats: 1, carbs: 18, unit: 'g' },
-  { name: "Sos sojowy", calories: 60, protein: 10, fats: 0, carbs: 5, unit: 'ml' },
-  { name: "Musztarda", calories: 100, protein: 4, fats: 4, carbs: 8, unit: 'g' },
-  { name: "Miód", calories: 304, protein: 0, fats: 0, carbs: 82, unit: 'g' },
-  { name: "Masło orzechowe", calories: 588, protein: 25, fats: 50, carbs: 13, unit: 'g' },
+  { name: "Jogurt naturalny", calories: 61, protein: 4, fats: 3, carbs: 5, unit: 'g' },
   { name: "Ser Mozzarella Light", calories: 160, protein: 19, fats: 9, carbs: 1, unit: 'g' },
-  { name: "Feta Light", calories: 180, protein: 17, fats: 12, carbs: 1, unit: 'g' },
-  { name: "Parmezan", calories: 430, protein: 38, fats: 28, carbs: 4, unit: 'g' },
-  { name: "Jogurt naturalny", calories: 61, protein: 4, fats: 3, carbs: 5, unit: 'g' }
+  { name: "Ser Feta Light", calories: 180, protein: 17, fats: 12, carbs: 1, unit: 'g' },
+  { name: "Mleczko kokosowe Light", calories: 75, protein: 1, fats: 7, carbs: 2, unit: 'ml' },
+  { name: "Sos sojowy", calories: 60, protein: 10, fats: 0, carbs: 5, unit: 'ml' }
 ];
