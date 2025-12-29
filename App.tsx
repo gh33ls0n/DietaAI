@@ -8,7 +8,6 @@ import Dashboard from './components/Dashboard';
 import { generateMealPlan } from './services/geminiService';
 import { MEAL_DATABASE } from './services/mealDatabase';
 import { CloudService } from './services/cloudService';
-import LZString from 'lz-string';
 
 const App: React.FC = () => {
   const [cloudId, setCloudId] = useState<string | null>(() => localStorage.getItem('cloud_id'));
@@ -36,41 +35,49 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Funkcja eksportu do pliku
-  const handleExportFile = () => {
-    const data = { profile, mealPlan, customMeals, version: '1.5' };
-    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `dieta_gilsona_${new Date().toISOString().split('T')[0]}.dieta`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  // Funkcja importu z pliku
-  const handleImportData = (data: any) => {
-    if (data.profile) {
-      setProfile(data.profile);
-      setMealPlan(data.mealPlan || null);
-      setCustomMeals(data.customMeals || []);
-      alert("Dane wczytane pomyślnie!");
+  // Fix: Defined handleReset to satisfy the Header and Dashboard component requirements
+  const handleReset = () => {
+    if (confirm("CZY NA PEWNO? Stracisz wszystkie dane lokalne!")) {
+      localStorage.clear();
+      window.location.reload();
     }
   };
 
-  // Funkcja manualnej synchronizacji chmury
+  // EKSPORT: Zmiana na .json dla telefonów
+  const handleExportFile = () => {
+    const data = { profile, mealPlan, customMeals, version: '1.6', exportDate: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `dieta_gilsona_backup.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportData = (data: any) => {
+    if (data && data.profile) {
+      preventNextSave.current = true;
+      setProfile(data.profile);
+      setMealPlan(data.mealPlan || null);
+      setCustomMeals(data.customMeals || []);
+      alert("Wszystkie dane zostały wczytane pomyślnie!");
+    } else {
+      alert("Nieprawidłowy format pliku kopii zapasowej.");
+    }
+  };
+
   const forceSync = useCallback(async () => {
     if (!profile) return;
     setSyncStatus('syncing');
-    
     const result = await CloudService.saveData(cloudId, {
       profile,
       mealPlan,
       customMeals,
       lastUpdated: new Date().toISOString()
     });
-    
     if (result.success) {
       if (result.id && result.id !== cloudId) {
         setCloudId(result.id);
@@ -84,7 +91,6 @@ const App: React.FC = () => {
     }
   }, [profile, mealPlan, customMeals, cloudId]);
 
-  // Ładowanie z chmury (inicjalne)
   useEffect(() => {
     const initCloud = async () => {
       if (!cloudId) return;
@@ -97,16 +103,12 @@ const App: React.FC = () => {
           if (remote.mealPlan) setMealPlan(remote.mealPlan);
           if (remote.customMeals) setCustomMeals(remote.customMeals);
           setSyncStatus('synced');
-          setSyncError(null);
         }
-      } catch (err) {
-        setSyncStatus('error');
-      }
+      } catch (err) { setSyncStatus('error'); }
     };
     initCloud();
   }, [cloudId]);
 
-  // Automatyczny zapis lokalny i chmura
   useEffect(() => {
     if (!profile) return;
     localStorage.setItem('user_profile', JSON.stringify(profile));
@@ -117,13 +119,9 @@ const App: React.FC = () => {
       preventNextSave.current = false;
       return;
     }
-
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(forceSync, 10000); // Rzadszy zapis dla stabilności
-    
-    return () => {
-      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    };
+    saveTimeoutRef.current = setTimeout(forceSync, 10000);
+    return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current); };
   }, [profile, mealPlan, customMeals, forceSync]);
 
   const allAvailableMeals = useMemo(() => [...MEAL_DATABASE, ...customMeals], [customMeals]);
@@ -139,99 +137,35 @@ const App: React.FC = () => {
     return Math.round(tdee);
   }, [profile]);
 
-  const handleGeneratePlan = async () => {
-    if (!profile) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      const plan = await generateMealPlan(profile, calculatedCalories);
-      setMealPlan(plan);
-    } catch (err: any) {
-      setError(err.message || "Błąd generowania.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleUpdateMeal = (day: number, mealType: string, newMeal: Meal) => {
-    if (!mealPlan) return;
-    const updatedDays = mealPlan.days.map(d => {
-      if (d.day === day) {
-        return {
-          ...d,
-          meals: d.meals.map(m => m.type === mealType ? newMeal : m)
-        };
-      }
-      return d;
-    });
-    setMealPlan({ days: updatedDays });
-  };
-
-  const handleCopyDay = (sourceDayNum: number, targetDaysNums: number[]) => {
-    if (!mealPlan) return;
-    const sourceDay = mealPlan.days.find(d => d.day === sourceDayNum);
-    if (!sourceDay) return;
-    const updatedDays = mealPlan.days.map(d => {
-      if (targetDaysNums.includes(d.day)) {
-        return { ...d, meals: sourceDay.meals.map(m => ({ ...m })) };
-      }
-      return d;
-    });
-    setMealPlan({ days: updatedDays });
-  };
-
-  const handleUpdateProfile = (newProfile: UserProfile) => {
-    setProfile(newProfile);
-  };
-
-  const handleReset = () => {
-    if (confirm("Zresetować wszystko?")) {
-      localStorage.clear();
-      window.location.href = window.location.pathname;
-    }
-  };
-
-  const handleSetCloudId = (id: string | null) => {
-    if (id) {
-      localStorage.setItem('cloud_id', id);
-    } else {
-      localStorage.removeItem('cloud_id');
-    }
-    setCloudId(id);
-    window.location.reload();
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
-      <Header 
-        onReset={handleReset} 
-        showReset={!!profile} 
-        syncStatus={syncStatus} 
-        syncError={syncError} 
-        onRetrySync={forceSync}
-      />
-      
+      <Header onReset={handleReset} showReset={!!profile} syncStatus={syncStatus} syncError={syncError} onRetrySync={forceSync} />
       <main className="flex-grow container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-5xl">
         {!profile ? (
-          <Onboarding onComplete={setProfile} onSetCloudId={handleSetCloudId} />
+          <Onboarding onComplete={setProfile} onSetCloudId={(id) => { setCloudId(id); localStorage.setItem('cloud_id', id); }} />
         ) : (
           <Dashboard 
-            profile={profile} 
-            mealPlan={mealPlan} 
-            allAvailableMeals={allAvailableMeals}
-            customMeals={customMeals}
-            calories={calculatedCalories}
-            isLoading={isLoading}
-            error={error}
-            cloudId={cloudId}
-            onGenerate={handleGeneratePlan}
-            onUpdateMeal={handleUpdateMeal}
-            onCopyDay={handleCopyDay}
-            onUpdateProfile={handleUpdateProfile}
+            profile={profile} mealPlan={mealPlan} allAvailableMeals={allAvailableMeals} customMeals={customMeals} calories={calculatedCalories} isLoading={isLoading} error={error} cloudId={cloudId}
+            onGenerate={async () => {
+              setIsLoading(true); setError(null);
+              try { setMealPlan(await generateMealPlan(profile, calculatedCalories)); } 
+              catch (err: any) { setError(err.message); } 
+              finally { setIsLoading(false); }
+            }}
+            onUpdateMeal={(day, type, newMeal) => {
+              if (!mealPlan) return;
+              setMealPlan({ days: mealPlan.days.map(d => d.day === day ? { ...d, meals: d.meals.map(m => m.type === type ? newMeal : m) } : d) });
+            }}
+            onCopyDay={(source, targets) => {
+              if (!mealPlan) return;
+              const s = mealPlan.days.find(d => d.day === source);
+              if (s) setMealPlan({ days: mealPlan.days.map(d => targets.includes(d.day) ? { ...d, meals: s.meals.map(m => ({ ...m })) } : d) });
+            }}
+            onUpdateProfile={setProfile}
             onAddCustomMeal={(m) => setCustomMeals(p => [...p, m])}
             onDeleteCustomMeal={(n) => setCustomMeals(p => p.filter(m => m.name !== n))}
             onReset={handleReset}
-            onSetCloudId={handleSetCloudId}
+            onSetCloudId={(id) => { setCloudId(id); if (id) localStorage.setItem('cloud_id', id); else localStorage.removeItem('cloud_id'); window.location.reload(); }}
             onExportFile={handleExportFile}
             onImportData={handleImportData}
           />
