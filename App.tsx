@@ -15,6 +15,8 @@ const App: React.FC = () => {
   const [syncError, setSyncError] = useState<string | null>(null);
   
   const preventNextSave = useRef(false);
+  // Fix: Use ReturnType<typeof setTimeout> instead of NodeJS.Timeout to avoid "Cannot find namespace 'NodeJS'" error in browser environments.
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [profile, setProfile] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('user_profile');
@@ -52,22 +54,29 @@ const App: React.FC = () => {
         }
       } catch (err) {
         setSyncStatus('error');
-        setSyncError("Błąd pobierania.");
+        setSyncError("Pobieranie nieudane.");
       }
     };
     initCloud();
   }, [cloudId]);
 
-  // 2. Automatyczny zapis przy zmianach
+  // 2. Automatyczny zapis przy zmianach (Debounced & Resilient)
   useEffect(() => {
     if (!profile) return;
+
+    // Lokalne bezpieczeństwo danych
+    localStorage.setItem('user_profile', JSON.stringify(profile));
+    if (mealPlan) localStorage.setItem('weekly_plan', JSON.stringify(mealPlan));
+    localStorage.setItem('custom_meals', JSON.stringify(customMeals));
 
     if (preventNextSave.current) {
       preventNextSave.current = false;
       return;
     }
 
-    const timer = setTimeout(async () => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+
+    saveTimeoutRef.current = setTimeout(async () => {
       setSyncStatus('syncing');
       const result = await CloudService.saveData(cloudId, {
         profile,
@@ -84,16 +93,15 @@ const App: React.FC = () => {
         setSyncStatus('synced');
         setSyncError(null);
       } else {
+        // Jeśli błąd, nie krzyczymy na użytkownika od razu, po prostu pokazujemy status
         setSyncStatus('error');
         setSyncError(result.error || "Błąd zapisu.");
       }
-    }, 3000);
-
-    localStorage.setItem('user_profile', JSON.stringify(profile));
-    if (mealPlan) localStorage.setItem('weekly_plan', JSON.stringify(mealPlan));
-    localStorage.setItem('custom_meals', JSON.stringify(customMeals));
+    }, 2000);
     
-    return () => clearTimeout(timer);
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    };
   }, [profile, mealPlan, customMeals, cloudId]);
 
   const allAvailableMeals = useMemo(() => [...MEAL_DATABASE, ...customMeals], [customMeals]);
@@ -179,6 +187,7 @@ const App: React.FC = () => {
       localStorage.removeItem('cloud_id');
     }
     setCloudId(id);
+    window.location.reload(); // Przeładowanie, aby zainicjować pobieranie
   };
 
   return (

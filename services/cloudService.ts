@@ -10,15 +10,10 @@ interface CloudData {
 }
 
 /**
- * CloudService V9 - Simple Request Protocol
- * 
- * ROZWIĄZANIE PROBLEMU BLOKADY:
- * Przeglądarki blokują zapytania JSON (OPTIONS preflight). 
- * Wysyłając dane jako 'text/plain', wymuszamy "Simple Request", 
- * który omija te zabezpieczenia i przechodzi przez większość filtrów sieciowych.
+ * CloudService V10 - JsonBlob Stability Provider
+ * JsonBlob jest najstabilniejszą darmową bazą JSON z poprawnym CORS.
  */
-const API_BASE = "https://api.keyvalue.xyz";
-const BUCKET_PREFIX = "DG_V9_"; 
+const API_BASE = "https://jsonblob.com/api/jsonBlob";
 
 export const CloudService = {
   /**
@@ -26,32 +21,28 @@ export const CloudService = {
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
-      // Pobieranie przez GET jest proste i zazwyczaj nieblokowane
-      const res = await fetch(`${API_BASE}/${BUCKET_PREFIX}${cloudId}`, {
+      if (!cloudId || cloudId.length < 5) return null;
+
+      const res = await fetch(`${API_BASE}/${cloudId}`, {
         method: 'GET',
-        cache: 'no-store'
+        headers: {
+          'Accept': 'application/json'
+        },
+        mode: 'cors'
       });
 
-      if (!res.ok) {
-        if (res.status === 404) return null;
-        throw new Error(`Błąd: ${res.status}`);
-      }
+      if (!res.ok) return null;
 
-      const raw = await res.text();
-      if (!raw || raw.length < 10) return null;
+      const raw = await res.json();
+      // JsonBlob przechowuje dane w polu 'd' (zgodnie z naszym poprzednim zapisem) lub jako root
+      const content = raw.d || raw;
+      
+      if (typeof content !== 'string') return null;
 
-      // Dekompresja
-      const decompressed = LZString.decompressFromBase64(raw);
+      const decompressed = LZString.decompressFromBase64(content);
       if (!decompressed) return null;
       
-      const data = JSON.parse(decompressed);
-
-      return {
-        profile: data.profile || null,
-        mealPlan: data.mealPlan || null,
-        customMeals: data.customMeals || [],
-        lastUpdated: data.lastUpdated || new Date().toISOString()
-      };
+      return JSON.parse(decompressed);
     } catch (e) {
       console.warn("Cloud Load Error:", e);
       return null;
@@ -59,55 +50,47 @@ export const CloudService = {
   },
 
   /**
-   * Zapisuje dane jako zwykły tekst (Simple Request).
+   * Zapisuje dane. Używa POST dla nowych i PUT dla istniejących.
    */
   saveData: async (cloudId: string | null, data: CloudData): Promise<{success: boolean, id?: string, error?: string}> => {
     try {
-      // Generujemy ID jeśli nie istnieje
-      const activeId = cloudId || CloudService.generateKey();
-      
-      const payload = JSON.stringify({
-        profile: data.profile,
-        mealPlan: data.mealPlan,
-        customMeals: data.customMeals,
-        lastUpdated: data.lastUpdated
-      });
-
+      const payload = JSON.stringify(data);
       const compressed = LZString.compressToBase64(payload);
+      const body = JSON.stringify({ d: compressed });
 
-      /**
-       * KLUCZOWE: Używamy POST z 'text/plain'.
-       * To sprawia, że zapytanie jest "Proste" i przeglądarka NIE WYSYŁA OPTIONS.
-       * Omija to 99% problemów z CORS i AdBlockami.
-       */
-      const res = await fetch(`${API_BASE}/${BUCKET_PREFIX}${activeId}`, {
-        method: 'POST',
-        body: compressed,
+      // Wybór metody: POST tworzy nowy blob, PUT aktualizuje istniejący
+      const url = cloudId ? `${API_BASE}/${cloudId}` : API_BASE;
+      const method = cloudId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method: method,
         headers: {
-          'Content-Type': 'text/plain'
-        }
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: body,
+        mode: 'cors'
       });
 
       if (res.ok) {
-        return { success: true, id: activeId };
+        // Jeśli to był POST, musimy wyciągnąć nowe ID z nagłówka Location
+        if (method === 'POST') {
+          const location = res.headers.get('Location');
+          if (location) {
+            const newId = location.split('/').pop();
+            return { success: true, id: newId };
+          }
+        }
+        return { success: true, id: cloudId || undefined };
       }
 
-      return { success: false, error: `Serwer zwrócił błąd ${res.status}` };
+      return { success: false, error: `Błąd serwera: ${res.status}` };
     } catch (e: any) {
-      console.error("Cloud Save Error:", e);
+      console.error("Cloud Save Critical Error:", e);
       return { 
         success: false, 
-        error: "Błąd sieci. Spróbuj zmienić sieć (np. na LTE)." 
+        error: "Blokada CORS lub błąd certyfikatu serwera." 
       };
     }
-  },
-
-  generateKey: () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let result = '';
-    for (let i = 0; i < 8; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
   }
 };
