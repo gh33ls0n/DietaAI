@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard';
 import { generateMealPlan } from './services/geminiService';
 import { MEAL_DATABASE } from './services/mealDatabase';
 import { CloudService } from './services/cloudService';
+import LZString from 'lz-string';
 
 const App: React.FC = () => {
   const [cloudId, setCloudId] = useState<string | null>(() => localStorage.getItem('cloud_id'));
@@ -35,6 +36,33 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 1. OBSŁUGA MAGIC LINKU (URL SYNC)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const syncData = params.get('s');
+    
+    if (syncData) {
+      try {
+        const decompressed = LZString.decompressFromEncodedURIComponent(syncData);
+        if (decompressed) {
+          const data = JSON.parse(decompressed);
+          if (data.profile) {
+            if (confirm("Wykryto dane z Magic Linku. Czy chcesz je zaimportować i nadpisać obecny jadłospis?")) {
+              setProfile(data.profile);
+              setMealPlan(data.mealPlan);
+              setCustomMeals(data.customMeals || []);
+              // Czyścimy URL po imporcie
+              window.history.replaceState({}, document.title, window.location.pathname);
+              alert("Dane zaimportowane pomyślnie!");
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Magic Link Error:", e);
+      }
+    }
+  }, []);
+
   // Funkcja manualnej synchronizacji
   const forceSync = useCallback(async () => {
     if (!profile) return;
@@ -56,15 +84,14 @@ const App: React.FC = () => {
       setSyncError(null);
     } else {
       setSyncStatus('error');
-      setSyncError(result.error || "Błąd sieci.");
+      setSyncError(result.error);
     }
   }, [profile, mealPlan, customMeals, cloudId]);
 
-  // 1. Ładowanie z chmury (inicjalne)
+  // Ładowanie z chmury (inicjalne)
   useEffect(() => {
     const initCloud = async () => {
       if (!cloudId) return;
-      
       setSyncStatus('syncing');
       try {
         const remote = await CloudService.loadData(cloudId);
@@ -78,16 +105,14 @@ const App: React.FC = () => {
         }
       } catch (err) {
         setSyncStatus('error');
-        setSyncError("Pobieranie nieudane.");
       }
     };
     initCloud();
   }, [cloudId]);
 
-  // 2. Automatyczny zapis przy zmianach
+  // Automatyczny zapis lokalny
   useEffect(() => {
     if (!profile) return;
-
     localStorage.setItem('user_profile', JSON.stringify(profile));
     if (mealPlan) localStorage.setItem('weekly_plan', JSON.stringify(mealPlan));
     localStorage.setItem('custom_meals', JSON.stringify(customMeals));
@@ -98,12 +123,12 @@ const App: React.FC = () => {
     }
 
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(forceSync, 3000);
+    saveTimeoutRef.current = setTimeout(forceSync, 5000);
     
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [profile, mealPlan, customMeals, cloudId, forceSync]);
+  }, [profile, mealPlan, customMeals, forceSync]);
 
   const allAvailableMeals = useMemo(() => [...MEAL_DATABASE, ...customMeals], [customMeals]);
 
@@ -126,7 +151,7 @@ const App: React.FC = () => {
       const plan = await generateMealPlan(profile, calculatedCalories);
       setMealPlan(plan);
     } catch (err: any) {
-      setError(err.message || "Błąd podczas generowania jadłospisu.");
+      setError(err.message || "Błąd generowania.");
     } finally {
       setIsLoading(false);
     }
@@ -159,25 +184,14 @@ const App: React.FC = () => {
     setMealPlan({ days: updatedDays });
   };
 
-  const handleAddCustomMeal = (meal: Meal) => {
-    setCustomMeals(prev => [...prev, meal]);
-  };
-
-  const handleDeleteCustomMeal = (mealName: string) => {
-    setCustomMeals(prev => prev.filter(m => m.name !== mealName));
-  };
-
   const handleUpdateProfile = (newProfile: UserProfile) => {
     setProfile(newProfile);
   };
 
   const handleReset = () => {
-    if (confirm("Czy na pewno chcesz zresetować wszystkie dane?")) {
-      setProfile(null);
-      setMealPlan(null);
-      setCloudId(null);
+    if (confirm("Zresetować wszystko?")) {
       localStorage.clear();
-      window.location.reload();
+      window.location.href = window.location.pathname;
     }
   };
 
@@ -218,19 +232,13 @@ const App: React.FC = () => {
             onUpdateMeal={handleUpdateMeal}
             onCopyDay={handleCopyDay}
             onUpdateProfile={handleUpdateProfile}
-            onAddCustomMeal={handleAddCustomMeal}
-            onDeleteCustomMeal={handleDeleteCustomMeal}
+            onAddCustomMeal={(m) => setCustomMeals(p => [...p, m])}
+            onDeleteCustomMeal={(n) => setCustomMeals(p => p.filter(m => m.name !== n))}
             onReset={handleReset}
             onSetCloudId={handleSetCloudId}
           />
         )}
       </main>
-
-      <footer className="bg-white border-t border-slate-100 py-4 mt-8">
-        <div className="container mx-auto px-4 text-center text-slate-400 text-[10px] uppercase font-bold tracking-widest">
-          {APP_NAME} &bull; {cloudId ? `ID CHMURY: ${cloudId}` : 'TRYB LOKALNY'}
-        </div>
-      </footer>
     </div>
   );
 };

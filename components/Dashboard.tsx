@@ -23,7 +23,7 @@ interface DashboardProps {
   onAddCustomMeal: (meal: Meal) => void;
   onDeleteCustomMeal: (name: string) => void;
   onReset: () => void;
-  onSetCloudId: (id: string) => void;
+  onSetCloudId: (id: string | null) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
@@ -32,17 +32,9 @@ const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'meals' | 'shopping' | 'inspirations' | 'settings'>('meals');
 
-  const handleBulkAdd = (meals: Meal[]) => {
-    // Dodawaj tylko te, których nie ma jeszcze w bazie
-    meals.forEach(m => {
-      const exists = customMeals.some(existing => existing.name === m.name);
-      if (!exists) onAddCustomMeal(m);
-    });
-  };
-
   return (
     <div className="space-y-4 sm:space-y-8 animate-in fade-in duration-500">
-      {/* Kompaktowy pasek statusu */}
+      {/* Pasek statusu */}
       <section className="bg-white p-3 sm:p-6 rounded-2xl sm:rounded-3xl shadow-sm border border-slate-200 flex items-center justify-between gap-2 overflow-x-auto scrollbar-hide">
         <div className="flex-shrink-0">
           <h2 className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Limit</h2>
@@ -65,22 +57,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </section>
 
-      {!mealPlan && !isLoading && activeTab !== 'settings' && activeTab !== 'inspirations' && (
-        <div className="bg-emerald-50 border-2 border-emerald-100 p-8 sm:p-12 rounded-3xl text-center space-y-4">
-          <div className="mx-auto w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-emerald-500">
-            <Icons.ChefHat />
-          </div>
-          <h3 className="text-xl font-bold text-emerald-900">Twój jadłospis czeka</h3>
-          <p className="text-emerald-700 text-sm max-w-md mx-auto">AI stworzy plan, korzystając z wgranej bazy przepisów i standardowych dań.</p>
-          <button 
-            onClick={onGenerate}
-            className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg transition-all"
-          >
-            Generuj Jadłospis
-          </button>
-        </div>
-      )}
-
+      {/* Loading & Errors */}
       {isLoading && (
         <div className="flex flex-col items-center justify-center p-12 text-center">
           <div className="relative w-16 h-16 mb-6">
@@ -88,40 +65,36 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
           <h3 className="text-lg font-bold text-slate-800">Pracuję nad menu...</h3>
-          <p className="text-slate-400 text-sm">Układam plan z Twoich przepisów.</p>
         </div>
       )}
-
       {error && <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl text-center text-sm">{error}</div>}
 
-      {(mealPlan || activeTab === 'inspirations' || activeTab === 'settings') && !isLoading && (
+      {/* Kontener Karty */}
+      {!isLoading && (
         <div className="space-y-4">
+          {/* Nawigacja Tabs */}
           <div className="flex bg-slate-200/50 p-1 rounded-xl w-full sm:w-fit overflow-x-auto scrollbar-hide">
             <button onClick={() => setActiveTab('meals')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'meals' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ChefHat className="w-4 h-4" />Jadłospis</button>
             <button onClick={() => setActiveTab('shopping')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'shopping' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ShoppingBag className="w-4 h-4" />Zakupy</button>
-            <button onClick={() => setActiveTab('inspirations')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'inspirations' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Plus className="w-4 h-4" />Baza ({customMeals.length})</button>
+            <button onClick={() => setActiveTab('inspirations')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'inspirations' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Plus className="w-4 h-4" />Baza</button>
             <button onClick={() => setActiveTab('settings')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'settings' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Settings className="w-4 h-4" />Opcje</button>
           </div>
 
           <div className="mt-2">
-            {activeTab === 'meals' && mealPlan ? (
-              <MealPlanView 
-                mealPlan={mealPlan} 
-                allAvailableMeals={allAvailableMeals} 
-                onRegenerate={onGenerate} 
-                onUpdateMeal={onUpdateMeal} 
-                onCopyDay={onCopyDay}
-                onAddCustomMeal={onAddCustomMeal}
-              />
-            ) : activeTab === 'shopping' && mealPlan ? (
-              <ShoppingListView mealPlan={mealPlan} />
-            ) : activeTab === 'inspirations' ? (
-              <InspirationsView customMeals={customMeals} onAddCustomMeal={onAddCustomMeal} onDeleteCustomMeal={onDeleteCustomMeal} />
-            ) : activeTab === 'settings' ? (
-              <SettingsView profile={profile} cloudId={cloudId} onUpdateProfile={onUpdateProfile} onReset={onReset} onSetCloudId={onSetCloudId} onBulkAddMeals={handleBulkAdd} />
-            ) : (
-              <div className="text-center py-10">Brak danych.</div>
+            {activeTab === 'meals' && (
+              mealPlan ? (
+                /* Fix: Changed handleUpdateMeal to onUpdateMeal as it is passed from props */
+                <MealPlanView mealPlan={mealPlan} allAvailableMeals={allAvailableMeals} onRegenerate={onGenerate} onUpdateMeal={onUpdateMeal} onCopyDay={onCopyDay} onAddCustomMeal={onAddCustomMeal} />
+              ) : (
+                <div className="bg-white p-12 rounded-3xl text-center border-2 border-dashed border-slate-100">
+                  <h3 className="text-xl font-bold text-slate-800 mb-4">Brak jadłospisu</h3>
+                  <button onClick={onGenerate} className="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold">Generuj teraz</button>
+                </div>
+              )
             )}
+            {activeTab === 'shopping' && mealPlan && <ShoppingListView mealPlan={mealPlan} />}
+            {activeTab === 'inspirations' && <InspirationsView customMeals={customMeals} onAddCustomMeal={onAddCustomMeal} onDeleteCustomMeal={onDeleteCustomMeal} />}
+            {activeTab === 'settings' && <SettingsView profile={profile} mealPlan={mealPlan} customMeals={customMeals} cloudId={cloudId} onUpdateProfile={onUpdateProfile} onReset={onReset} onSetCloudId={onSetCloudId} />}
           </div>
         </div>
       )}
