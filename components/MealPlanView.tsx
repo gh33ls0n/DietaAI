@@ -128,41 +128,42 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
       {/* Lista Posiłków */}
       <div className="lg:col-span-9 space-y-3 sm:space-y-6">
-        {/* ZMIANA: Rozjaśnione tło (emerald-600 zamiast slate-900) */}
-        <div className="bg-emerald-600 rounded-3xl p-5 sm:p-8 text-white shadow-xl relative overflow-hidden">
+        {/* ZMIANA: Jeszcze jaśniejszy gradient (emerald-400 do emerald-500) dla lżejszego wyglądu */}
+        <div className="bg-gradient-to-br from-emerald-400 to-emerald-500 rounded-3xl p-5 sm:p-8 text-white shadow-lg relative overflow-hidden">
           <div className="flex justify-between items-center relative z-10">
             <div>
-              <p className="text-[10px] font-black opacity-70 uppercase tracking-widest mb-1">Dzienne zapotrzebowanie</p>
-              <p className="text-2xl sm:text-4xl font-black">{totals.calories} <span className="text-sm opacity-60">kcal</span></p>
+              <p className="text-[10px] font-black opacity-80 uppercase tracking-widest mb-1">Dzień {selectedDay} • Podsumowanie</p>
+              <p className="text-2xl sm:text-4xl font-black">{totals.calories} <span className="text-sm opacity-60 font-medium">kcal</span></p>
             </div>
             <div className="flex flex-col items-end gap-3">
               <div className="flex gap-1.5">
                 <button 
                   onClick={handleSaveAllDayToLibrary}
-                  title="Zarchiwizuj cały ten dzień w swojej bazie"
-                  className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-tight flex items-center gap-1.5 transition-all"
+                  className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight flex items-center gap-1.5 transition-all"
                 >
-                  <Icons.Save className="w-3.5 h-3.5" /> Zapisz dzień
+                  <Icons.Save className="w-3.5 h-3.5" /> Zapisz
                 </button>
                 <button 
                   onClick={() => setIsCopyingDay(true)}
-                  className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-tight flex items-center gap-1.5 transition-all"
+                  className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight flex items-center gap-1.5 transition-all"
                 >
-                  <Icons.Copy className="w-3.5 h-3.5" /> Kopiuj dzień
+                  <Icons.Copy className="w-3.5 h-3.5" /> Kopiuj
                 </button>
               </div>
-              <div className="flex gap-4 sm:gap-8 text-center bg-black/10 px-4 py-2 rounded-2xl">
-                <div><span className="block text-[8px] opacity-60 uppercase font-black">Białko</span><span className="text-xs sm:text-lg font-bold">{totals.protein}g</span></div>
-                <div><span className="block text-[8px] opacity-60 uppercase font-black">Tłuszcz</span><span className="text-xs sm:text-lg font-bold">{totals.fats}g</span></div>
-                <div><span className="block text-[8px] opacity-60 uppercase font-black">Węgle</span><span className="text-xs sm:text-lg font-bold">{totals.carbs}g</span></div>
+              <div className="flex gap-4 sm:gap-8 text-center bg-black/5 px-4 py-2 rounded-2xl border border-white/10">
+                <div><span className="block text-[8px] opacity-70 uppercase font-black">B</span><span className="text-xs sm:text-lg font-bold">{totals.protein}g</span></div>
+                <div><span className="block text-[8px] opacity-70 uppercase font-black">T</span><span className="text-xs sm:text-lg font-bold">{totals.fats}g</span></div>
+                <div><span className="block text-[8px] opacity-70 uppercase font-black">W</span><span className="text-xs sm:text-lg font-bold">{totals.carbs}g</span></div>
               </div>
             </div>
           </div>
+          {/* Ozdobny element tła dla "lekkości" */}
+          <div className="absolute -right-8 -top-8 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
         </div>
 
         <div className="space-y-2 sm:space-y-4">
           {currentDayPlan.meals.map((meal, idx) => (
-            <div key={idx} className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-6 shadow-sm hover:border-emerald-200 transition-all">
+            <div key={idx} className="bg-white rounded-2xl border border-slate-200 p-3 sm:p-6 shadow-sm hover:border-emerald-200 transition-all group">
               <div className="flex items-center gap-3">
                 <div className="flex-grow min-w-0 cursor-pointer" onClick={() => setSelectedMeal(meal)}>
                    <div className="flex items-center gap-2 mb-0.5">
@@ -171,37 +172,13 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                      </span>
                      <span className="text-[9px] font-bold text-slate-300">{meal.calories} kcal</span>
                    </div>
-                   <h4 className="text-sm sm:text-lg font-bold text-slate-800 truncate">{meal.name}</h4>
+                   <h4 className="text-sm sm:text-lg font-bold text-slate-800 truncate group-hover:text-emerald-700 transition-colors">{meal.name}</h4>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-1.5">
-                  <button 
-                    onClick={() => handleSaveToLibrary(meal)} 
-                    title="Zapisz to danie w swojej bazie inspiracji"
-                    className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
-                  >
-                    <Icons.Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </button>
-                  <button 
-                    onClick={() => handleCopyMealToNextDay(meal)} 
-                    title="Kopiuj na jutro"
-                    className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
-                  >
-                    <Icons.Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </button>
-                  <button 
-                    onClick={() => setSwappingMealType(meal.type)} 
-                    title="Wymień"
-                    className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"
-                  >
-                    <Icons.Swap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </button>
-                  <button 
-                    onClick={() => setSelectedMeal(meal)} 
-                    title="Zobacz przepis"
-                    className="p-2 sm:p-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"
-                  >
-                    <Icons.ChefHat className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </button>
+                  <button onClick={() => handleSaveToLibrary(meal)} className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"><Icons.Save className="w-4 h-4" /></button>
+                  <button onClick={() => handleCopyMealToNextDay(meal)} className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"><Icons.Copy className="w-4 h-4" /></button>
+                  <button onClick={() => setSwappingMealType(meal.type)} className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-colors"><Icons.Swap className="w-4 h-4" /></button>
+                  <button onClick={() => setSelectedMeal(meal)} className="p-2 sm:p-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors"><Icons.ChefHat className="w-4 h-4" /></button>
                 </div>
               </div>
             </div>
@@ -213,10 +190,10 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       {isCopyingDay && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsCopyingDay(false)}></div>
-          <div className="relative bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 p-6 space-y-6">
+          <div className="relative bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl p-6 space-y-6">
             <div className="text-center">
               <h2 className="text-xl font-bold text-slate-800">Kopiuj Dzień {selectedDay}</h2>
-              <p className="text-xs text-slate-400 font-bold uppercase mt-1">Wybierz dni docelowe:</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase mt-1">Wybierz dni docelowe:</p>
             </div>
             <div className="grid grid-cols-4 gap-2">
               {[1, 2, 3, 4, 5, 6, 7].map(d => (
@@ -224,21 +201,15 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                   key={d}
                   disabled={d === selectedDay}
                   onClick={() => toggleTargetDay(d)}
-                  className={`p-3 rounded-xl font-black text-sm border-2 transition-all ${d === selectedDay ? 'bg-slate-50 border-slate-100 text-slate-200' : copyTargetDays.includes(d) ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-400 hover:border-emerald-200'}`}
+                  className={`p-3 rounded-xl font-black text-sm border-2 transition-all ${d === selectedDay ? 'bg-slate-50 border-slate-100 text-slate-200' : copyTargetDays.includes(d) ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-100 text-slate-400'}`}
                 >
                   {d}
                 </button>
               ))}
             </div>
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2">
               <button onClick={() => setIsCopyingDay(false)} className="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm">Anuluj</button>
-              <button 
-                onClick={handleApplyCopyDay} 
-                disabled={copyTargetDays.length === 0}
-                className="flex-1 py-3 bg-emerald-600 disabled:bg-slate-300 text-white font-bold rounded-xl text-sm shadow-lg shadow-emerald-200"
-              >
-                Kopiuj
-              </button>
+              <button onClick={handleApplyCopyDay} disabled={copyTargetDays.length === 0} className="flex-1 py-3 bg-emerald-600 disabled:bg-slate-300 text-white font-bold rounded-xl text-sm">Kopiuj</button>
             </div>
           </div>
         </div>
@@ -248,25 +219,19 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       {swappingMealType && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSwappingMealType(null)}></div>
-          <div className="relative bg-white w-full max-w-4xl rounded-2xl overflow-hidden max-h-[85vh] flex flex-col shadow-2xl animate-in zoom-in-95 duration-200">
+          <div className="relative bg-white w-full max-w-4xl rounded-2xl overflow-hidden max-h-[85vh] flex flex-col shadow-2xl">
             <div className="p-4 border-b border-slate-100 space-y-3">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-slate-800">Wymień posiłek</h2>
+                <h2 className="text-lg font-bold text-slate-800">Wymień na inny {mealTypeLabels[swappingMealType]}</h2>
                 <button onClick={() => setSwappingMealType(null)} className="p-2 hover:bg-slate-100 rounded-full"><Icons.Plus className="rotate-45" /></button>
               </div>
-              <input 
-                type="text" 
-                placeholder="Szukaj..." 
-                value={swapSearch}
-                onChange={(e) => setSwapSearch(e.target.value)}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none text-sm"
-              />
+              <input type="text" placeholder="Szukaj dania..." value={swapSearch} onChange={(e) => setSwapSearch(e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none text-sm" />
             </div>
             <div className="p-4 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 text-sm">
               {swappableMeals.map((meal, idx) => (
-                <div key={idx} onClick={() => handleSwap(selectedDay, meal)} className="border border-slate-100 rounded-xl p-3 hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer flex justify-between items-center">
+                <div key={idx} onClick={() => handleSwap(selectedDay, meal)} className="border border-slate-100 rounded-xl p-3 hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer flex justify-between items-center group">
                   <div className="min-w-0">
-                    <h4 className="font-bold text-slate-800 truncate">{meal.name}</h4>
+                    <h4 className="font-bold text-slate-800 truncate group-hover:text-emerald-700">{meal.name}</h4>
                     <span className="text-[10px] font-bold text-emerald-600">{meal.calories} kcal</span>
                   </div>
                   <Icons.ArrowRight className="w-4 h-4 text-slate-300" />
@@ -282,14 +247,17 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedMeal(null)}></div>
           <div className="relative bg-white w-full max-w-2xl rounded-2xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl">
-            <div className="bg-emerald-600 p-6 text-white shrink-0">
+            <div className="bg-emerald-500 p-6 text-white shrink-0">
               <span className="text-[10px] font-black opacity-70 uppercase tracking-widest">{mealTypeLabels[selectedMeal.type]}</span>
               <h2 className="text-xl font-bold mb-1 leading-tight">{selectedMeal.name}</h2>
-              <p className="text-sm font-bold bg-white/20 inline-block px-2 py-0.5 rounded-lg">{selectedMeal.calories} kcal</p>
+              <div className="flex gap-4 mt-3">
+                <p className="text-xs font-bold bg-white/20 px-2 py-1 rounded">{selectedMeal.calories} kcal</p>
+                <p className="text-xs font-medium bg-white/10 px-2 py-1 rounded">B: {selectedMeal.protein}g • T: {selectedMeal.fats}g • W: {selectedMeal.carbs}g</p>
+              </div>
             </div>
             <div className="p-6 overflow-y-auto space-y-6">
               <section>
-                <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">Składniki</h3>
+                <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Składniki</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {selectedMeal.ingredients.map((ing, i) => (
                     <div key={i} className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs flex justify-between">
@@ -300,7 +268,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                 </div>
               </section>
               <section>
-                <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">Sposób przygotowania</h3>
+                <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-3">Instrukcja</h3>
                 <div className="bg-slate-50 p-4 rounded-xl text-slate-600 text-xs leading-relaxed whitespace-pre-wrap">{selectedMeal.recipe}</div>
               </section>
             </div>

@@ -10,7 +10,7 @@ interface ShoppingListViewProps {
 const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
   const [selectedDays, setSelectedDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-  const [copied, setCopied] = useState<'standard' | 'vitalia' | null>(null);
+  const [copied, setCopied] = useState<'standard' | 'listonic' | null>(null);
 
   const mealTypeLabels: Record<string, string> = {
     breakfast: 'Śniadanie',
@@ -64,7 +64,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     setCheckedItems(newState);
   };
 
-  const handleCopy = async (target: 'standard' | 'vitalia') => {
+  const handleCopy = async (target: 'standard' | 'listonic') => {
     const toCopy: string[] = [];
     
     mealPlan.days.forEach(day => {
@@ -74,9 +74,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         meal.ingredients.forEach((ing, idx) => {
           const id = `${day.day}-${meal.type}-${ing.item}-${idx}`;
           if (checkedItems[id]) {
-            // Dla Vitalii czyścimy nazwy jeszcze mocniej
+            // Dla Listonic czyścimy nazwy ze zbędnych znaków
             const cleanItem = ing.item.replace(/[*_~`]/g, '').trim();
-            toCopy.push(`${cleanItem} (${ing.amount})`);
+            toCopy.push(`${cleanItem} ${ing.amount}`);
           }
         });
       });
@@ -90,14 +90,18 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     // Unikalna lista
     const uniqueListArray = Array.from(new Set(toCopy));
     
-    // Kluczowa zmiana: Dla telefonów używamy \r\n (Carriage Return + Line Feed) 
-    // co zmusza systemy mobilne do traktowania każdej linii jako oddzielnego wpisu.
-    const uniqueList = uniqueListArray.join('\r\n');
+    // KLUCZ: Listonic Mobile najlepiej radzi sobie z prostym \n (LF).
+    // Jeśli produkty wklejają się jako jeden, oznacza to, że aplikacja nie widzi "entera".
+    // Zastosowanie prostego złączenia każda linia = jeden produkt.
+    const uniqueList = uniqueListArray.join('\n');
 
     try {
       await navigator.clipboard.writeText(uniqueList);
       setCopied(target);
       setTimeout(() => setCopied(null), 2000);
+      if (target === 'listonic') {
+        alert("Skopiowano! Wklej listę w Listonic (opcja: Dodaj wiele produktów).");
+      }
     } catch (err) {
       alert("Błąd kopiowania.");
     }
@@ -105,31 +109,29 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
   return (
     <div className="space-y-6">
-      {/* Top bar with global actions */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col lg:flex-row justify-between items-center gap-6 sticky top-20 z-40">
         <div className="text-center lg:text-left">
           <h2 className="text-2xl font-bold text-slate-800">Lista Zakupów</h2>
-          <p className="text-slate-500 text-sm mt-1">Zaznacz co chcesz kupić i wklej do aplikacji.</p>
+          <p className="text-slate-500 text-sm mt-1">Zaznacz produkty i przenieś do Listonic.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <button 
             onClick={() => handleCopy('standard')}
-            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-md active:scale-95 ${copied === 'standard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-md ${copied === 'standard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}
           >
             {copied === 'standard' ? <Icons.Check /> : <Icons.Clipboard />}
-            Standard
+            Kopiuj standard
           </button>
           <button 
-            onClick={() => handleCopy('vitalia')}
-            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-lg active:scale-95 ${copied === 'vitalia' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-white hover:bg-slate-700'}`}
+            onClick={() => handleCopy('listonic')}
+            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-lg ${copied === 'listonic' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-white hover:bg-slate-700'}`}
           >
-            {copied === 'vitalia' ? <Icons.Check /> : <Icons.ShoppingBag />}
-            Do Vitalii (Mobile)
+            {copied === 'listonic' ? <Icons.Check /> : <Icons.ShoppingBag />}
+            Do Listonic (Mobile)
           </button>
         </div>
       </div>
 
-      {/* Day Selector Quick Filters */}
       <div className="flex flex-wrap gap-2">
         {dayNames.map((name, i) => (
           <button
@@ -138,14 +140,13 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
               const d = i + 1;
               setSelectedDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
             }}
-            className={`px-4 py-2 rounded-xl text-xs font-bold border-2 transition-all ${selectedDays.includes(i + 1) ? 'bg-emerald-100 border-emerald-500 text-emerald-700' : 'bg-white border-slate-100 text-slate-400'}`}
+            className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase border-2 transition-all ${selectedDays.includes(i + 1) ? 'bg-emerald-100 border-emerald-500 text-emerald-700' : 'bg-white border-slate-100 text-slate-400'}`}
           >
             {name}
           </button>
         ))}
       </div>
 
-      {/* Grouped Shopping List */}
       <div className="grid grid-cols-1 gap-8">
         {mealPlan.days
           .filter(day => selectedDays.includes(day.day))
@@ -156,25 +157,23 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                   <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">{day.day}</div>
                   <h3 className="text-lg font-bold text-slate-800">{dayNames[day.day - 1]}</h3>
                 </div>
-                <div className="flex gap-2">
-                  <button onClick={() => toggleDay(day.day, true)} className="text-[10px] font-bold text-emerald-600 hover:underline">Zaznacz wszystkie</button>
-                  <span className="text-slate-300">|</span>
-                  <button onClick={() => toggleDay(day.day, false)} className="text-[10px] font-bold text-slate-400 hover:underline">Odznacz wszystkie</button>
+                <div className="flex gap-4">
+                  <button onClick={() => toggleDay(day.day, true)} className="text-[10px] font-black text-emerald-600 uppercase">Zaznacz wszystko</button>
+                  <button onClick={() => toggleDay(day.day, false)} className="text-[10px] font-black text-slate-400 uppercase">Odznacz wszystko</button>
                 </div>
               </div>
 
               <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {day.meals.map((meal, mIdx) => (
                   <div key={mIdx} className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">{mealTypeLabels[meal.type]}</h4>
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{mealTypeLabels[meal.type]}</h4>
                       <div className="flex gap-2">
-                        <button onClick={() => toggleMeal(day.day, meal.type, true)} className="text-[9px] font-bold text-emerald-600" title="Zaznacz posiłek"><Icons.Check className="w-3 h-3"/></button>
-                        <button onClick={() => toggleMeal(day.day, meal.type, false)} className="text-[9px] font-bold text-slate-300" title="Odznacz posiłek"><Icons.Plus className="w-3 h-3 rotate-45"/></button>
+                        <button onClick={() => toggleMeal(day.day, meal.type, true)} className="text-emerald-600"><Icons.Check className="w-4 h-4"/></button>
+                        <button onClick={() => toggleMeal(day.day, meal.type, false)} className="text-slate-300"><Icons.Plus className="w-4 h-4 rotate-45"/></button>
                       </div>
                     </div>
-                    <div className="bg-slate-50/50 rounded-2xl p-4 border border-slate-100 space-y-3">
-                      <p className="text-[11px] font-bold text-slate-800 line-clamp-1 border-b border-slate-200 pb-2 mb-2">{meal.name}</p>
+                    <div className="space-y-3">
                       {meal.ingredients.map((ing, iIdx) => {
                         const id = `${day.day}-${meal.type}-${ing.item}-${iIdx}`;
                         return (
@@ -183,13 +182,13 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                               type="checkbox" 
                               checked={!!checkedItems[id]} 
                               onChange={() => toggleItem(id)}
-                              className="mt-1 w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                              className="mt-1 w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                             />
                             <div className="flex-grow min-w-0">
-                              <span className={`block text-sm font-medium leading-tight transition-all ${checkedItems[id] ? 'text-slate-700' : 'text-slate-300 line-through'}`}>
+                              <span className={`block text-sm font-bold leading-tight ${checkedItems[id] ? 'text-slate-700' : 'text-slate-300 line-through'}`}>
                                 {ing.item}
                               </span>
-                              <span className={`text-[10px] italic ${checkedItems[id] ? 'text-emerald-600' : 'text-slate-300'}`}>
+                              <span className={`text-[10px] font-medium ${checkedItems[id] ? 'text-emerald-500' : 'text-slate-200'}`}>
                                 {ing.amount}
                               </span>
                             </div>
@@ -203,12 +202,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
             </section>
           ))}
       </div>
-
-      {selectedDays.length === 0 && (
-        <div className="text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-          <p className="text-slate-500">Wybierz przynajmniej jeden dzień, aby zobaczyć listę zakupów.</p>
-        </div>
-      )}
     </div>
   );
 };
