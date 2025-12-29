@@ -66,7 +66,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
   const handleCopy = async (target: 'standard' | 'listonic') => {
     const toCopy: string[] = [];
-    let counter = 1;
     
     mealPlan.days.forEach(day => {
       if (!selectedDays.includes(day.day)) return;
@@ -77,9 +76,8 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
           if (checkedItems[id]) {
             const cleanItem = ing.item.replace(/[*_~`]/g, '').trim();
             if (target === 'listonic') {
-              // FORMATOWANIE SPECJALNE: Numeracja i potrójny Enter
-              toCopy.push(`${counter}. ${cleanItem} ${ing.amount}`);
-              counter++;
+              // ZMIANA: Używamy przecinka jako separatora - to standard dla pól wyszukiwania 1-liniowych
+              toCopy.push(`${cleanItem} ${ing.amount}`);
             } else {
               toCopy.push(`- ${cleanItem} (${ing.amount})`);
             }
@@ -95,16 +93,17 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
     const uniqueListArray = Array.from(new Set(toCopy));
     
-    // ZMIANA: Używamy \n\n\n - niektóre aplikacje mobilne traktują pojedynczy \n jako spację
-    const uniqueList = uniqueListArray.join('\n\n\n');
+    // ZMIANA: Jeśli dla Listonic, łączymy PRZECINKAMI. Jeśli standard, NOWĄ LINIĄ.
+    const separator = target === 'listonic' ? ', ' : '\n';
+    const finalString = uniqueListArray.join(separator);
 
     try {
-      await navigator.clipboard.writeText(uniqueList);
+      await navigator.clipboard.writeText(finalString);
       setCopied(target);
       setTimeout(() => setCopied(null), 2000);
       
       if (target === 'listonic') {
-        alert("SKOPIOWANO DLA LISTONIC!\n\nWAŻNE: Otwórz Listonic, kliknij '+' (plus), wybierz 'DODAJ WIELE PRODUKTÓW' i tam wklej listę. Tylko wtedy Listonic rozdzieli produkty automatycznie.");
+        alert("Skopiowano listę zakupów! Wklej ją w pole wyszukiwania Listonic.");
       }
     } catch (err) {
       alert("Błąd kopiowania.");
@@ -115,23 +114,23 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     <div className="space-y-6">
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-lg flex flex-col lg:flex-row justify-between items-center gap-6 sticky top-20 z-40">
         <div className="text-center lg:text-left">
-          <h2 className="text-2xl font-bold text-slate-800">Zakupy</h2>
-          <p className="text-slate-400 text-sm mt-1">Zaznacz co masz i przenieś listę do Listonic.</p>
+          <h2 className="text-2xl font-bold text-slate-800">Twoje Zakupy</h2>
+          <p className="text-slate-400 text-sm mt-1">Lista produktów gotowa do wklejenia.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
           <button 
             onClick={() => handleCopy('standard')}
-            className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black text-xs uppercase transition-all shadow-md ${copied === 'standard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+            className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black text-[10px] uppercase transition-all shadow-sm ${copied === 'standard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
           >
             {copied === 'standard' ? <Icons.Check /> : <Icons.Clipboard />}
             Zwykła lista
           </button>
           <button 
             onClick={() => handleCopy('listonic')}
-            className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black text-xs uppercase transition-all shadow-lg active:scale-95 ${copied === 'listonic' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-white hover:bg-slate-900'}`}
+            className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-2xl font-black text-[10px] uppercase transition-all shadow-md active:scale-95 ${copied === 'listonic' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-white hover:bg-slate-900'}`}
           >
             {copied === 'listonic' ? <Icons.Check /> : <Icons.ShoppingBag />}
-            Do Listonic (Mobile)
+            Kopiuj do Listonic
           </button>
         </div>
       </div>
@@ -155,15 +154,15 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         {mealPlan.days
           .filter(day => selectedDays.includes(day.day))
           .map(day => (
-            <section key={day.day} className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden animate-in slide-in-from-bottom-4 duration-300">
+            <section key={day.day} className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden animate-in slide-in-from-bottom-4">
               <div className="bg-slate-50 p-4 px-6 border-b border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-emerald-500 rounded-xl flex items-center justify-center text-white text-[10px] font-black">{day.day}</div>
                   <h3 className="text-base font-bold text-slate-800">{dayNames[day.day - 1]}</h3>
                 </div>
                 <div className="flex gap-4">
-                  <button onClick={() => toggleDay(day.day, true)} className="text-[9px] font-black text-emerald-600 uppercase hover:underline">Wszystko</button>
-                  <button onClick={() => toggleDay(day.day, false)} className="text-[9px] font-black text-slate-400 uppercase hover:underline">Nic</button>
+                  <button onClick={() => toggleDay(day.day, true)} className="text-[9px] font-black text-emerald-600 uppercase">Wszystko</button>
+                  <button onClick={() => toggleDay(day.day, false)} className="text-[9px] font-black text-slate-400 uppercase">Nic</button>
                 </div>
               </div>
 
