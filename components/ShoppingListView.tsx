@@ -10,7 +10,7 @@ interface ShoppingListViewProps {
 const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
   const [selectedDays, setSelectedDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<'standard' | 'vitalia' | null>(null);
 
   const mealTypeLabels: Record<string, string> = {
     breakfast: 'Śniadanie',
@@ -22,7 +22,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
   const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 
-  // Initialize all items as checked (to buy) on first load
   useEffect(() => {
     const initialState: Record<string, boolean> = {};
     mealPlan.days.forEach(day => {
@@ -65,7 +64,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     setCheckedItems(newState);
   };
 
-  const handleCopy = async () => {
+  const handleCopy = async (target: 'standard' | 'vitalia') => {
     const toCopy: string[] = [];
     
     mealPlan.days.forEach(day => {
@@ -75,24 +74,30 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         meal.ingredients.forEach((ing, idx) => {
           const id = `${day.day}-${meal.type}-${ing.item}-${idx}`;
           if (checkedItems[id]) {
-            toCopy.push(`${ing.item} (${ing.amount})`);
+            // Dla Vitalii czyścimy nazwy jeszcze mocniej
+            const cleanItem = ing.item.replace(/[*_~`]/g, '').trim();
+            toCopy.push(`${cleanItem} (${ing.amount})`);
           }
         });
       });
     });
 
     if (toCopy.length === 0) {
-      alert("Wszystkie składniki są odznaczone (już je masz). Zaznacz to, co chcesz kupić!");
+      alert("Lista jest pusta!");
       return;
     }
 
-    // Deduplicate for Listonic (if someone wants a clean list)
-    const uniqueList = Array.from(new Set(toCopy)).join('\n');
+    // Unikalna lista
+    const uniqueListArray = Array.from(new Set(toCopy));
+    
+    // Kluczowa zmiana: Dla telefonów używamy \r\n (Carriage Return + Line Feed) 
+    // co zmusza systemy mobilne do traktowania każdej linii jako oddzielnego wpisu.
+    const uniqueList = uniqueListArray.join('\r\n');
 
     try {
       await navigator.clipboard.writeText(uniqueList);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopied(target);
+      setTimeout(() => setCopied(null), 2000);
     } catch (err) {
       alert("Błąd kopiowania.");
     }
@@ -101,18 +106,27 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
   return (
     <div className="space-y-6">
       {/* Top bar with global actions */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6 sticky top-20 z-40">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-800">Twoja Lista Zakupów</h2>
-          <p className="text-slate-500 text-sm mt-1">Odznacz to, co już masz w lodówce. Skopiujemy tylko resztę.</p>
+      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col lg:flex-row justify-between items-center gap-6 sticky top-20 z-40">
+        <div className="text-center lg:text-left">
+          <h2 className="text-2xl font-bold text-slate-800">Lista Zakupów</h2>
+          <p className="text-slate-500 text-sm mt-1">Zaznacz co chcesz kupić i wklej do aplikacji.</p>
         </div>
-        <button 
-          onClick={handleCopy}
-          className={`w-full md:w-auto flex items-center justify-center gap-2 px-8 py-3 rounded-2xl font-bold transition-all shadow-lg active:scale-95 ${copied ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-white hover:bg-slate-700'}`}
-        >
-          {copied ? <Icons.Check /> : <Icons.Clipboard />}
-          {copied ? 'Skopiowano do Listonic!' : 'Kopiuj listę do kupienia'}
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+          <button 
+            onClick={() => handleCopy('standard')}
+            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-md active:scale-95 ${copied === 'standard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
+          >
+            {copied === 'standard' ? <Icons.Check /> : <Icons.Clipboard />}
+            Standard
+          </button>
+          <button 
+            onClick={() => handleCopy('vitalia')}
+            className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-lg active:scale-95 ${copied === 'vitalia' ? 'bg-emerald-500 text-white' : 'bg-slate-800 text-white hover:bg-slate-700'}`}
+          >
+            {copied === 'vitalia' ? <Icons.Check /> : <Icons.ShoppingBag />}
+            Do Vitalii (Mobile)
+          </button>
+        </div>
       </div>
 
       {/* Day Selector Quick Filters */}
@@ -143,9 +157,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                   <h3 className="text-lg font-bold text-slate-800">{dayNames[day.day - 1]}</h3>
                 </div>
                 <div className="flex gap-2">
-                  <button onClick={() => toggleDay(day.day, true)} className="text-[10px] font-bold text-emerald-600 hover:underline">Wszystko do kupienia</button>
+                  <button onClick={() => toggleDay(day.day, true)} className="text-[10px] font-bold text-emerald-600 hover:underline">Zaznacz wszystkie</button>
                   <span className="text-slate-300">|</span>
-                  <button onClick={() => toggleDay(day.day, false)} className="text-[10px] font-bold text-slate-400 hover:underline">Już mam wszystko</button>
+                  <button onClick={() => toggleDay(day.day, false)} className="text-[10px] font-bold text-slate-400 hover:underline">Odznacz wszystkie</button>
                 </div>
               </div>
 

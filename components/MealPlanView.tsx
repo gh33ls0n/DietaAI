@@ -47,7 +47,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
   };
 
   const handleSaveToLibrary = (meal: Meal) => {
-    // Sprawdź czy już jest w bazie użytkownika (customMeals)
     const alreadyInLibrary = allAvailableMeals.some(m => m.name === meal.name);
     if (alreadyInLibrary) {
       alert("To danie jest już w Twojej bazie!");
@@ -129,32 +128,33 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
       {/* Lista Posiłków */}
       <div className="lg:col-span-9 space-y-3 sm:space-y-6">
-        <div className="bg-slate-900 rounded-2xl p-4 sm:p-6 text-white shadow-lg relative overflow-hidden">
+        {/* ZMIANA: Rozjaśnione tło (emerald-600 zamiast slate-900) */}
+        <div className="bg-emerald-600 rounded-3xl p-5 sm:p-8 text-white shadow-xl relative overflow-hidden">
           <div className="flex justify-between items-center relative z-10">
             <div>
-              <p className="text-[10px] font-bold opacity-50 uppercase tracking-widest">Suma dnia</p>
-              <p className="text-xl sm:text-3xl font-black text-emerald-400">{totals.calories} kcal</p>
+              <p className="text-[10px] font-black opacity-70 uppercase tracking-widest mb-1">Dzienne zapotrzebowanie</p>
+              <p className="text-2xl sm:text-4xl font-black">{totals.calories} <span className="text-sm opacity-60">kcal</span></p>
             </div>
-            <div className="flex flex-col items-end gap-2">
-              <div className="flex gap-1">
+            <div className="flex flex-col items-end gap-3">
+              <div className="flex gap-1.5">
                 <button 
                   onClick={handleSaveAllDayToLibrary}
                   title="Zarchiwizuj cały ten dzień w swojej bazie"
-                  className="bg-white/10 hover:bg-emerald-500 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tighter flex items-center gap-1 transition-all"
+                  className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-tight flex items-center gap-1.5 transition-all"
                 >
-                  <Icons.Save className="w-3 h-3" /> Zapisz dzień
+                  <Icons.Save className="w-3.5 h-3.5" /> Zapisz dzień
                 </button>
                 <button 
                   onClick={() => setIsCopyingDay(true)}
-                  className="bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-tighter flex items-center gap-1 transition-all"
+                  className="bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl text-[10px] font-black uppercase tracking-tight flex items-center gap-1.5 transition-all"
                 >
-                  <Icons.Copy className="w-3 h-3" /> Kopiuj dzień
+                  <Icons.Copy className="w-3.5 h-3.5" /> Kopiuj dzień
                 </button>
               </div>
-              <div className="flex gap-3 sm:gap-6 text-center">
-                <div><span className="block text-[8px] opacity-40 uppercase font-black">B</span><span className="text-xs sm:text-base font-bold">{totals.protein}g</span></div>
-                <div><span className="block text-[8px] opacity-40 uppercase font-black">T</span><span className="text-xs sm:text-base font-bold">{totals.fats}g</span></div>
-                <div><span className="block text-[8px] opacity-40 uppercase font-black">W</span><span className="text-xs sm:text-base font-bold">{totals.carbs}g</span></div>
+              <div className="flex gap-4 sm:gap-8 text-center bg-black/10 px-4 py-2 rounded-2xl">
+                <div><span className="block text-[8px] opacity-60 uppercase font-black">Białko</span><span className="text-xs sm:text-lg font-bold">{totals.protein}g</span></div>
+                <div><span className="block text-[8px] opacity-60 uppercase font-black">Tłuszcz</span><span className="text-xs sm:text-lg font-bold">{totals.fats}g</span></div>
+                <div><span className="block text-[8px] opacity-60 uppercase font-black">Węgle</span><span className="text-xs sm:text-lg font-bold">{totals.carbs}g</span></div>
               </div>
             </div>
           </div>
