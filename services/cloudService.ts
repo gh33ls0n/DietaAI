@@ -12,16 +12,19 @@ interface CloudData {
 const BUCKET_ID = 'dietagilsona_v4_adaptive'; 
 const API_BASE = `https://kvdb.io/${BUCKET_ID}`;
 
-// Maksymalna liczba przepisów w jednym fragmencie (bezpieczny bufor)
-const CHUNK_SIZE = 200;
+// Zmniejszamy rozmiar fragmentu dla stabilności (100 przepisów na paczkę)
+const CHUNK_SIZE = 100;
+const MAX_RETRIES = 3;
+
+// Pomocnicza funkcja opóźnienia
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const CloudService = {
   /**
-   * Pobiera dane główne oraz wszystkie fragmenty biblioteki w sposób równoległy.
+   * Pobiera dane główne oraz fragmenty.
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
-      // 1. Pobierz CORE, aby dowiedzieć się, ile jest fragmentów
       const resCore = await fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`);
       if (!resCore.ok) return null;
 
@@ -33,15 +36,19 @@ export const CloudService = {
       let allCustomMeals: Meal[] = [];
 
       if (chunkCount > 0) {
-        // 2. Pobierz wszystkie fragmenty biblioteki równolegle
+        // Pobieranie fragmentów (tutaj Promise.all zwykle działa ok, bo to GET)
         const chunkPromises = [];
         for (let i = 0; i < chunkCount; i++) {
-          chunkPromises.push(fetch(`${API_BASE}/${cloudId}_lib_${i}?t=${Date.now()}`).then(r => r.text()));
+          chunkPromises.push(
+            fetch(`${API_BASE}/${cloudId}_lib_${i}?t=${Date.now()}`)
+              .then(r => r.ok ? r.text() : "")
+          );
         }
 
         const rawChunks = await Promise.all(chunkPromises);
         
         rawChunks.forEach(raw => {
+          if (!raw) return;
           try {
             const decompressed = LZString.decompressFromBase64(raw);
             const chunk = JSON.parse(decompressed || raw);
@@ -49,11 +56,10 @@ export const CloudService = {
               allCustomMeals = [...allCustomMeals, ...chunk.meals];
             }
           } catch (e) {
-            console.error("Błąd dekodowania fragmentu biblioteki:", e);
+            console.error("Błąd dekodowania fragmentu:", e);
           }
         });
       } else if (coreData.customMeals) {
-        // Wsparcie dla starego formatu (legacy)
         allCustomMeals = coreData.customMeals;
       }
 
@@ -70,56 +76,82 @@ export const CloudService = {
   },
 
   /**
-   * Dzieli customMeals na fragmenty i zapisuje wszystko w chmurze.
+   * Zapisuje dane sekwencyjnie z mechanizmem ponawiania prób.
    */
   saveData: async (cloudId: string, data: CloudData): Promise<{success: boolean, error?: string}> => {
     try {
-      // 1. Podziel posiłki na fragmenty po CHUNK_SIZE sztuk
+      // 1. Podział na mniejsze fragmenty
       const mealChunks: Meal[][] = [];
       for (let i = 0; i < data.customMeals.length; i += CHUNK_SIZE) {
         mealChunks.push(data.customMeals.slice(i, i + CHUNK_SIZE));
       }
 
-      // 2. Przygotuj CORE (z informacją o liczbie fragmentów)
+      // 2. Przygotowanie paczek do wysłania
+      const payloads: {url: string, body: string}[] = [];
+      
       const corePayload = JSON.stringify({
         profile: data.profile,
         mealPlan: data.mealPlan,
         lastUpdated: data.lastUpdated,
         libChunkCount: mealChunks.length
       });
-      const compressedCore = LZString.compressToBase64(corePayload);
+      payloads.push({ url: `${API_BASE}/${cloudId}`, body: LZString.compressToBase64(corePayload) });
 
-      // 3. Przygotuj fragmenty biblioteki
-      const savePromises = [
-        fetch(`${API_BASE}/${cloudId}`, { method: 'POST', body: compressedCore })
-      ];
-
-      mealChunks.forEach((chunkMeals, index) => {
-        const chunkPayload = JSON.stringify({ meals: chunkMeals });
-        const compressedChunk = LZString.compressToBase64(chunkPayload);
-        
-        // Logowanie dla celów diagnostycznych
-        console.log(`Fragment ${index} (rozmiar): ${(compressedChunk.length/1024).toFixed(1)}KB`);
-        
-        savePromises.push(
-          fetch(`${API_BASE}/${cloudId}_lib_${index}`, { method: 'POST', body: compressedChunk })
-        );
+      mealChunks.forEach((chunk, index) => {
+        const chunkPayload = JSON.stringify({ meals: chunk });
+        payloads.push({ 
+          url: `${API_BASE}/${cloudId}_lib_${index}`, 
+          body: LZString.compressToBase64(chunkPayload) 
+        });
       });
 
-      const results = await Promise.all(savePromises);
-      const allOk = results.every(r => r.ok);
-
-      if (allOk) {
-        return { success: true };
-      }
+      // 3. Wysyłanie sekwencyjne z retry
+      console.log(`Starting sync of ${payloads.length} chunks...`);
       
-      return { 
-        success: false, 
-        error: "Nie udało się zapisać wszystkich fragmentów danych." 
-      };
+      for (let i = 0; i < payloads.length; i++) {
+        const item = payloads[i];
+        let success = false;
+        let lastError = "";
+
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+          try {
+            const res = await fetch(item.url, { 
+              method: 'POST', 
+              body: item.body,
+              // Zapobieganie cache'owaniu
+              headers: { 'Cache-Control': 'no-cache' }
+            });
+            
+            if (res.ok) {
+              success = true;
+              break; 
+            }
+            lastError = `Server returned ${res.status}`;
+          } catch (e: any) {
+            lastError = e.message;
+          }
+          
+          if (attempt < MAX_RETRIES) {
+            console.warn(`Retry ${attempt}/${MAX_RETRIES} for chunk ${i}...`);
+            await delay(500 * attempt); // Eksponencjalne oczekiwanie
+          }
+        }
+
+        if (!success) {
+          return { 
+            success: false, 
+            error: `Błąd zapisu fragmentu ${i}: ${lastError}` 
+          };
+        }
+        
+        // Mała przerwa między chunkami, żeby nie przeciążyć API
+        await delay(100);
+      }
+
+      return { success: true };
     } catch (e) {
       console.error("Cloud Save Error:", e);
-      return { success: false, error: "Błąd połączenia z chmurą." };
+      return { success: false, error: "Krytyczny błąd połączenia." };
     }
   },
 
