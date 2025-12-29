@@ -10,15 +10,12 @@ interface CloudData {
 }
 
 /**
- * CloudService V7 - Resilient Sync
+ * CloudService V8 - JsonBlob Provider
  * 
- * Rozwiązanie problemu "Failed to fetch":
- * 1. Powrót do kvdb.io, ale z dedykowanym, publicznym kontenerem (Bucket).
- * 2. Usunięcie nagłówków Content-Type, co wymusza "Simple Request" w przeglądarce.
- * 3. Automatyczne ponawianie prób przy błędach sieciowych.
+ * JsonBlob jest stabilniejszy i lepiej obsługuje CORS niż proste KV story.
+ * Cloud ID w tej wersji to unikalny identyfikator bloba.
  */
-const BUCKET_ID = 'dietagilsona_global_v1'; 
-const API_BASE = `https://kvdb.io/${BUCKET_ID}`;
+const API_BASE = "https://jsonblob.com/api/jsonBlob";
 
 export const CloudService = {
   /**
@@ -26,19 +23,26 @@ export const CloudService = {
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
-      const res = await fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`);
+      // Jeśli ID nie wygląda na ID JsonBlob, ignorujemy
+      if (cloudId.length < 10) return null;
+
+      const res = await fetch(`${API_BASE}/${cloudId}`, {
+        method: 'GET',
+        headers: { 'Accept': 'application/json' }
+      });
 
       if (!res.ok) {
         if (res.status === 404) return null;
-        throw new Error(`Status ${res.status}`);
+        throw new Error(`Błąd: ${res.status}`);
       }
 
-      const raw = await res.text();
-      if (!raw || raw.length < 10) return null;
+      const rawData = await res.json();
+      
+      // Dane są przechowywane jako skompresowany string w polu 'd'
+      if (!rawData.d) return null;
 
-      // Dekompresja
-      const decompressed = LZString.decompressFromBase64(raw);
-      const data = JSON.parse(decompressed || raw);
+      const decompressed = LZString.decompressFromBase64(rawData.d);
+      const data = JSON.parse(decompressed);
 
       return {
         profile: data.profile || null,
@@ -48,61 +52,57 @@ export const CloudService = {
       };
     } catch (e) {
       console.error("Cloud Load Error:", e);
-      return null;
+      throw e;
     }
   },
 
   /**
-   * Zapisuje dane w chmurze z mechanizmem retry.
+   * Zapisuje dane. Jeśli cloudId nie istnieje, tworzy nowy blob.
    */
-  saveData: async (cloudId: string, data: CloudData): Promise<{success: boolean, error?: string}> => {
-    const payload = JSON.stringify({
-      profile: data.profile,
-      mealPlan: data.mealPlan,
-      customMeals: data.customMeals,
-      lastUpdated: data.lastUpdated
-    });
+  saveData: async (cloudId: string | null, data: CloudData): Promise<{success: boolean, id?: string, error?: string}> => {
+    try {
+      const payload = JSON.stringify({
+        profile: data.profile,
+        mealPlan: data.mealPlan,
+        customMeals: data.customMeals,
+        lastUpdated: data.lastUpdated
+      });
 
-    const compressed = LZString.compressToBase64(payload);
+      const compressed = LZString.compressToBase64(payload);
+      const body = JSON.stringify({ d: compressed });
 
-    // Próba zapisu (3 podejścia)
-    for (let i = 0; i < 3; i++) {
-      try {
-        /**
-         * KLUCZOWE: Nie używamy żadnych customowych nagłówków (nawet Content-Type).
-         * Dzięki temu przeglądarka wysyła zapytanie jako "Simple Request",
-         * co omija większość problemów z CORS i preflight (OPTIONS).
-         */
-        const response = await fetch(`${API_BASE}/${cloudId}`, {
+      // Jeśli nie mamy ID, tworzymy nowy zasób (POST)
+      if (!cloudId) {
+        const res = await fetch(API_BASE, {
           method: 'POST',
-          body: compressed
+          headers: { 'Content-Type': 'application/json' },
+          body: body
         });
 
-        if (response.ok) {
-          return { success: true };
+        if (res.ok) {
+          // Pobieramy ID z nagłówka Location: .../api/jsonBlob/{ID}
+          const location = res.headers.get('Location');
+          const newId = location?.split('/').pop();
+          return { success: true, id: newId };
         }
-      } catch (e) {
-        console.warn(`Próba ${i + 1} nieudana...`);
-        if (i === 2) {
-          return { 
-            success: false, 
-            error: "Błąd połączenia. Sprawdź internet lub wyłącz AdBlocka." 
-          };
-        }
-        // Krótka pauza przed kolejną próbą
-        await new Promise(r => setTimeout(r, 1000));
-      }
-    }
-    
-    return { success: false, error: "Nie udało się zsynchronizować." };
-  },
+      } else {
+        // Jeśli mamy ID, aktualizujemy istniejący (PUT)
+        const res = await fetch(`${API_BASE}/${cloudId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: body
+        });
 
-  generateKey: () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let result = 'DG-';
-    for (let i = 0; i < 5; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
+        if (res.ok) return { success: true, id: cloudId };
+      }
+
+      return { success: false, error: "Serwer odrzucił dane." };
+    } catch (e: any) {
+      console.error("Cloud Save Error:", e);
+      return { 
+        success: false, 
+        error: "Blokada sieci. Sprawdź AdBlocka lub VPN." 
+      };
     }
-    return result;
   }
 };

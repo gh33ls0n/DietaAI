@@ -14,7 +14,6 @@ const App: React.FC = () => {
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error'>('synced');
   const [syncError, setSyncError] = useState<string | null>(null);
   
-  // Ref zapobiegający natychmiastowemu zapisowi po odczycie
   const preventNextSave = useRef(false);
 
   const [profile, setProfile] = useState<UserProfile | null>(() => {
@@ -35,9 +34,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // --- LOGIKA SYNCHRONIZACJI ---
-
-  // 1. Ładowanie z chmury
+  // 1. Ładowanie z chmury (inicjalne)
   useEffect(() => {
     const initCloud = async () => {
       if (!cloudId) return;
@@ -46,26 +43,24 @@ const App: React.FC = () => {
       try {
         const remote = await CloudService.loadData(cloudId);
         if (remote) {
-          preventNextSave.current = true; // Blokujemy auto-zapis po pobraniu danych
+          preventNextSave.current = true;
           if (remote.profile) setProfile(remote.profile);
           if (remote.mealPlan) setMealPlan(remote.mealPlan);
           if (remote.customMeals) setCustomMeals(remote.customMeals);
           setSyncStatus('synced');
           setSyncError(null);
-        } else {
-          setSyncStatus('synced');
         }
       } catch (err) {
         setSyncStatus('error');
-        setSyncError("Nie udało się pobrać danych.");
+        setSyncError("Błąd pobierania.");
       }
     };
     initCloud();
   }, [cloudId]);
 
-  // 2. Automatyczny zapis (z zabezpieczeniem przed pętlą)
+  // 2. Automatyczny zapis przy zmianach
   useEffect(() => {
-    if (!cloudId || !profile) return;
+    if (!profile) return;
 
     if (preventNextSave.current) {
       preventNextSave.current = false;
@@ -82,13 +77,17 @@ const App: React.FC = () => {
       });
       
       if (result.success) {
+        if (result.id && result.id !== cloudId) {
+          setCloudId(result.id);
+          localStorage.setItem('cloud_id', result.id);
+        }
         setSyncStatus('synced');
         setSyncError(null);
       } else {
         setSyncStatus('error');
         setSyncError(result.error || "Błąd zapisu.");
       }
-    }, 5000); // Wydłużone do 5s dla stabilności
+    }, 3000);
 
     localStorage.setItem('user_profile', JSON.stringify(profile));
     if (mealPlan) localStorage.setItem('weekly_plan', JSON.stringify(mealPlan));
@@ -164,7 +163,7 @@ const App: React.FC = () => {
   };
 
   const handleReset = () => {
-    if (confirm("Czy na pewno chcesz zresetować wszystkie dane? To usunie profil i jadłospis z tego urządzenia.")) {
+    if (confirm("Czy na pewno chcesz zresetować wszystkie dane?")) {
       setProfile(null);
       setMealPlan(null);
       setCloudId(null);
@@ -213,7 +212,7 @@ const App: React.FC = () => {
 
       <footer className="bg-white border-t border-slate-100 py-4 mt-8">
         <div className="container mx-auto px-4 text-center text-slate-400 text-[10px] uppercase font-bold tracking-widest">
-          {APP_NAME} &bull; {cloudId ? `KONTO: ${cloudId}` : 'TRYB OFFLINE'}
+          {APP_NAME} &bull; {cloudId ? `ID CHMURY: ${cloudId}` : 'TRYB LOKALNY'}
         </div>
       </footer>
     </div>
