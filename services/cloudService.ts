@@ -14,81 +14,92 @@ const API_BASE = `https://kvdb.io/${BUCKET_ID}`;
 
 export const CloudService = {
   /**
-   * Pobiera dane i dekompresuje je
+   * Pobiera dane z dwóch niezależnych kluczy (Core i Library) i łączy je w jeden obiekt.
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
-      const response = await fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`);
-      if (!response.ok) {
-        if (response.status === 404) return null;
-        throw new Error(`Serwer zwrócił błąd: ${response.status}`);
+      // Pobieramy dane równolegle (Performance!)
+      const [resCore, resLib] = await Promise.all([
+        fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`),
+        fetch(`${API_BASE}/${cloudId}_lib?t=${Date.now()}`)
+      ]);
+
+      let coreData: any = {};
+      let libData: any = { customMeals: [] };
+
+      if (resCore.ok) {
+        const raw = await resCore.text();
+        const decompressed = LZString.decompressFromBase64(raw);
+        coreData = JSON.parse(decompressed || raw);
       }
-      
-      const rawData = await response.text();
-      
-      // Sprawdzamy czy dane są skompresowane (zwykle zaczynają się od znaków kontrolnych lub są w Base64)
-      // LZString.decompressFromBase64 zwraca null jeśli dane nie są w tym formacie
-      let decoded;
-      try {
-        const decompressed = LZString.decompressFromBase64(rawData);
-        decoded = decompressed ? JSON.parse(decompressed) : JSON.parse(rawData);
-      } catch (e) {
-        // Jeśli dekompresja zawiedzie, spróbuj sparsować jako czysty JSON (dla starych danych)
-        decoded = JSON.parse(rawData);
+
+      if (resLib.ok) {
+        const raw = await resLib.text();
+        const decompressed = LZString.decompressFromBase64(raw);
+        libData = JSON.parse(decompressed || raw);
       }
-      
-      return decoded;
+
+      if (!resCore.ok && !resLib.ok) return null;
+
+      return {
+        profile: coreData.profile || null,
+        mealPlan: coreData.mealPlan || null,
+        customMeals: libData.customMeals || coreData.customMeals || [],
+        lastUpdated: coreData.lastUpdated || new Date().toISOString()
+      };
     } catch (e) {
       console.error("Cloud Load Error:", e);
-      const localFallback = localStorage.getItem(`cloud_cache_${cloudId}`);
-      if (localFallback) {
-        try {
-          const decompressed = LZString.decompressFromBase64(localFallback);
-          return decompressed ? JSON.parse(decompressed) : JSON.parse(localFallback);
-        } catch (err) {
-          return JSON.parse(localFallback);
-        }
-      }
       return null;
     }
   },
 
   /**
-   * Kompresuje dane i zapisuje w chmurze
+   * Rozdziela dane na dwie paczki i zapisuje je pod osobnymi kluczami.
    */
   saveData: async (cloudId: string, data: CloudData): Promise<{success: boolean, error?: string}> => {
     try {
-      const jsonString = JSON.stringify(data);
-      // Kompresja do Base64 (najbezpieczniejsza dla transferu HTTP)
-      const compressed = LZString.compressToBase64(jsonString);
+      // 1. Paczka CORE (Profil + Jadłospis)
+      const corePayload = JSON.stringify({
+        profile: data.profile,
+        mealPlan: data.mealPlan,
+        lastUpdated: data.lastUpdated
+      });
       
-      console.log(`Cloud Sync: Original size: ${(jsonString.length / 1024).toFixed(1)}KB, Compressed: ${(compressed.length / 1024).toFixed(1)}KB`);
+      // 2. Paczka LIBRARY (Tylko Twoje 1300 przepisów)
+      const libPayload = JSON.stringify({
+        customMeals: data.customMeals
+      });
 
-      // Limit kvdb.io to ok 512KB. Po kompresji 2MB powinno zajmować ok 150-250KB.
-      if (compressed.length > 500000) {
+      const compressedCore = LZString.compressToBase64(corePayload);
+      const compressedLib = LZString.compressToBase64(libPayload);
+
+      console.log(`Sync Stats: Core: ${(compressedCore.length/1024).toFixed(1)}KB, Library: ${(compressedLib.length/1024).toFixed(1)}KB`);
+
+      // Sprawdzenie limitu fizycznego serwera (512KB na klucz)
+      if (compressedLib.length > 510000) {
         return { 
           success: false, 
-          error: "Nawet po kompresji dane są za duże. Przekroczono 500KB." 
+          error: "Baza przepisów jest zbyt duża (nawet po kompresji > 500KB)." 
         };
       }
 
-      const response = await fetch(`${API_BASE}/${cloudId}`, {
-        method: 'POST',
-        body: compressed, // Wysyłamy skompresowany ciąg znaków
-      });
+      // Zapisujemy obie paczki
+      const [statusCore, statusLib] = await Promise.all([
+        fetch(`${API_BASE}/${cloudId}`, { method: 'POST', body: compressedCore }),
+        fetch(`${API_BASE}/${cloudId}_lib`, { method: 'POST', body: compressedLib })
+      ]);
 
-      if (response.ok) {
-        localStorage.setItem(`cloud_cache_${cloudId}`, compressed);
+      if (statusCore.ok && statusLib.ok) {
         return { success: true };
       }
       
       return { 
         success: false, 
-        error: response.status === 413 ? "Serwer odrzucił paczkę (zbyt duża)." : "Błąd serwera." 
+        error: "Błąd podczas zapisu jednego z segmentów danych." 
       };
     } catch (e) {
       console.error("Cloud Save Error:", e);
-      return { success: false, error: "Brak połączenia z internetem." };
+      return { success: false, error: "Błąd połączenia." };
     }
   },
 
