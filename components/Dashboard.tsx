@@ -94,7 +94,15 @@ const Dashboard: React.FC<DashboardProps> = ({
               )
             )}
             {activeTab === 'shopping' && mealPlan && <ShoppingListView mealPlan={mealPlan} />}
-            {activeTab === 'inspirations' && <InspirationsView customMeals={customMeals} onAddCustomMeal={onAddCustomMeal} onDeleteCustomMeal={onDeleteCustomMeal} />}
+            {activeTab === 'inspirations' && (
+              <InspirationsView 
+                customMeals={customMeals} 
+                onAddCustomMeal={onAddCustomMeal} 
+                onDeleteCustomMeal={onDeleteCustomMeal}
+                mealPlan={mealPlan}
+                onUpdateMeal={onUpdateMeal}
+              />
+            )}
             {activeTab === 'settings' && (
               <SettingsView 
                 profile={profile} 
