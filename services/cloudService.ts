@@ -9,10 +9,11 @@ interface CloudData {
   lastUpdated: string;
 }
 
-const BUCKET_ID = 'dietagilsona_v4_adaptive'; 
-const API_BASE = `https://kvdb.io/${BUCKET_ID}`;
+// Używamy stabilnego i otwartego API keyvalue.xyz
+const API_BASE = `https://api.keyvalue.xyz`;
+// Unikalny prefiks dla aplikacji Dieta Gilsona, aby klucze nie kolidowały z innymi aplikacjami
+const APP_PREFIX = "dietagilsona_v5";
 
-// Ultra-bezpieczny rozmiar fragmentu (50 przepisów)
 const CHUNK_SIZE = 50;
 const MAX_RETRIES = 3;
 
@@ -20,12 +21,14 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const CloudService = {
   /**
-   * Pobiera wszystkie rozproszone fragmenty danych.
+   * Pobiera dane z chmury.
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
-      // 1. Pobierz CORE
-      const resCore = await fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`);
+      const fullKey = `${APP_PREFIX}_${cloudId}`;
+      
+      // 1. Pobierz CORE (Profil + Meta)
+      const resCore = await fetch(`${API_BASE}/${fullKey}/core?t=${Date.now()}`);
       if (!resCore.ok) return null;
 
       const rawCore = await resCore.text();
@@ -34,48 +37,45 @@ export const CloudService = {
 
       const chunkCount = coreData.libChunkCount || 0;
       let allCustomMeals: Meal[] = [];
-      let mealPlan: WeeklyPlan | null = coreData.mealPlan || null;
+      let mealPlan: WeeklyPlan | null = null;
 
-      // 2. Jeśli plan jest w osobnym fragmencie, pobierz go
+      // 2. Pobierz JADŁOSPIS
       if (coreData.hasExternalPlan) {
         try {
-          const resPlan = await fetch(`${API_BASE}/${cloudId}_plan?t=${Date.now()}`);
+          const resPlan = await fetch(`${API_BASE}/${fullKey}/plan?t=${Date.now()}`);
           if (resPlan.ok) {
             const rawPlan = await resPlan.text();
             const decompressedPlan = LZString.decompressFromBase64(rawPlan);
             mealPlan = JSON.parse(decompressedPlan || rawPlan);
           }
         } catch (e) {
-          console.warn("Nie udało się pobrać wydzielonego planu, używam cache lokalnego.");
+          console.warn("Błąd pobierania planu.");
         }
       }
 
-      // 3. Pobierz bibliotekę przepisów
+      // 3. Pobierz BIBLIOTEKĘ (Fragmenty)
       if (chunkCount > 0) {
-        const chunkPromises = [];
+        // Tu używamy sekwencyjnego pobierania dla stabilności
         for (let i = 0; i < chunkCount; i++) {
-          chunkPromises.push(
-            fetch(`${API_BASE}/${cloudId}_lib_${i}?t=${Date.now()}`)
-              .then(r => r.ok ? r.text() : "")
-          );
-        }
-
-        const rawChunks = await Promise.all(chunkPromises);
-        rawChunks.forEach(raw => {
-          if (!raw) return;
           try {
-            const decompressed = LZString.decompressFromBase64(raw);
-            const chunk = JSON.parse(decompressed || raw);
-            if (chunk.meals) allCustomMeals = [...allCustomMeals, ...chunk.meals];
+            const res = await fetch(`${API_BASE}/${fullKey}/lib_${i}?t=${Date.now()}`);
+            if (res.ok) {
+              const raw = await res.text();
+              const decompressed = LZString.decompressFromBase64(raw);
+              const chunk = JSON.parse(decompressed || raw);
+              if (chunk.meals) {
+                allCustomMeals = [...allCustomMeals, ...chunk.meals];
+              }
+            }
           } catch (e) {
-            console.error("Błąd dekodowania fragmentu:", e);
+            console.error(`Błąd fragmentu ${i}`);
           }
-        });
+        }
       }
 
       return {
         profile: coreData.profile || null,
-        mealPlan,
+        mealPlan: mealPlan || coreData.mealPlan || null,
         customMeals: allCustomMeals,
         lastUpdated: coreData.lastUpdated || new Date().toISOString()
       };
@@ -86,85 +86,78 @@ export const CloudService = {
   },
 
   /**
-   * Zapisuje dane z maksymalną ostrożnością.
+   * Zapisuje dane w chmurze (Metoda POST dla keyvalue.xyz).
    */
   saveData: async (cloudId: string, data: CloudData): Promise<{success: boolean, error?: string}> => {
     try {
-      // 1. Podział biblioteki na małe paczki
+      const fullKey = `${APP_PREFIX}_${cloudId}`;
+      
+      // 1. Podział na fragmenty
       const mealChunks: Meal[][] = [];
       for (let i = 0; i < data.customMeals.length; i += CHUNK_SIZE) {
         mealChunks.push(data.customMeals.slice(i, i + CHUNK_SIZE));
       }
 
-      // 2. Przygotowanie listy zadań do wykonania (sekwencyjnie)
+      // 2. Lista zadań (Zapis na keyvalue.xyz to POST na /KEY/SUBKEY)
       const tasks: {url: string, body: string, label: string}[] = [];
       
-      // Zadanie: Plan (osobno, bo bywa duży)
       if (data.mealPlan) {
-        const planPayload = JSON.stringify(data.mealPlan);
         tasks.push({
-          url: `${API_BASE}/${cloudId}_plan`,
-          body: LZString.compressToBase64(planPayload),
+          url: `${API_BASE}/${fullKey}/plan`,
+          body: LZString.compressToBase64(JSON.stringify(data.mealPlan)),
           label: "Jadłospis"
         });
       }
 
-      // Zadanie: Biblioteka
       mealChunks.forEach((chunk, index) => {
-        const chunkPayload = JSON.stringify({ meals: chunk });
         tasks.push({
-          url: `${API_BASE}/${cloudId}_lib_${index}`,
-          body: LZString.compressToBase64(chunkPayload),
-          label: `Paczka przepisów ${index + 1}/${mealChunks.length}`
+          url: `${API_BASE}/${fullKey}/lib_${index}`,
+          body: LZString.compressToBase64(JSON.stringify({ meals: chunk })),
+          label: `Biblioteka ${index + 1}`
         });
       });
 
-      // Zadanie: CORE (na samym końcu, jako potwierdzenie sukcesu reszty)
-      const corePayload = JSON.stringify({
-        profile: data.profile,
-        lastUpdated: data.lastUpdated,
-        libChunkCount: mealChunks.length,
-        hasExternalPlan: !!data.mealPlan
-      });
       tasks.push({
-        url: `${API_BASE}/${cloudId}`,
-        body: LZString.compressToBase64(corePayload),
+        url: `${API_BASE}/${fullKey}/core`,
+        body: LZString.compressToBase64(JSON.stringify({
+          profile: data.profile,
+          lastUpdated: data.lastUpdated,
+          libChunkCount: mealChunks.length,
+          hasExternalPlan: !!data.mealPlan
+        })),
         label: "Dane profilu"
       });
 
-      // 3. Wykonanie sekwencyjne z dużym buforem bezpieczeństwa
+      // 3. Wysyłanie sekwencyjne
       for (const task of tasks) {
         let success = false;
-        let errorMsg = "";
+        let lastError = "";
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
           try {
-            // Używamy prostego POST bez zbędnych nagłówków, które mogą powodować błędy CORS/Fetch
             const res = await fetch(task.url, { 
               method: 'POST', 
-              body: task.body,
-              cache: 'no-store'
+              body: task.body 
             });
             
             if (res.ok) {
               success = true;
               break; 
             }
-            errorMsg = `Status ${res.status}`;
+            lastError = `Serwer: ${res.status}`;
           } catch (e: any) {
-            errorMsg = e.message || "Błąd sieci";
+            lastError = e.message || "Błąd sieci";
           }
           
-          if (attempt < MAX_RETRIES) {
-            await delay(1000 * attempt); // Dłuższe czekanie przy błędzie
+          if (!success && attempt < MAX_RETRIES) {
+            await delay(800 * attempt);
           }
         }
 
         if (!success) {
-          return { success: false, error: `${task.label}: ${errorMsg}` };
+          return { success: false, error: `${task.label}: ${lastError}` };
         }
-        
-        await delay(200); // 0.2s przerwy między paczkami
+        await delay(150);
       }
 
       return { success: true };
