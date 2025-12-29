@@ -10,16 +10,15 @@ interface CloudData {
 }
 
 /**
- * CloudService V6 - Stabilna synchronizacja
+ * CloudService V7 - Resilient Sync
  * 
  * Rozwiązanie problemu "Failed to fetch":
- * 1. Użycie płaskiej struktury kluczy (bez ukośników w nazwie klucza).
- * 2. Przesyłanie danych jako 'text/plain', co czyni zapytanie "Simple Request".
- *    Dzięki temu przeglądarka nie wysyła zapytania OPTIONS (preflight), które często jest blokowane.
- * 3. Kompresja LZ-String pozwala zmieścić nawet 1500+ przepisów w limicie 512KB większości darmowych KV.
+ * 1. Powrót do kvdb.io, ale z dedykowanym, publicznym kontenerem (Bucket).
+ * 2. Usunięcie nagłówków Content-Type, co wymusza "Simple Request" w przeglądarce.
+ * 3. Automatyczne ponawianie prób przy błędach sieciowych.
  */
-const API_BASE = `https://api.keyvalue.xyz`;
-const APP_PREFIX = "DG_V6"; 
+const BUCKET_ID = 'dietagilsona_global_v1'; 
+const API_BASE = `https://kvdb.io/${BUCKET_ID}`;
 
 export const CloudService = {
   /**
@@ -27,28 +26,17 @@ export const CloudService = {
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
-      // Używamy unikalnego, płaskiego klucza
-      const fullKey = `${APP_PREFIX}_${cloudId}`;
-      
-      const res = await fetch(`${API_BASE}/${fullKey}?t=${Date.now()}`, {
-        method: 'GET',
-        headers: { 
-          'Accept': 'text/plain'
-        }
-      });
+      const res = await fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`);
 
       if (!res.ok) {
-        if (res.status === 404) {
-          console.log("Konto nie istnieje w chmurze, używam danych lokalnych.");
-          return null;
-        }
-        throw new Error(`Błąd serwera: ${res.status}`);
+        if (res.status === 404) return null;
+        throw new Error(`Status ${res.status}`);
       }
 
       const raw = await res.text();
       if (!raw || raw.length < 10) return null;
 
-      // Dekompresja danych
+      // Dekompresja
       const decompressed = LZString.decompressFromBase64(raw);
       const data = JSON.parse(decompressed || raw);
 
@@ -65,51 +53,48 @@ export const CloudService = {
   },
 
   /**
-   * Zapisuje dane w chmurze.
+   * Zapisuje dane w chmurze z mechanizmem retry.
    */
   saveData: async (cloudId: string, data: CloudData): Promise<{success: boolean, error?: string}> => {
-    try {
-      const fullKey = `${APP_PREFIX}_${cloudId}`;
-      
-      // Pakujemy wszystko w jeden obiekt dla maksymalnej spójności
-      const payload = JSON.stringify({
-        profile: data.profile,
-        mealPlan: data.mealPlan,
-        customMeals: data.customMeals,
-        lastUpdated: data.lastUpdated
-      });
+    const payload = JSON.stringify({
+      profile: data.profile,
+      mealPlan: data.mealPlan,
+      customMeals: data.customMeals,
+      lastUpdated: data.lastUpdated
+    });
 
-      const compressed = LZString.compressToBase64(payload);
+    const compressed = LZString.compressToBase64(payload);
 
-      /**
-       * CRITICAL FIX: Wysyłamy jako text/plain.
-       * To zapobiega wysyłaniu zapytania preflight OPTIONS.
-       * Jeśli serwer nie wspiera OPTIONS (co jest częste w darmowych API), 
-       * to właśnie to powoduje błąd "Failed to fetch".
-       */
-      const response = await fetch(`${API_BASE}/${fullKey}`, {
-        method: 'POST',
-        body: compressed,
-        headers: {
-          'Content-Type': 'text/plain' 
+    // Próba zapisu (3 podejścia)
+    for (let i = 0; i < 3; i++) {
+      try {
+        /**
+         * KLUCZOWE: Nie używamy żadnych customowych nagłówków (nawet Content-Type).
+         * Dzięki temu przeglądarka wysyła zapytanie jako "Simple Request",
+         * co omija większość problemów z CORS i preflight (OPTIONS).
+         */
+        const response = await fetch(`${API_BASE}/${cloudId}`, {
+          method: 'POST',
+          body: compressed
+        });
+
+        if (response.ok) {
+          return { success: true };
         }
-      });
-
-      if (response.ok) {
-        return { success: true };
-      } else {
-        return { success: false, error: `Błąd serwera: ${response.status}` };
+      } catch (e) {
+        console.warn(`Próba ${i + 1} nieudana...`);
+        if (i === 2) {
+          return { 
+            success: false, 
+            error: "Błąd połączenia. Sprawdź internet lub wyłącz AdBlocka." 
+          };
+        }
+        // Krótka pauza przed kolejną próbą
+        await new Promise(r => setTimeout(r, 1000));
       }
-    } catch (e: any) {
-      console.error("Cloud Save Error:", e);
-      // Jeśli błąd to "Failed to fetch", zazwyczaj winny jest CORS lub brak internetu
-      return { 
-        success: false, 
-        error: e.message === "Failed to fetch" 
-          ? "Błąd sieci (CORS/Blokada). Spróbuj za chwilę." 
-          : "Nie udało się zapisać danych." 
-      };
     }
+    
+    return { success: false, error: "Nie udało się zsynchronizować." };
   },
 
   generateKey: () => {

@@ -1,4 +1,5 @@
 
+// Added React import to provide access to the React namespace for types like React.FC
 import React from 'react';
 import { Icons, APP_NAME } from '../constants';
 
@@ -23,9 +24,17 @@ const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus, syncErr
             </span>
             {syncStatus && (
               <div className="flex items-center gap-1">
-                <div className={`w-1.5 h-1.5 rounded-full ${syncStatus === 'synced' ? 'bg-emerald-500' : syncStatus === 'syncing' ? 'bg-amber-400 animate-pulse' : 'bg-red-500'}`}></div>
-                <span className={`text-[8px] font-black uppercase ${syncStatus === 'error' ? 'text-red-500' : 'text-slate-400'}`}>
-                  {syncStatus === 'synced' ? 'Zsynchronizowano' : syncStatus === 'syncing' ? 'Zapisywanie...' : (syncError || 'Błąd połączenia')}
+                <div className={`w-1.5 h-1.5 rounded-full ${
+                  syncStatus === 'synced' ? 'bg-emerald-500' : 
+                  syncStatus === 'syncing' ? 'bg-amber-400 animate-pulse' : 
+                  'bg-red-500'
+                }`}></div>
+                <span className={`text-[8px] font-black uppercase ${
+                  syncStatus === 'error' ? 'text-red-500' : 'text-slate-400'
+                }`}>
+                  {syncStatus === 'synced' ? 'Chmura: OK' : 
+                   syncStatus === 'syncing' ? 'Zapisywanie...' : 
+                   (syncError || 'Błąd sieci')}
                 </span>
               </div>
             )}
