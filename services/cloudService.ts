@@ -10,87 +10,107 @@ interface CloudData {
 }
 
 /**
- * CloudService V10 - JsonBlob Stability Provider
- * JsonBlob jest najstabilniejszą darmową bazą JSON z poprawnym CORS.
+ * CloudService V11 - Multi-Provider Resilient Architecture
+ * Wykorzystuje dwa niezależne serwery, aby ominąć lokalne blokady DNS/CORS.
  */
-const API_BASE = "https://jsonblob.com/api/jsonBlob";
+const PROVIDERS = {
+  KVDB: "https://kvdb.io/25vK8Zq3XmB8zS5Dk2FpTq", // Dedykowany bucket
+  JSONBLOB: "https://jsonblob.com/api/jsonBlob"
+};
 
 export const CloudService = {
   /**
-   * Pobiera dane z chmury.
+   * Pobiera dane z chmury, próbując różnych dostawców.
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
+    if (!cloudId || cloudId.length < 4) return null;
+
+    // Próba 1: KVDB (Zazwyczaj szybszy i mniej blokowany w PL)
     try {
-      if (!cloudId || cloudId.length < 5) return null;
-
-      const res = await fetch(`${API_BASE}/${cloudId}`, {
+      const res = await fetch(`${PROVIDERS.KVDB}/${cloudId}`, { 
         method: 'GET',
-        headers: {
-          'Accept': 'application/json'
-        },
-        mode: 'cors'
+        cache: 'no-store'
       });
-
-      if (!res.ok) return null;
-
-      const raw = await res.json();
-      // JsonBlob przechowuje dane w polu 'd' (zgodnie z naszym poprzednim zapisem) lub jako root
-      const content = raw.d || raw;
-      
-      if (typeof content !== 'string') return null;
-
-      const decompressed = LZString.decompressFromBase64(content);
-      if (!decompressed) return null;
-      
-      return JSON.parse(decompressed);
+      if (res.ok) {
+        const raw = await res.text();
+        return CloudService.decompress(raw);
+      }
     } catch (e) {
-      console.warn("Cloud Load Error:", e);
-      return null;
+      console.warn("KVDB Load Failed, trying fallback...");
     }
+
+    // Próba 2: JSONBLOB (Zapas)
+    try {
+      const res = await fetch(`${PROVIDERS.JSONBLOB}/${cloudId}`, { method: 'GET' });
+      if (res.ok) {
+        const json = await res.json();
+        return CloudService.decompress(json.d || json);
+      }
+    } catch (e) {
+      console.error("All Cloud Providers Failed.");
+    }
+
+    return null;
   },
 
   /**
-   * Zapisuje dane. Używa POST dla nowych i PUT dla istniejących.
+   * Zapisuje dane. Jeśli cloudId nie istnieje, tworzy nowy zasób na KVDB.
    */
   saveData: async (cloudId: string | null, data: CloudData): Promise<{success: boolean, id?: string, error?: string}> => {
+    const compressed = CloudService.compress(data);
+    const activeId = cloudId || CloudService.generateShortId();
+
     try {
-      const payload = JSON.stringify(data);
-      const compressed = LZString.compressToBase64(payload);
-      const body = JSON.stringify({ d: compressed });
-
-      // Wybór metody: POST tworzy nowy blob, PUT aktualizuje istniejący
-      const url = cloudId ? `${API_BASE}/${cloudId}` : API_BASE;
-      const method = cloudId ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: body,
+      // Używamy PUT na KVDB - jest najbardziej odporny na błędy "Failed to fetch"
+      const res = await fetch(`${PROVIDERS.KVDB}/${activeId}`, {
+        method: 'PUT',
+        body: compressed,
+        headers: { 'Content-Type': 'text/plain' }, // Simple Request - omija OPTIONS preflight
         mode: 'cors'
       });
 
       if (res.ok) {
-        // Jeśli to był POST, musimy wyciągnąć nowe ID z nagłówka Location
-        if (method === 'POST') {
-          const location = res.headers.get('Location');
-          if (location) {
-            const newId = location.split('/').pop();
-            return { success: true, id: newId };
-          }
-        }
-        return { success: true, id: cloudId || undefined };
+        return { success: true, id: activeId };
       }
 
-      return { success: false, error: `Błąd serwera: ${res.status}` };
-    } catch (e: any) {
-      console.error("Cloud Save Critical Error:", e);
-      return { 
-        success: false, 
-        error: "Blokada CORS lub błąd certyfikatu serwera." 
-      };
+      // Fallback do JSONBLOB jeśli KVDB padnie
+      const blobRes = await fetch(cloudId ? `${PROVIDERS.JSONBLOB}/${cloudId}` : PROVIDERS.JSONBLOB, {
+        method: cloudId ? 'PUT' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ d: compressed })
+      });
+
+      if (blobRes.ok) {
+        let newId = cloudId;
+        if (!cloudId) {
+          const loc = blobRes.headers.get('Location');
+          newId = loc ? loc.split('/').pop() || activeId : activeId;
+        }
+        return { success: true, id: newId || activeId };
+      }
+
+      return { success: false, error: "Błąd serwerów zapasowych." };
+    } catch (e) {
+      console.warn("Cloud Save Failed (Network/CORS block)");
+      return { success: false, error: "Sieć blokuje połączenie z chmurą." };
     }
+  },
+
+  compress: (data: any): string => {
+    return LZString.compressToBase64(JSON.stringify(data));
+  },
+
+  decompress: (raw: string): CloudData | null => {
+    try {
+      if (!raw || raw.length < 10) return null;
+      const decompressed = LZString.decompressFromBase64(raw);
+      return decompressed ? JSON.parse(decompressed) : null;
+    } catch {
+      return null;
+    }
+  },
+
+  generateShortId: () => {
+    return Math.random().toString(36).substring(2, 10).toUpperCase();
   }
 };

@@ -1,5 +1,4 @@
 
-// Added React import to provide access to the React namespace for types like React.FC
 import React from 'react';
 import { Icons, APP_NAME } from '../constants';
 
@@ -23,19 +22,24 @@ const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus, syncErr
               {APP_NAME}
             </span>
             {syncStatus && (
-              <div className="flex items-center gap-1">
-                <div className={`w-1.5 h-1.5 rounded-full ${
-                  syncStatus === 'synced' ? 'bg-emerald-500' : 
+              <div className="flex items-center gap-1.5 group cursor-help">
+                <div className={`w-2 h-2 rounded-full transition-all duration-500 ${
+                  syncStatus === 'synced' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 
                   syncStatus === 'syncing' ? 'bg-amber-400 animate-pulse' : 
-                  'bg-red-500'
+                  'bg-slate-300'
                 }`}></div>
-                <span className={`text-[8px] font-black uppercase ${
-                  syncStatus === 'error' ? 'text-red-500' : 'text-slate-400'
+                <span className={`text-[9px] font-black uppercase tracking-tighter ${
+                  syncStatus === 'error' ? 'text-slate-400' : 'text-slate-500'
                 }`}>
-                  {syncStatus === 'synced' ? 'Chmura: OK' : 
-                   syncStatus === 'syncing' ? 'Zapisywanie...' : 
-                   (syncError || 'Błąd sieci')}
+                  {syncStatus === 'synced' ? 'Zsynchronizowano' : 
+                   syncStatus === 'syncing' ? 'Wysyłanie...' : 
+                   'Tryb Lokalny'}
                 </span>
+                {syncStatus === 'error' && (
+                  <div className="hidden group-hover:block absolute top-full left-0 mt-2 bg-slate-800 text-white text-[10px] p-2 rounded-lg whitespace-nowrap z-50">
+                    Błąd połączenia. Dane są bezpieczne na Twoim komputerze.
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -44,8 +48,8 @@ const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus, syncErr
         {showReset && (
           <button 
             onClick={onReset}
-            className="text-slate-400 hover:text-red-500 transition-colors p-2"
-            title="Ustawienia / Reset"
+            className="text-slate-400 hover:text-emerald-500 transition-colors p-2 rounded-full hover:bg-slate-50"
+            title="Ustawienia i Synchronizacja"
           >
             <Icons.Settings className="w-5 h-5" />
           </button>
