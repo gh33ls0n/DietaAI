@@ -10,80 +10,79 @@ interface CloudData {
 }
 
 /**
- * CloudService V12 - npoint.io Provider
- * npoint.io jest wyjątkowo odporny na blokady CORS i błędy preflight.
+ * CloudService V13 - Firebase/Google Infrastructure
+ * Wykorzystuje Google Firebase REST API - najbardziej zaufaną domenę, 
+ * rzadko blokowaną przez dostawców takich jak Netia.
  */
-const API_BASE = "https://api.npoint.io";
+const FIREBASE_URL = "https://dieta-gilsona-default-rtdb.europe-west1.firebasedatabase.app/sync";
 
 export const CloudService = {
   /**
-   * Pobiera dane z chmury.
+   * Pobiera dane. Używamy .json na końcu (wymóg Firebase REST API).
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     if (!cloudId || cloudId.length < 5) return null;
 
     try {
-      const res = await fetch(`${API_BASE}/${cloudId}`, {
+      // Wykorzystujemy Google-hosted domain
+      const res = await fetch(`${FIREBASE_URL}/${cloudId}.json`, {
         method: 'GET',
-        headers: {
-          'Accept': 'application/json'
-        }
+        mode: 'cors'
       });
 
       if (!res.ok) return null;
 
       const raw = await res.json();
-      // npoint przechowuje dane bezpośrednio
-      const content = raw.d || raw;
-      
-      if (typeof content !== 'string') return null;
+      if (!raw || !raw.d) return null;
 
-      const decompressed = LZString.decompressFromBase64(content);
+      const decompressed = LZString.decompressFromBase64(raw.d);
       return decompressed ? JSON.parse(decompressed) : null;
     } catch (e) {
-      console.warn("Npoint Load Error:", e);
+      console.warn("Cloud Load Error (Google/Firebase):", e);
       return null;
     }
   },
 
   /**
-   * Zapisuje dane.
+   * Zapisuje dane przy użyciu PUT (nadpisywanie w Firebase).
    */
   saveData: async (cloudId: string | null, data: CloudData): Promise<{success: boolean, id?: string, error?: string}> => {
+    const activeId = cloudId || CloudService.generateShortId();
+    
     try {
-      const payload = JSON.stringify(data);
-      const compressed = LZString.compressToBase64(payload);
+      const compressed = LZString.compressToBase64(JSON.stringify(data));
       
-      // Dla npoint.io używamy POST do tworzenia i POST/PUT do edycji (zależy od implementacji bin-u)
-      // Ale najbezpieczniejszy dla CORS jest POST na konkretny endpoint.
-      const url = cloudId ? `${API_BASE}/${cloudId}` : API_BASE;
-      
-      const res = await fetch(url, {
-        method: 'POST',
+      // PUT na Firebase REST API jest bardzo proste i rzadko blokowane
+      const res = await fetch(`${FIREBASE_URL}/${activeId}.json`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ d: compressed })
+        body: JSON.stringify({ d: compressed, ts: Date.now() })
       });
 
       if (res.ok) {
-        const result = await res.json();
-        // npoint zwraca ID w polu 'id' lub 'binId'
-        const newId = result.id || result.binId || cloudId;
-        return { success: true, id: newId };
+        return { success: true, id: activeId };
       }
 
-      return { success: false, error: `Serwer zwrócił błąd ${res.status}` };
+      return { success: false, error: `Status: ${res.status}` };
     } catch (e: any) {
       console.error("Critical Sync Error:", e);
+      // Przekazujemy czytelny błąd dla diagnostyki
       return { 
         success: false, 
-        error: "Połączenie zablokowane przez Twoją sieć (CORS/Firewall)." 
+        error: e.message || "Błąd sieci/CORS"
       };
     }
   },
 
   generateShortId: () => {
-    return Math.random().toString(36).substring(2, 12).toLowerCase();
+    // Firebase lubi proste klucze bez znaków specjalnych
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
   }
 };
