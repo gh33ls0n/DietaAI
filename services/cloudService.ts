@@ -9,42 +9,58 @@ interface CloudData {
   lastUpdated: string;
 }
 
-const BUCKET_ID = 'dietagilsona_v3_compressed'; 
+const BUCKET_ID = 'dietagilsona_v4_adaptive'; 
 const API_BASE = `https://kvdb.io/${BUCKET_ID}`;
+
+// Maksymalna liczba przepisów w jednym fragmencie (bezpieczny bufor)
+const CHUNK_SIZE = 200;
 
 export const CloudService = {
   /**
-   * Pobiera dane z dwóch niezależnych kluczy (Core i Library) i łączy je w jeden obiekt.
+   * Pobiera dane główne oraz wszystkie fragmenty biblioteki w sposób równoległy.
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
-      // Pobieramy dane równolegle (Performance!)
-      const [resCore, resLib] = await Promise.all([
-        fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`),
-        fetch(`${API_BASE}/${cloudId}_lib?t=${Date.now()}`)
-      ]);
+      // 1. Pobierz CORE, aby dowiedzieć się, ile jest fragmentów
+      const resCore = await fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`);
+      if (!resCore.ok) return null;
 
-      let coreData: any = {};
-      let libData: any = { customMeals: [] };
+      const rawCore = await resCore.text();
+      const decompressedCore = LZString.decompressFromBase64(rawCore);
+      const coreData = JSON.parse(decompressedCore || rawCore);
 
-      if (resCore.ok) {
-        const raw = await resCore.text();
-        const decompressed = LZString.decompressFromBase64(raw);
-        coreData = JSON.parse(decompressed || raw);
+      const chunkCount = coreData.libChunkCount || 0;
+      let allCustomMeals: Meal[] = [];
+
+      if (chunkCount > 0) {
+        // 2. Pobierz wszystkie fragmenty biblioteki równolegle
+        const chunkPromises = [];
+        for (let i = 0; i < chunkCount; i++) {
+          chunkPromises.push(fetch(`${API_BASE}/${cloudId}_lib_${i}?t=${Date.now()}`).then(r => r.text()));
+        }
+
+        const rawChunks = await Promise.all(chunkPromises);
+        
+        rawChunks.forEach(raw => {
+          try {
+            const decompressed = LZString.decompressFromBase64(raw);
+            const chunk = JSON.parse(decompressed || raw);
+            if (chunk.meals) {
+              allCustomMeals = [...allCustomMeals, ...chunk.meals];
+            }
+          } catch (e) {
+            console.error("Błąd dekodowania fragmentu biblioteki:", e);
+          }
+        });
+      } else if (coreData.customMeals) {
+        // Wsparcie dla starego formatu (legacy)
+        allCustomMeals = coreData.customMeals;
       }
-
-      if (resLib.ok) {
-        const raw = await resLib.text();
-        const decompressed = LZString.decompressFromBase64(raw);
-        libData = JSON.parse(decompressed || raw);
-      }
-
-      if (!resCore.ok && !resLib.ok) return null;
 
       return {
         profile: coreData.profile || null,
         mealPlan: coreData.mealPlan || null,
-        customMeals: libData.customMeals || coreData.customMeals || [],
+        customMeals: allCustomMeals,
         lastUpdated: coreData.lastUpdated || new Date().toISOString()
       };
     } catch (e) {
@@ -54,52 +70,56 @@ export const CloudService = {
   },
 
   /**
-   * Rozdziela dane na dwie paczki i zapisuje je pod osobnymi kluczami.
+   * Dzieli customMeals na fragmenty i zapisuje wszystko w chmurze.
    */
   saveData: async (cloudId: string, data: CloudData): Promise<{success: boolean, error?: string}> => {
     try {
-      // 1. Paczka CORE (Profil + Jadłospis)
+      // 1. Podziel posiłki na fragmenty po CHUNK_SIZE sztuk
+      const mealChunks: Meal[][] = [];
+      for (let i = 0; i < data.customMeals.length; i += CHUNK_SIZE) {
+        mealChunks.push(data.customMeals.slice(i, i + CHUNK_SIZE));
+      }
+
+      // 2. Przygotuj CORE (z informacją o liczbie fragmentów)
       const corePayload = JSON.stringify({
         profile: data.profile,
         mealPlan: data.mealPlan,
-        lastUpdated: data.lastUpdated
+        lastUpdated: data.lastUpdated,
+        libChunkCount: mealChunks.length
       });
-      
-      // 2. Paczka LIBRARY (Tylko Twoje 1300 przepisów)
-      const libPayload = JSON.stringify({
-        customMeals: data.customMeals
-      });
-
       const compressedCore = LZString.compressToBase64(corePayload);
-      const compressedLib = LZString.compressToBase64(libPayload);
 
-      console.log(`Sync Stats: Core: ${(compressedCore.length/1024).toFixed(1)}KB, Library: ${(compressedLib.length/1024).toFixed(1)}KB`);
+      // 3. Przygotuj fragmenty biblioteki
+      const savePromises = [
+        fetch(`${API_BASE}/${cloudId}`, { method: 'POST', body: compressedCore })
+      ];
 
-      // Sprawdzenie limitu fizycznego serwera (512KB na klucz)
-      if (compressedLib.length > 510000) {
-        return { 
-          success: false, 
-          error: "Baza przepisów jest zbyt duża (nawet po kompresji > 500KB)." 
-        };
-      }
+      mealChunks.forEach((chunkMeals, index) => {
+        const chunkPayload = JSON.stringify({ meals: chunkMeals });
+        const compressedChunk = LZString.compressToBase64(chunkPayload);
+        
+        // Logowanie dla celów diagnostycznych
+        console.log(`Fragment ${index} (rozmiar): ${(compressedChunk.length/1024).toFixed(1)}KB`);
+        
+        savePromises.push(
+          fetch(`${API_BASE}/${cloudId}_lib_${index}`, { method: 'POST', body: compressedChunk })
+        );
+      });
 
-      // Zapisujemy obie paczki
-      const [statusCore, statusLib] = await Promise.all([
-        fetch(`${API_BASE}/${cloudId}`, { method: 'POST', body: compressedCore }),
-        fetch(`${API_BASE}/${cloudId}_lib`, { method: 'POST', body: compressedLib })
-      ]);
+      const results = await Promise.all(savePromises);
+      const allOk = results.every(r => r.ok);
 
-      if (statusCore.ok && statusLib.ok) {
+      if (allOk) {
         return { success: true };
       }
       
       return { 
         success: false, 
-        error: "Błąd podczas zapisu jednego z segmentów danych." 
+        error: "Nie udało się zapisać wszystkich fragmentów danych." 
       };
     } catch (e) {
       console.error("Cloud Save Error:", e);
-      return { success: false, error: "Błąd połączenia." };
+      return { success: false, error: "Błąd połączenia z chmurą." };
     }
   },
 
