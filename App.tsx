@@ -35,7 +35,6 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fix: Defined handleReset to satisfy the Header and Dashboard component requirements
   const handleReset = () => {
     if (confirm("CZY NA PEWNO? Stracisz wszystkie dane lokalne!")) {
       localStorage.clear();
@@ -43,7 +42,6 @@ const App: React.FC = () => {
     }
   };
 
-  // EKSPORT: Zmiana na .json dla telefonów
   const handleExportFile = () => {
     const data = { profile, mealPlan, customMeals, version: '1.6', exportDate: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -160,6 +158,15 @@ const App: React.FC = () => {
               if (!mealPlan) return;
               const s = mealPlan.days.find(d => d.day === source);
               if (s) setMealPlan({ days: mealPlan.days.map(d => targets.includes(d.day) ? { ...d, meals: s.meals.map(m => ({ ...m })) } : d) });
+            }}
+            onCopyMealToDays={(meal, targets) => {
+              if (!mealPlan) return;
+              setMealPlan({ 
+                days: mealPlan.days.map(d => targets.includes(d.day) 
+                  ? { ...d, meals: d.meals.map(m => m.type === meal.type ? { ...meal } : m) } 
+                  : d
+                ) 
+              });
             }}
             onUpdateProfile={setProfile}
             onAddCustomMeal={(m) => setCustomMeals(p => [...p, m])}
