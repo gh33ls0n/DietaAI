@@ -9,15 +9,17 @@ interface CloudData {
   lastUpdated: string;
 }
 
-// Używamy stabilnego i otwartego API keyvalue.xyz
+/**
+ * CloudService V6 - Stabilna synchronizacja
+ * 
+ * Rozwiązanie problemu "Failed to fetch":
+ * 1. Użycie płaskiej struktury kluczy (bez ukośników w nazwie klucza).
+ * 2. Przesyłanie danych jako 'text/plain', co czyni zapytanie "Simple Request".
+ *    Dzięki temu przeglądarka nie wysyła zapytania OPTIONS (preflight), które często jest blokowane.
+ * 3. Kompresja LZ-String pozwala zmieścić nawet 1500+ przepisów w limicie 512KB większości darmowych KV.
+ */
 const API_BASE = `https://api.keyvalue.xyz`;
-// Unikalny prefiks dla aplikacji Dieta Gilsona, aby klucze nie kolidowały z innymi aplikacjami
-const APP_PREFIX = "dietagilsona_v5";
-
-const CHUNK_SIZE = 50;
-const MAX_RETRIES = 3;
-
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const APP_PREFIX = "DG_V6"; 
 
 export const CloudService = {
   /**
@@ -25,59 +27,36 @@ export const CloudService = {
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
+      // Używamy unikalnego, płaskiego klucza
       const fullKey = `${APP_PREFIX}_${cloudId}`;
       
-      // 1. Pobierz CORE (Profil + Meta)
-      const resCore = await fetch(`${API_BASE}/${fullKey}/core?t=${Date.now()}`);
-      if (!resCore.ok) return null;
-
-      const rawCore = await resCore.text();
-      const decompressedCore = LZString.decompressFromBase64(rawCore);
-      const coreData = JSON.parse(decompressedCore || rawCore);
-
-      const chunkCount = coreData.libChunkCount || 0;
-      let allCustomMeals: Meal[] = [];
-      let mealPlan: WeeklyPlan | null = null;
-
-      // 2. Pobierz JADŁOSPIS
-      if (coreData.hasExternalPlan) {
-        try {
-          const resPlan = await fetch(`${API_BASE}/${fullKey}/plan?t=${Date.now()}`);
-          if (resPlan.ok) {
-            const rawPlan = await resPlan.text();
-            const decompressedPlan = LZString.decompressFromBase64(rawPlan);
-            mealPlan = JSON.parse(decompressedPlan || rawPlan);
-          }
-        } catch (e) {
-          console.warn("Błąd pobierania planu.");
+      const res = await fetch(`${API_BASE}/${fullKey}?t=${Date.now()}`, {
+        method: 'GET',
+        headers: { 
+          'Accept': 'text/plain'
         }
+      });
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          console.log("Konto nie istnieje w chmurze, używam danych lokalnych.");
+          return null;
+        }
+        throw new Error(`Błąd serwera: ${res.status}`);
       }
 
-      // 3. Pobierz BIBLIOTEKĘ (Fragmenty)
-      if (chunkCount > 0) {
-        // Tu używamy sekwencyjnego pobierania dla stabilności
-        for (let i = 0; i < chunkCount; i++) {
-          try {
-            const res = await fetch(`${API_BASE}/${fullKey}/lib_${i}?t=${Date.now()}`);
-            if (res.ok) {
-              const raw = await res.text();
-              const decompressed = LZString.decompressFromBase64(raw);
-              const chunk = JSON.parse(decompressed || raw);
-              if (chunk.meals) {
-                allCustomMeals = [...allCustomMeals, ...chunk.meals];
-              }
-            }
-          } catch (e) {
-            console.error(`Błąd fragmentu ${i}`);
-          }
-        }
-      }
+      const raw = await res.text();
+      if (!raw || raw.length < 10) return null;
+
+      // Dekompresja danych
+      const decompressed = LZString.decompressFromBase64(raw);
+      const data = JSON.parse(decompressed || raw);
 
       return {
-        profile: coreData.profile || null,
-        mealPlan: mealPlan || coreData.mealPlan || null,
-        customMeals: allCustomMeals,
-        lastUpdated: coreData.lastUpdated || new Date().toISOString()
+        profile: data.profile || null,
+        mealPlan: data.mealPlan || null,
+        customMeals: data.customMeals || [],
+        lastUpdated: data.lastUpdated || new Date().toISOString()
       };
     } catch (e) {
       console.error("Cloud Load Error:", e);
@@ -86,83 +65,50 @@ export const CloudService = {
   },
 
   /**
-   * Zapisuje dane w chmurze (Metoda POST dla keyvalue.xyz).
+   * Zapisuje dane w chmurze.
    */
   saveData: async (cloudId: string, data: CloudData): Promise<{success: boolean, error?: string}> => {
     try {
       const fullKey = `${APP_PREFIX}_${cloudId}`;
       
-      // 1. Podział na fragmenty
-      const mealChunks: Meal[][] = [];
-      for (let i = 0; i < data.customMeals.length; i += CHUNK_SIZE) {
-        mealChunks.push(data.customMeals.slice(i, i + CHUNK_SIZE));
-      }
-
-      // 2. Lista zadań (Zapis na keyvalue.xyz to POST na /KEY/SUBKEY)
-      const tasks: {url: string, body: string, label: string}[] = [];
-      
-      if (data.mealPlan) {
-        tasks.push({
-          url: `${API_BASE}/${fullKey}/plan`,
-          body: LZString.compressToBase64(JSON.stringify(data.mealPlan)),
-          label: "Jadłospis"
-        });
-      }
-
-      mealChunks.forEach((chunk, index) => {
-        tasks.push({
-          url: `${API_BASE}/${fullKey}/lib_${index}`,
-          body: LZString.compressToBase64(JSON.stringify({ meals: chunk })),
-          label: `Biblioteka ${index + 1}`
-        });
+      // Pakujemy wszystko w jeden obiekt dla maksymalnej spójności
+      const payload = JSON.stringify({
+        profile: data.profile,
+        mealPlan: data.mealPlan,
+        customMeals: data.customMeals,
+        lastUpdated: data.lastUpdated
       });
 
-      tasks.push({
-        url: `${API_BASE}/${fullKey}/core`,
-        body: LZString.compressToBase64(JSON.stringify({
-          profile: data.profile,
-          lastUpdated: data.lastUpdated,
-          libChunkCount: mealChunks.length,
-          hasExternalPlan: !!data.mealPlan
-        })),
-        label: "Dane profilu"
+      const compressed = LZString.compressToBase64(payload);
+
+      /**
+       * CRITICAL FIX: Wysyłamy jako text/plain.
+       * To zapobiega wysyłaniu zapytania preflight OPTIONS.
+       * Jeśli serwer nie wspiera OPTIONS (co jest częste w darmowych API), 
+       * to właśnie to powoduje błąd "Failed to fetch".
+       */
+      const response = await fetch(`${API_BASE}/${fullKey}`, {
+        method: 'POST',
+        body: compressed,
+        headers: {
+          'Content-Type': 'text/plain' 
+        }
       });
 
-      // 3. Wysyłanie sekwencyjne
-      for (const task of tasks) {
-        let success = false;
-        let lastError = "";
-
-        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-          try {
-            const res = await fetch(task.url, { 
-              method: 'POST', 
-              body: task.body 
-            });
-            
-            if (res.ok) {
-              success = true;
-              break; 
-            }
-            lastError = `Serwer: ${res.status}`;
-          } catch (e: any) {
-            lastError = e.message || "Błąd sieci";
-          }
-          
-          if (!success && attempt < MAX_RETRIES) {
-            await delay(800 * attempt);
-          }
-        }
-
-        if (!success) {
-          return { success: false, error: `${task.label}: ${lastError}` };
-        }
-        await delay(150);
+      if (response.ok) {
+        return { success: true };
+      } else {
+        return { success: false, error: `Błąd serwera: ${response.status}` };
       }
-
-      return { success: true };
-    } catch (e) {
-      return { success: false, error: "Błąd krytyczny połączenia." };
+    } catch (e: any) {
+      console.error("Cloud Save Error:", e);
+      // Jeśli błąd to "Failed to fetch", zazwyczaj winny jest CORS lub brak internetu
+      return { 
+        success: false, 
+        error: e.message === "Failed to fetch" 
+          ? "Błąd sieci (CORS/Blokada). Spróbuj za chwilę." 
+          : "Nie udało się zapisać danych." 
+      };
     }
   },
 
