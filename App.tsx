@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { UserProfile, WeeklyPlan, Gender, ActivityLevel, Meal } from './types';
 import { Icons, APP_NAME } from './constants';
 import Header from './components/Header';
@@ -33,26 +33,32 @@ const App: React.FC = () => {
 
   // --- LOGIKA SYNCHRONIZACJI ---
 
-  // 1. Ładowanie z chmury przy starcie
+  // 1. Ładowanie z chmury przy starcie lub zmianie klucza
   useEffect(() => {
     const initCloud = async () => {
-      if (cloudId) {
-        setSyncStatus('syncing');
+      if (!cloudId) return;
+      
+      setSyncStatus('syncing');
+      try {
         const remote = await CloudService.loadData(cloudId);
         if (remote) {
+          // Jeśli znaleziono dane w chmurze, nadpisujemy lokalne
           if (remote.profile) setProfile(remote.profile);
           if (remote.mealPlan) setMealPlan(remote.mealPlan);
           if (remote.customMeals) setCustomMeals(remote.customMeals);
           setSyncStatus('synced');
         } else {
-          setSyncStatus('error');
+          // Jeśli klucz jest nowy i nie ma go w chmurze, po prostu oznaczamy jako zsynchronizowany (pusty)
+          setSyncStatus('synced');
         }
+      } catch (err) {
+        setSyncStatus('error');
       }
     };
     initCloud();
   }, [cloudId]);
 
-  // 2. Automatyczny zapis w chmurze przy każdej zmianie (Debounced)
+  // 2. Automatyczny zapis w chmurze przy każdej zmianie
   useEffect(() => {
     if (!cloudId || !profile) return;
 
@@ -65,9 +71,9 @@ const App: React.FC = () => {
         lastUpdated: new Date().toISOString()
       });
       setSyncStatus(success ? 'synced' : 'error');
-    }, 2000); 
+    }, 3000); // 3 sekundy zwłoki, żeby nie przeciążać API przy każdym kliknięciu
 
-    // Lokalny backup
+    // Zawsze robimy lokalny backup w localStorage
     localStorage.setItem('user_profile', JSON.stringify(profile));
     if (mealPlan) localStorage.setItem('weekly_plan', JSON.stringify(mealPlan));
     localStorage.setItem('custom_meals', JSON.stringify(customMeals));
