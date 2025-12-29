@@ -30,6 +30,13 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
     ingredients: [{ item: '', amount: '' }]
   });
 
+  // Definicja grup wyświetlanych w UI
+  const displayGroups = [
+    { id: 'cold_meals', label: 'Śniadania, II Śniadania i Kolacje', types: ['breakfast', 'snack1', 'dinner'] },
+    { id: 'lunch', label: 'Obiady', types: ['lunch'] },
+    { id: 'snack2', label: 'Podwieczorek / Przekąski', types: ['snack2'] }
+  ];
+
   const mealTypeLabels: Record<string, string> = {
     breakfast: 'Śniadanie',
     snack1: 'II Śniadanie',
@@ -38,27 +45,26 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
     dinner: 'Kolacja'
   };
 
-  // Grupowanie wszystkich dań (wbudowane + własne)
+  // Grupowanie wszystkich dań (wbudowane + własne) do nowych 3 kategorii
   const groupedMeals = useMemo(() => {
     const all = [...MEAL_DATABASE, ...customMeals];
     const groups: Record<string, Meal[]> = {
-      breakfast: [],
-      snack1: [],
+      cold_meals: [],
       lunch: [],
-      snack2: [],
-      dinner: []
+      snack2: []
     };
     
     all.forEach(m => {
-      if (groups[m.type]) {
-        groups[m.type].push(m);
-      } else {
-        // Jeśli typ jest nieznany, wrzuć do śniadań jako fallback
-        groups.breakfast.push(m);
+      if (['breakfast', 'snack1', 'dinner'].includes(m.type)) {
+        groups.cold_meals.push(m);
+      } else if (m.type === 'lunch') {
+        groups.lunch.push(m);
+      } else if (m.type === 'snack2') {
+        groups.snack2.push(m);
       }
     });
 
-    // Sortowanie alfabetyczne w grupach
+    // Sortowanie alfabetyczne
     Object.keys(groups).forEach(key => {
       groups[key].sort((a, b) => a.name.localeCompare(b.name));
     });
@@ -66,8 +72,8 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
     return groups;
   }, [customMeals]);
 
-  const toggleCategory = (cat: string) => {
-    setOpenCategories(prev => ({ ...prev, [cat]: !prev[cat] }));
+  const toggleCategory = (catId: string) => {
+    setOpenCategories(prev => ({ ...prev, [catId]: !prev[catId] }));
   };
 
   useEffect(() => {
@@ -92,7 +98,7 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
   const handleInsert = () => {
     if (!selectedMeal || !mealPlan) return;
     onUpdateMeal(insertDay, insertType, { ...selectedMeal, type: insertType as any });
-    alert(`Danie "${selectedMeal.name}" zostało wstawione do Dnia ${insertDay}!`);
+    alert(`Danie "${selectedMeal.name}" zostało wstawione do sekcji ${mealTypeLabels[insertType]} (Dzień ${insertDay})!`);
     setSelectedMeal(null);
   };
 
@@ -108,31 +114,31 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
         </button>
       </div>
 
-      {/* LISTA KATEGORII (AKORDEONY) */}
+      {/* LISTA KATEGORII (3 AKORDEONY) */}
       <div className="space-y-3">
-        {Object.entries(mealTypeLabels).map(([type, label]) => {
-          const meals = groupedMeals[type] || [];
-          const isOpen = !!openCategories[type];
+        {displayGroups.map((group) => {
+          const meals = groupedMeals[group.id] || [];
+          const isOpen = !!openCategories[group.id];
           
           if (meals.length === 0) return null;
 
           return (
-            <div key={type} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden transition-all">
+            <div key={group.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden transition-all">
               <button 
-                onClick={() => toggleCategory(type)}
-                className="w-full px-6 py-5 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                onClick={() => toggleCategory(group.id)}
+                className="w-full px-5 py-4 sm:px-6 sm:py-5 flex items-center justify-between hover:bg-slate-50 transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${isOpen ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                    <Icons.ChefHat className="w-5 h-5" />
+                  <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center ${isOpen ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                    <Icons.ChefHat className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                   <div className="text-left">
-                    <h3 className="font-black text-slate-800 tracking-tight">{label}</h3>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{meals.length} pozycji</span>
+                    <h3 className="font-black text-slate-800 tracking-tight text-sm sm:text-base leading-tight">{group.label}</h3>
+                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{meals.length} pozycji</span>
                   </div>
                 </div>
                 <div className={`transition-transform duration-300 ${isOpen ? 'rotate-45 text-emerald-500' : 'text-slate-300'}`}>
-                  <Icons.Plus className="w-6 h-6" />
+                  <Icons.Plus className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
               </button>
 
@@ -144,13 +150,13 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
                       <div 
                         key={meal.name} 
                         onClick={() => { setSelectedMeal(meal); setInsertType(meal.type); }}
-                        className={`group relative p-4 rounded-xl border transition-all cursor-pointer flex justify-between items-center ${isCustom ? 'bg-emerald-50/30 border-emerald-100 hover:border-emerald-500' : 'bg-white border-slate-100 hover:border-emerald-400 hover:shadow-md'}`}
+                        className={`group relative p-3 sm:p-4 rounded-xl border transition-all cursor-pointer flex justify-between items-center ${isCustom ? 'bg-emerald-50/30 border-emerald-100 hover:border-emerald-500' : 'bg-white border-slate-100 hover:border-emerald-400 hover:shadow-md'}`}
                       >
                         <div className="min-w-0">
-                          <h4 className="font-bold text-slate-800 text-sm truncate">{meal.name}</h4>
+                          <h4 className="font-bold text-slate-800 text-xs sm:text-sm truncate">{meal.name}</h4>
                           <div className="flex gap-2 items-center">
-                            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter">{meal.calories} kcal</span>
-                            {isCustom && <span className="text-[8px] font-black bg-emerald-500 text-white px-1.5 py-0.5 rounded uppercase">Mój</span>}
+                            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-tighter">{meal.calories} kcal</span>
+                            {isCustom && <span className="text-[7px] font-black bg-emerald-500 text-white px-1 py-0.5 rounded uppercase">Mój</span>}
                           </div>
                         </div>
                         {isCustom && (
@@ -242,10 +248,10 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
             <div className="bg-emerald-600 p-6 text-white flex justify-between items-start">
               <div>
                 <span className="text-[10px] font-black opacity-70 uppercase tracking-widest">{mealTypeLabels[selectedMeal.type] || "Danie"}</span>
-                <h2 className="text-2xl font-bold leading-tight tracking-tight">{selectedMeal.name}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold leading-tight tracking-tight">{selectedMeal.name}</h2>
                 <div className="flex gap-2 mt-2">
                   <p className="text-xs font-bold bg-white/20 inline-block px-3 py-1 rounded-lg">{selectedMeal.calories} kcal</p>
-                  <p className="text-xs font-medium bg-white/10 inline-block px-3 py-1 rounded-lg">B: {selectedMeal.protein}g • T: {selectedMeal.fats}g • W: {selectedMeal.carbs}g</p>
+                  <p className="text-[10px] sm:text-xs font-medium bg-white/10 inline-block px-3 py-1 rounded-lg">B: {selectedMeal.protein}g • T: {selectedMeal.fats}g • W: {selectedMeal.carbs}g</p>
                 </div>
               </div>
               <button onClick={() => setSelectedMeal(null)} className="p-2 hover:bg-white/10 rounded-full transition-all"><Icons.Plus className="rotate-45" /></button>
