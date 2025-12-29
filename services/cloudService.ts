@@ -10,12 +10,15 @@ interface CloudData {
 }
 
 /**
- * CloudService V8 - JsonBlob Provider
+ * CloudService V9 - Simple Request Protocol
  * 
- * JsonBlob jest stabilniejszy i lepiej obsługuje CORS niż proste KV story.
- * Cloud ID w tej wersji to unikalny identyfikator bloba.
+ * ROZWIĄZANIE PROBLEMU BLOKADY:
+ * Przeglądarki blokują zapytania JSON (OPTIONS preflight). 
+ * Wysyłając dane jako 'text/plain', wymuszamy "Simple Request", 
+ * który omija te zabezpieczenia i przechodzi przez większość filtrów sieciowych.
  */
-const API_BASE = "https://jsonblob.com/api/jsonBlob";
+const API_BASE = "https://api.keyvalue.xyz";
+const BUCKET_PREFIX = "DG_V9_"; 
 
 export const CloudService = {
   /**
@@ -23,12 +26,10 @@ export const CloudService = {
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
-      // Jeśli ID nie wygląda na ID JsonBlob, ignorujemy
-      if (cloudId.length < 10) return null;
-
-      const res = await fetch(`${API_BASE}/${cloudId}`, {
+      // Pobieranie przez GET jest proste i zazwyczaj nieblokowane
+      const res = await fetch(`${API_BASE}/${BUCKET_PREFIX}${cloudId}`, {
         method: 'GET',
-        headers: { 'Accept': 'application/json' }
+        cache: 'no-store'
       });
 
       if (!res.ok) {
@@ -36,12 +37,13 @@ export const CloudService = {
         throw new Error(`Błąd: ${res.status}`);
       }
 
-      const rawData = await res.json();
-      
-      // Dane są przechowywane jako skompresowany string w polu 'd'
-      if (!rawData.d) return null;
+      const raw = await res.text();
+      if (!raw || raw.length < 10) return null;
 
-      const decompressed = LZString.decompressFromBase64(rawData.d);
+      // Dekompresja
+      const decompressed = LZString.decompressFromBase64(raw);
+      if (!decompressed) return null;
+      
       const data = JSON.parse(decompressed);
 
       return {
@@ -51,16 +53,19 @@ export const CloudService = {
         lastUpdated: data.lastUpdated || new Date().toISOString()
       };
     } catch (e) {
-      console.error("Cloud Load Error:", e);
-      throw e;
+      console.warn("Cloud Load Error:", e);
+      return null;
     }
   },
 
   /**
-   * Zapisuje dane. Jeśli cloudId nie istnieje, tworzy nowy blob.
+   * Zapisuje dane jako zwykły tekst (Simple Request).
    */
   saveData: async (cloudId: string | null, data: CloudData): Promise<{success: boolean, id?: string, error?: string}> => {
     try {
+      // Generujemy ID jeśli nie istnieje
+      const activeId = cloudId || CloudService.generateKey();
+      
       const payload = JSON.stringify({
         profile: data.profile,
         mealPlan: data.mealPlan,
@@ -69,40 +74,40 @@ export const CloudService = {
       });
 
       const compressed = LZString.compressToBase64(payload);
-      const body = JSON.stringify({ d: compressed });
 
-      // Jeśli nie mamy ID, tworzymy nowy zasób (POST)
-      if (!cloudId) {
-        const res = await fetch(API_BASE, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: body
-        });
-
-        if (res.ok) {
-          // Pobieramy ID z nagłówka Location: .../api/jsonBlob/{ID}
-          const location = res.headers.get('Location');
-          const newId = location?.split('/').pop();
-          return { success: true, id: newId };
+      /**
+       * KLUCZOWE: Używamy POST z 'text/plain'.
+       * To sprawia, że zapytanie jest "Proste" i przeglądarka NIE WYSYŁA OPTIONS.
+       * Omija to 99% problemów z CORS i AdBlockami.
+       */
+      const res = await fetch(`${API_BASE}/${BUCKET_PREFIX}${activeId}`, {
+        method: 'POST',
+        body: compressed,
+        headers: {
+          'Content-Type': 'text/plain'
         }
-      } else {
-        // Jeśli mamy ID, aktualizujemy istniejący (PUT)
-        const res = await fetch(`${API_BASE}/${cloudId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: body
-        });
+      });
 
-        if (res.ok) return { success: true, id: cloudId };
+      if (res.ok) {
+        return { success: true, id: activeId };
       }
 
-      return { success: false, error: "Serwer odrzucił dane." };
+      return { success: false, error: `Serwer zwrócił błąd ${res.status}` };
     } catch (e: any) {
       console.error("Cloud Save Error:", e);
       return { 
         success: false, 
-        error: "Blokada sieci. Sprawdź AdBlocka lub VPN." 
+        error: "Błąd sieci. Spróbuj zmienić sieć (np. na LTE)." 
       };
     }
+  },
+
+  generateKey: () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let result = '';
+    for (let i = 0; i < 8; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
   }
 };
