@@ -94,7 +94,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
           <button
             key={dayPlan.day}
             onClick={() => setSelectedDay(dayPlan.day)}
-            className={`flex-shrink-0 lg:w-full p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all text-left ${selectedDay === dayPlan.day ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 bg-white'}`}
+            className={`flex-shrink-0 lg:w-full p-2.5 sm:p-4 rounded-2xl border transition-all text-left ${selectedDay === dayPlan.day ? 'border-emerald-500 bg-emerald-50 shadow-sm' : 'border-slate-100 bg-white'}`}
           >
             <span className={`block text-[8px] font-black uppercase ${selectedDay === dayPlan.day ? 'text-emerald-600' : 'text-slate-400'}`}>Dzień {dayPlan.day}</span>
             <span className={`block text-sm sm:text-base font-bold ${selectedDay === dayPlan.day ? 'text-emerald-900' : 'text-slate-600'}`}>
@@ -106,54 +106,54 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
       {/* Lista Posiłków */}
       <div className="lg:col-span-9 space-y-4">
-        {/* PODSUMOWANIE - STERYLNA BIEL */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-6">
+        {/* PODSUMOWANIE - CLEAN WHITE STYLE */}
+        <div className="bg-white rounded-[32px] p-6 sm:p-10 border border-slate-100 shadow-sm relative overflow-hidden flex flex-col sm:flex-row justify-between items-center gap-8 border-l-[12px] border-l-emerald-500">
           <div className="text-center sm:text-left">
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Dzisiejszy plan</p>
-            <div className="flex items-center gap-2 justify-center sm:justify-start">
-              <span className="text-4xl sm:text-5xl font-black text-slate-800">{totals.calories}</span>
-              <span className="text-sm font-black text-emerald-500 uppercase">kcal</span>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Energia na dziś</p>
+            <div className="flex items-baseline gap-2 justify-center sm:justify-start">
+              <span className="text-5xl sm:text-6xl font-black text-slate-800 tracking-tighter">{totals.calories}</span>
+              <span className="text-base font-black text-emerald-500 uppercase">kcal</span>
             </div>
           </div>
           
-          <div className="flex flex-col items-center sm:items-end gap-4 w-full sm:w-auto">
-            <div className="flex gap-2">
+          <div className="flex flex-col items-center sm:items-end gap-5 w-full sm:w-auto">
+            <div className="flex gap-2 w-full sm:w-auto">
               <button 
                 onClick={() => setIsCopyingDay(true)}
-                className="bg-slate-50 hover:bg-slate-100 text-slate-500 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight flex items-center gap-2 border border-slate-200 transition-all"
+                className="flex-1 sm:flex-none bg-slate-50 hover:bg-slate-100 text-slate-600 px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-tight flex items-center justify-center gap-2 border border-slate-200 transition-all"
               >
-                <Icons.Copy className="w-3 h-3" /> Kopiuj dzień
+                <Icons.Copy className="w-4 h-4" /> Kopiuj
               </button>
               <button 
                 onClick={handleSaveAllDayToLibrary}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-tight flex items-center gap-2 shadow-sm transition-all"
+                className="flex-1 sm:flex-none bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-tight flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 transition-all"
               >
-                <Icons.Save className="w-3 h-3" /> Zapisz w bazie
+                <Icons.Save className="w-4 h-4" /> Zapisz
               </button>
             </div>
-            <div className="flex gap-4 sm:gap-8 justify-center sm:justify-end w-full border-t border-slate-100 pt-4 sm:border-0 sm:pt-0">
-              <div className="text-center"><span className="block text-[8px] text-slate-400 uppercase font-black">Białko</span><span className="text-sm font-bold text-slate-700">{totals.protein}g</span></div>
-              <div className="text-center"><span className="block text-[8px] text-slate-400 uppercase font-black">Tłuszcz</span><span className="text-sm font-bold text-slate-700">{totals.fats}g</span></div>
-              <div className="text-center"><span className="block text-[8px] text-slate-400 uppercase font-black">Węgle</span><span className="text-sm font-bold text-slate-700">{totals.carbs}g</span></div>
+            <div className="grid grid-cols-3 gap-6 sm:gap-10 w-full sm:w-auto">
+              <div className="text-center"><span className="block text-[8px] text-slate-400 uppercase font-black mb-1">Białko</span><span className="text-lg font-bold text-slate-700">{totals.protein}g</span></div>
+              <div className="text-center"><span className="block text-[8px] text-slate-400 uppercase font-black mb-1">Tłuszcz</span><span className="text-lg font-bold text-slate-700">{totals.fats}g</span></div>
+              <div className="text-center"><span className="block text-[8px] text-slate-400 uppercase font-black mb-1">Węgle</span><span className="text-lg font-bold text-slate-700">{totals.carbs}g</span></div>
             </div>
           </div>
         </div>
 
         <div className="space-y-3">
           {currentDayPlan.meals.map((meal, idx) => (
-            <div key={idx} className="bg-white rounded-2xl border border-slate-100 p-4 sm:p-5 shadow-sm hover:border-emerald-200 transition-all group flex items-center gap-4">
+            <div key={idx} className="bg-white rounded-2xl border border-slate-100 p-5 sm:p-6 shadow-sm hover:border-emerald-200 transition-all group flex items-center gap-5">
                 <div className="flex-grow min-w-0 cursor-pointer" onClick={() => setSelectedMeal(meal)}>
-                   <div className="flex items-center gap-2 mb-0.5">
-                     <span className="text-[9px] font-black text-emerald-600 uppercase bg-emerald-50 px-1.5 py-0.5 rounded">
+                   <div className="flex items-center gap-3 mb-1">
+                     <span className="text-[10px] font-black text-emerald-600 uppercase bg-emerald-50 px-2 py-1 rounded-lg">
                        {mealTypeLabels[meal.type]}
                      </span>
-                     <span className="text-[10px] font-bold text-slate-300">{meal.calories} kcal</span>
+                     <span className="text-xs font-bold text-slate-300">{meal.calories} kcal</span>
                    </div>
-                   <h4 className="text-base sm:text-lg font-bold text-slate-800 truncate group-hover:text-emerald-700 transition-colors">{meal.name}</h4>
+                   <h4 className="text-lg sm:text-xl font-bold text-slate-800 truncate group-hover:text-emerald-700 transition-colors">{meal.name}</h4>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <button onClick={() => setSwappingMealType(meal.type)} className="p-2 sm:p-2.5 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-lg transition-all"><Icons.Swap className="w-4 h-4" /></button>
-                  <button onClick={() => setSelectedMeal(meal)} className="p-2 sm:p-2.5 bg-slate-800 text-white rounded-lg hover:bg-emerald-600 transition-all"><Icons.ChefHat className="w-4 h-4" /></button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button onClick={() => setSwappingMealType(meal.type)} className="p-3 bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 rounded-xl transition-all"><Icons.Swap className="w-5 h-5" /></button>
+                  <button onClick={() => setSelectedMeal(meal)} className="p-3 bg-slate-900 text-white rounded-xl hover:bg-emerald-600 transition-all shadow-md"><Icons.ChefHat className="w-5 h-5" /></button>
                 </div>
             </div>
           ))}
@@ -163,27 +163,27 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       {/* Modale */}
       {isCopyingDay && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsCopyingDay(false)}></div>
-          <div className="relative bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl p-6 space-y-6 animate-in zoom-in-95">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setIsCopyingDay(false)}></div>
+          <div className="relative bg-white w-full max-w-sm rounded-[32px] overflow-hidden shadow-2xl p-8 space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-slate-800">Kopiuj Dzień {selectedDay}</h2>
-              <p className="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-widest">Wybierz dni docelowe</p>
+              <h2 className="text-2xl font-bold text-slate-800 tracking-tight">Kopiuj Dzień {selectedDay}</h2>
+              <p className="text-[10px] text-slate-400 font-bold uppercase mt-2 tracking-widest">Wybierz dni docelowe</p>
             </div>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-4 gap-2.5">
               {[1, 2, 3, 4, 5, 6, 7].map(d => (
                 <button
                   key={d}
                   disabled={d === selectedDay}
                   onClick={() => toggleTargetDay(d)}
-                  className={`p-3 rounded-xl font-black text-sm border-2 transition-all ${d === selectedDay ? 'bg-slate-50 border-slate-100 text-slate-200' : copyTargetDays.includes(d) ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-100 text-slate-400 hover:border-emerald-200'}`}
+                  className={`h-12 rounded-xl font-black text-sm border-2 transition-all ${d === selectedDay ? 'bg-slate-50 border-slate-100 text-slate-200' : copyTargetDays.includes(d) ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-100 text-slate-400'}`}
                 >
                   {d}
                 </button>
               ))}
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setIsCopyingDay(false)} className="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl text-sm">Anuluj</button>
-              <button onClick={handleApplyCopyDay} disabled={copyTargetDays.length === 0} className="flex-1 py-3 bg-emerald-600 disabled:bg-slate-300 text-white font-bold rounded-xl text-sm">Zastosuj</button>
+            <div className="flex gap-3">
+              <button onClick={() => setIsCopyingDay(false)} className="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl text-sm transition-all">Anuluj</button>
+              <button onClick={handleApplyCopyDay} disabled={copyTargetDays.length === 0} className="flex-1 py-4 bg-emerald-600 disabled:bg-slate-300 text-white font-bold rounded-2xl text-sm transition-all shadow-lg shadow-emerald-100">Potwierdź</button>
             </div>
           </div>
         </div>
@@ -192,21 +192,21 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       {/* Modal Wymiany */}
       {swappingMealType && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setSwappingMealType(null)}></div>
-          <div className="relative bg-white w-full max-w-4xl rounded-3xl overflow-hidden max-h-[85vh] flex flex-col shadow-2xl">
-            <div className="p-4 border-b border-slate-100 space-y-3">
+          <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={() => setSwappingMealType(null)}></div>
+          <div className="relative bg-white w-full max-w-4xl rounded-[32px] overflow-hidden max-h-[85vh] flex flex-col shadow-2xl">
+            <div className="p-6 border-b border-slate-50 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-slate-800">Wymień posiłek</h2>
+                <h2 className="text-xl font-bold text-slate-800">Wymień posiłek</h2>
                 <button onClick={() => setSwappingMealType(null)} className="p-2 hover:bg-slate-100 rounded-full transition-all"><Icons.Plus className="rotate-45" /></button>
               </div>
-              <input type="text" placeholder="Szukaj dania..." value={swapSearch} onChange={(e) => setSwapSearch(e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:border-emerald-500 outline-none text-sm transition-all" />
+              <input type="text" placeholder="Szukaj dania w bazie..." value={swapSearch} onChange={(e) => setSwapSearch(e.target.value)} className="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl focus:border-emerald-500 outline-none text-sm transition-all" />
             </div>
-            <div className="p-4 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {swappableMeals.map((meal, idx) => (
-                <div key={idx} onClick={() => handleSwap(selectedDay, meal)} className="border border-slate-100 rounded-xl p-3 hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer flex justify-between items-center group">
+                <div key={idx} onClick={() => handleSwap(selectedDay, meal)} className="border border-slate-50 bg-slate-50/30 rounded-2xl p-4 hover:border-emerald-500 hover:bg-white transition-all cursor-pointer flex justify-between items-center group shadow-sm">
                   <div className="min-w-0">
                     <h4 className="font-bold text-slate-800 text-sm truncate group-hover:text-emerald-700">{meal.name}</h4>
-                    <span className="text-[10px] font-bold text-emerald-600">{meal.calories} kcal</span>
+                    <span className="text-[10px] font-bold text-emerald-600 uppercase">{meal.calories} kcal</span>
                   </div>
                   <Icons.ArrowRight className="w-4 h-4 text-slate-300" />
                 </div>
@@ -219,35 +219,35 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       {/* Modal Przepisu */}
       {selectedMeal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setSelectedMeal(null)}></div>
-          <div className="relative bg-white w-full max-w-2xl rounded-3xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
-            <div className="bg-emerald-600 p-8 text-white shrink-0">
-              <span className="text-[10px] font-black opacity-70 uppercase tracking-widest">{mealTypeLabels[selectedMeal.type]}</span>
-              <h2 className="text-2xl font-bold mb-1 leading-tight">{selectedMeal.name}</h2>
-              <div className="flex gap-4 mt-3">
-                <p className="text-xs font-bold bg-white/20 px-3 py-1 rounded-lg">{selectedMeal.calories} kcal</p>
-                <p className="text-xs font-medium bg-white/10 px-3 py-1 rounded-lg">B: {selectedMeal.protein}g • T: {selectedMeal.fats}g • W: {selectedMeal.carbs}g</p>
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setSelectedMeal(null)}></div>
+          <div className="relative bg-white w-full max-w-2xl rounded-[40px] overflow-hidden max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
+            <div className="bg-emerald-600 p-10 text-white shrink-0">
+              <span className="text-[10px] font-black opacity-70 uppercase tracking-[0.2em]">{mealTypeLabels[selectedMeal.type]}</span>
+              <h2 className="text-2xl sm:text-3xl font-black mb-3 leading-tight">{selectedMeal.name}</h2>
+              <div className="flex flex-wrap gap-3 mt-5">
+                <p className="text-xs font-black bg-white/20 px-4 py-2 rounded-xl">{selectedMeal.calories} kcal</p>
+                <p className="text-xs font-bold bg-white/10 px-4 py-2 rounded-xl">B: {selectedMeal.protein}g • T: {selectedMeal.fats}g • W: {selectedMeal.carbs}g</p>
               </div>
             </div>
-            <div className="p-8 overflow-y-auto space-y-6">
+            <div className="p-10 overflow-y-auto space-y-10">
               <section>
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Składniki</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Składniki</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {selectedMeal.ingredients.map((ing, i) => (
-                    <div key={i} className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-sm flex justify-between">
-                      <span className="text-slate-600">{ing.item}</span>
-                      <span className="font-bold text-emerald-600">{ing.amount}</span>
+                    <div key={i} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-sm flex justify-between">
+                      <span className="text-slate-600 font-medium">{ing.item}</span>
+                      <span className="font-black text-emerald-600">{ing.amount}</span>
                     </div>
                   ))}
                 </div>
               </section>
               <section>
-                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Instrukcja</h3>
-                <div className="bg-slate-50 p-5 rounded-xl text-slate-700 text-sm leading-relaxed whitespace-pre-wrap border border-slate-100 italic">{selectedMeal.recipe}</div>
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Przygotowanie</h3>
+                <div className="bg-emerald-50/30 p-6 rounded-3xl text-slate-700 text-sm leading-relaxed whitespace-pre-wrap border border-emerald-50 italic">{selectedMeal.recipe}</div>
               </section>
             </div>
-            <div className="p-6 border-t border-slate-100 shrink-0">
-              <button onClick={() => setSelectedMeal(null)} className="w-full py-4 bg-slate-800 text-white font-bold rounded-2xl text-sm transition-all shadow-lg active:scale-95">Zamknij</button>
+            <div className="p-6 border-t border-slate-50 shrink-0">
+              <button onClick={() => setSelectedMeal(null)} className="w-full py-5 bg-slate-900 text-white font-bold rounded-[20px] text-sm transition-all shadow-xl active:scale-95">Zamknij</button>
             </div>
           </div>
         </div>
