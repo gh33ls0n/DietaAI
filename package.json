@@ -12,11 +12,13 @@
   "dependencies": {
     "@google/genai": "^1.34.0",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "lz-string": "^1.5.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.3",
     "@types/react-dom": "^19.2.3",
+    "@types/lz-string": "^1.5.0",
     "@vitejs/plugin-react": "^4.3.4",
     "typescript": "^5.7.3",
     "vite": "^6.1.0"
