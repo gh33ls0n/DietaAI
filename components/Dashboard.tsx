@@ -32,6 +32,14 @@ const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'meals' | 'shopping' | 'inspirations' | 'settings'>('meals');
 
+  const handleBulkAdd = (meals: Meal[]) => {
+    // Dodawaj tylko te, których nie ma jeszcze w bazie
+    meals.forEach(m => {
+      const exists = customMeals.some(existing => existing.name === m.name);
+      if (!exists) onAddCustomMeal(m);
+    });
+  };
+
   return (
     <div className="space-y-4 sm:space-y-8 animate-in fade-in duration-500">
       {/* Kompaktowy pasek statusu */}
@@ -63,7 +71,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <Icons.ChefHat />
           </div>
           <h3 className="text-xl font-bold text-emerald-900">Twój jadłospis czeka</h3>
-          <p className="text-emerald-700 text-sm max-w-md mx-auto">Kliknij przycisk, aby AI stworzyło plan.</p>
+          <p className="text-emerald-700 text-sm max-w-md mx-auto">AI stworzy plan, korzystając z wgranej bazy przepisów i standardowych dań.</p>
           <button 
             onClick={onGenerate}
             className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-4 rounded-xl shadow-lg transition-all"
@@ -80,6 +88,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <div className="absolute inset-0 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
           <h3 className="text-lg font-bold text-slate-800">Pracuję nad menu...</h3>
+          <p className="text-slate-400 text-sm">Układam plan z Twoich przepisów.</p>
         </div>
       )}
 
@@ -90,7 +99,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="flex bg-slate-200/50 p-1 rounded-xl w-full sm:w-fit overflow-x-auto scrollbar-hide">
             <button onClick={() => setActiveTab('meals')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'meals' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ChefHat className="w-4 h-4" />Jadłospis</button>
             <button onClick={() => setActiveTab('shopping')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'shopping' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ShoppingBag className="w-4 h-4" />Zakupy</button>
-            <button onClick={() => setActiveTab('inspirations')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'inspirations' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Plus className="w-4 h-4" />Baza</button>
+            <button onClick={() => setActiveTab('inspirations')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'inspirations' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Plus className="w-4 h-4" />Baza ({customMeals.length})</button>
             <button onClick={() => setActiveTab('settings')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'settings' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Settings className="w-4 h-4" />Opcje</button>
           </div>
 
@@ -109,7 +118,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             ) : activeTab === 'inspirations' ? (
               <InspirationsView customMeals={customMeals} onAddCustomMeal={onAddCustomMeal} onDeleteCustomMeal={onDeleteCustomMeal} />
             ) : activeTab === 'settings' ? (
-              <SettingsView profile={profile} cloudId={cloudId} onUpdateProfile={onUpdateProfile} onReset={onReset} onSetCloudId={onSetCloudId} />
+              <SettingsView profile={profile} cloudId={cloudId} onUpdateProfile={onUpdateProfile} onReset={onReset} onSetCloudId={onSetCloudId} onBulkAddMeals={handleBulkAdd} />
             ) : (
               <div className="text-center py-10">Brak danych.</div>
             )}

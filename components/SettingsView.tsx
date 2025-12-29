@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { UserProfile } from '../types';
+import { UserProfile, Meal } from '../types';
 import { Icons } from '../constants';
 import { CloudService } from '../services/cloudService';
+import { parseRecipesJson } from '../services/recipeParser';
 
 interface SettingsViewProps {
   profile: UserProfile;
@@ -10,13 +11,15 @@ interface SettingsViewProps {
   onUpdateProfile: (updatedProfile: UserProfile) => void;
   onReset: () => void;
   onSetCloudId: (id: string) => void;
+  onBulkAddMeals?: (meals: Meal[]) => void;
 }
 
-const SettingsView: React.FC<SettingsViewProps> = ({ profile, cloudId, onUpdateProfile, onReset, onSetCloudId }) => {
+const SettingsView: React.FC<SettingsViewProps> = ({ profile, cloudId, onUpdateProfile, onReset, onSetCloudId, onBulkAddMeals }) => {
   const [localWeight, setLocalWeight] = useState(profile.weight.toString());
   const [formData, setFormData] = useState<UserProfile>(profile);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [inputCloudId, setInputCloudId] = useState("");
+  const [isImporting, setIsImporting] = useState(false);
 
   const handleWeightSave = () => {
     const newWeight = parseFloat(localWeight);
@@ -55,13 +58,66 @@ const SettingsView: React.FC<SettingsViewProps> = ({ profile, cloudId, onUpdateP
     setTimeout(() => window.location.reload(), 1000);
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        const parsedMeals = parseRecipesJson(json);
+        if (onBulkAddMeals) {
+          onBulkAddMeals(parsedMeals);
+          showFeedback(`Zaimportowano ${parsedMeals.length} przepisów!`);
+        }
+      } catch (err) {
+        alert("Błąd podczas czytania pliku JSON. Upewnij się, że format jest poprawny.");
+      } finally {
+        setIsImporting(false);
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
       {saveMessage && (
-        <div className="fixed bottom-8 right-8 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-2xl z-50">
+        <div className="fixed bottom-8 right-8 bg-emerald-600 text-white px-6 py-3 rounded-2xl shadow-2xl z-50 animate-in slide-in-from-right-4">
           {saveMessage}
         </div>
       )}
+
+      {/* Import Sekcja */}
+      <section className="bg-emerald-50 p-8 rounded-3xl border-2 border-emerald-100 shadow-sm space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white">
+            <Icons.Plus />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">Masowy Import Przepisów</h2>
+            <p className="text-slate-500 text-xs">Wgraj swój plik JSON (nawet 1300+ przepisów). Aplikacja automatycznie je skategoryzuje.</p>
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-center w-full">
+          <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-emerald-300 border-dashed rounded-2xl cursor-pointer bg-emerald-50/50 hover:bg-emerald-100 transition-all">
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              {isImporting ? (
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+              ) : (
+                <>
+                  <Icons.Clipboard className="w-8 h-8 mb-3 text-emerald-500" />
+                  <p className="mb-2 text-sm text-emerald-700 font-bold underline">Kliknij, aby wybrać plik .json</p>
+                  <p className="text-xs text-emerald-500">Przetworzymy go lokalnie w Twojej przeglądarce</p>
+                </>
+              )}
+            </div>
+            <input type="file" className="hidden" accept=".json" onChange={handleFileUpload} disabled={isImporting} />
+          </label>
+        </div>
+      </section>
 
       <section className="bg-slate-900 p-8 rounded-3xl text-white shadow-xl border border-white/5">
         <div className="flex items-center gap-3 mb-4">
@@ -102,7 +158,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ profile, cloudId, onUpdateP
                 <Icons.Clipboard className="w-5 h-5" />
               </button>
             </div>
-            <p className="text-xs text-slate-400">Zapisz ten klucz. Wpisz go na nowym urządzeniu (telefonie, tablecie), aby natychmiast wczytać swój jadłospis i listę zakupów.</p>
+            <p className="text-xs text-slate-400">Zapisz ten klucz. Wpisz go na nowym urządzeniu, aby natychmiast wczytać swój jadłospis.</p>
           </div>
         )}
       </section>
