@@ -75,13 +75,8 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
           const id = `${day.day}-${meal.type}-${ing.item}-${idx}`;
           if (checkedItems[id]) {
             const cleanItem = ing.item.replace(/[*_~`]/g, '').trim();
-            if (target === 'listonic') {
-              // ZMIANA: Używamy ŚREDNIKA jako separatora. 
-              // W polach 1-liniowych aplikacji mobilnych średnik często działa najlepiej jako rozdzielacz.
-              toCopy.push(`${cleanItem} ${ing.amount}`);
-            } else {
-              toCopy.push(`${cleanItem} (${ing.amount})`);
-            }
+            // FORMAT DLA LISTONIC: Czysta linia "Produkt Ilość"
+            toCopy.push(`${cleanItem} ${ing.amount}`);
           }
         });
       });
@@ -94,9 +89,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
     const uniqueListArray = Array.from(new Set(toCopy));
     
-    // ZMIANA: Dla Listonic używamy średnika z spacją, dla standardu nowej linii.
-    const separator = target === 'listonic' ? '; ' : '\n';
-    const finalString = uniqueListArray.join(separator);
+    // ZAWSZE UŻYWAMY NOWEJ LINII (\n)
+    // Listonic przy wklejaniu listy sformatowanej nowymi liniami rozdziela pozycje.
+    const finalString = uniqueListArray.join('\n');
 
     try {
       await navigator.clipboard.writeText(finalString);
@@ -104,7 +99,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       setTimeout(() => setCopied(null), 2000);
       
       if (target === 'listonic') {
-        alert("Lista skopiowana! Wklej ją w pole wyszukiwania w Listonic.");
+        alert("Skopiowano listę! Wklej ją w Listonic. Jeśli nie rozdzieli się od razu, wklej jeszcze raz przytrzymując pole dodawania.");
       }
     } catch (err) {
       alert("Błąd kopiowania.");
@@ -113,22 +108,22 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 sm:p-10 rounded-[32px] border border-slate-100 shadow-sm flex flex-col lg:flex-row justify-between items-center gap-8 sticky top-20 z-40">
+      <div className="bg-white p-8 sm:p-10 rounded-[32px] border border-slate-100 shadow-sm flex flex-col lg:flex-row justify-between items-center gap-8 sticky top-20 z-40">
         <div className="text-center lg:text-left">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Twoje Zakupy</h2>
-          <p className="text-slate-400 text-sm mt-1 font-medium">Lista produktów gotowa do wklejenia.</p>
+          <h2 className="text-3xl font-black text-slate-800 tracking-tight">Zakupy</h2>
+          <p className="text-slate-400 text-sm mt-1 font-medium">Lista produktów do wklejenia w Listonic.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <button 
             onClick={() => handleCopy('standard')}
-            className={`flex-1 flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-black text-[10px] uppercase transition-all border ${copied === 'standard' ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
+            className={`flex-1 flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-[10px] uppercase transition-all border ${copied === 'standard' ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'}`}
           >
             {copied === 'standard' ? <Icons.Check /> : <Icons.Clipboard />}
             Zwykła lista
           </button>
           <button 
             onClick={() => handleCopy('listonic')}
-            className={`flex-1 flex items-center justify-center gap-2 px-7 py-4 rounded-2xl font-black text-[10px] uppercase transition-all shadow-xl active:scale-95 ${copied === 'listonic' ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white hover:bg-black'}`}
+            className={`flex-1 flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-[10px] uppercase transition-all shadow-xl active:scale-95 ${copied === 'listonic' ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white hover:bg-black'}`}
           >
             {copied === 'listonic' ? <Icons.Check /> : <Icons.ShoppingBag />}
             Kopiuj do Listonic
@@ -155,26 +150,26 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         {mealPlan.days
           .filter(day => selectedDays.includes(day.day))
           .map(day => (
-            <section key={day.day} className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden animate-in slide-in-from-bottom-4">
-              <div className="bg-slate-50 p-5 px-8 border-b border-slate-100 flex items-center justify-between">
+            <section key={day.day} className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+              <div className="bg-slate-50/50 p-6 px-10 border-b border-slate-50 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white text-[11px] font-black shadow-lg shadow-emerald-100">{day.day}</div>
-                  <h3 className="text-lg font-black text-slate-800 tracking-tight">{dayNames[day.day - 1]}</h3>
+                  <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-[11px] font-black shadow-lg shadow-emerald-100">{day.day}</div>
+                  <h3 className="text-xl font-black text-slate-800 tracking-tight">{dayNames[day.day - 1]}</h3>
                 </div>
-                <div className="flex gap-5">
+                <div className="flex gap-6">
                   <button onClick={() => toggleDay(day.day, true)} className="text-[10px] font-black text-emerald-600 uppercase tracking-wide">Wszystko</button>
                   <button onClick={() => toggleDay(day.day, false)} className="text-[10px] font-black text-slate-400 uppercase tracking-wide">Nic</button>
                 </div>
               </div>
 
-              <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+              <div className="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
                 {day.meals.map((meal, mIdx) => (
-                  <div key={mIdx} className="space-y-5">
+                  <div key={mIdx} className="space-y-6">
                     <div className="flex items-center justify-between border-b border-slate-50 pb-3">
-                      <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em]">{mealTypeLabels[meal.type]}</h4>
+                      <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">{mealTypeLabels[meal.type]}</h4>
                       <div className="flex gap-3">
-                        <button onClick={() => toggleMeal(day.day, meal.type, true)} className="text-emerald-500 hover:scale-110 transition-transform"><Icons.Check className="w-4 h-4"/></button>
-                        <button onClick={() => toggleMeal(day.day, meal.type, false)} className="text-slate-300 hover:scale-110 transition-transform"><Icons.Plus className="w-4 h-4 rotate-45"/></button>
+                        <button onClick={() => toggleMeal(day.day, meal.type, true)} className="text-emerald-500"><Icons.Check className="w-4 h-4"/></button>
+                        <button onClick={() => toggleMeal(day.day, meal.type, false)} className="text-slate-200"><Icons.Plus className="w-4 h-4 rotate-45"/></button>
                       </div>
                     </div>
                     <div className="space-y-4">
@@ -189,10 +184,10 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                               className="mt-1 w-5 h-5 rounded-lg border-slate-200 text-emerald-600 focus:ring-emerald-500 transition-all"
                             />
                             <div className="flex-grow min-w-0">
-                              <span className={`block text-sm font-bold leading-snug transition-all ${checkedItems[id] ? 'text-slate-700' : 'text-slate-300 line-through'}`}>
+                              <span className={`block text-sm font-bold leading-snug transition-all ${checkedItems[id] ? 'text-slate-700' : 'text-slate-200 line-through'}`}>
                                 {ing.item}
                               </span>
-                              <span className={`text-[10px] font-black ${checkedItems[id] ? 'text-emerald-500' : 'text-slate-200'}`}>
+                              <span className={`text-[10px] font-black ${checkedItems[id] ? 'text-emerald-500' : 'text-slate-100'}`}>
                                 {ing.amount}
                               </span>
                             </div>
