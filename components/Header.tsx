@@ -6,9 +6,10 @@ interface HeaderProps {
   onReset: () => void;
   showReset: boolean;
   syncStatus?: 'synced' | 'syncing' | 'error';
+  syncError?: string | null;
 }
 
-const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus }) => {
+const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus, syncError }) => {
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 h-12 sm:h-16 flex items-center justify-between">
@@ -23,8 +24,8 @@ const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus }) => {
             {syncStatus && (
               <div className="flex items-center gap-1">
                 <div className={`w-1.5 h-1.5 rounded-full ${syncStatus === 'synced' ? 'bg-emerald-500' : syncStatus === 'syncing' ? 'bg-amber-400 animate-pulse' : 'bg-red-500'}`}></div>
-                <span className="text-[8px] font-black uppercase text-slate-400">
-                  {syncStatus === 'synced' ? 'Zsynchronizowano' : syncStatus === 'syncing' ? 'Zapisywanie...' : 'Błąd połączenia'}
+                <span className={`text-[8px] font-black uppercase ${syncStatus === 'error' ? 'text-red-500' : 'text-slate-400'}`}>
+                  {syncStatus === 'synced' ? 'Zsynchronizowano' : syncStatus === 'syncing' ? 'Zapisywanie...' : (syncError || 'Błąd połączenia')}
                 </span>
               </div>
             )}

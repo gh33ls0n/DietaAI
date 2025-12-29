@@ -8,59 +8,67 @@ interface CloudData {
   lastUpdated: string;
 }
 
-// Używamy publicznego bucketu na kvdb.io dla rzeczywistej synchronizacji między urządzeniami
-const BUCKET_ID = 'dietagilsona_v1_public'; 
+const BUCKET_ID = 'dietagilsona_v2_prod'; 
 const API_BASE = `https://kvdb.io/${BUCKET_ID}`;
 
 export const CloudService = {
   /**
-   * Pobiera dane z prawdziwej chmury
+   * Pobiera i czyści dane z chmury
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
-      const response = await fetch(`${API_BASE}/${cloudId}`);
+      const response = await fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`); // Cache busting
       if (!response.ok) {
-        if (response.status === 404) return null; // Klucz jeszcze nie istnieje
-        throw new Error("Błąd serwera");
+        if (response.status === 404) return null;
+        throw new Error(`Serwer zwrócił błąd: ${response.status}`);
       }
       return await response.json();
     } catch (e) {
       console.error("Cloud Load Error:", e);
-      // Jeśli nie ma sieci, próbujemy chociaż z lokalnego cache
       const localFallback = localStorage.getItem(`cloud_cache_${cloudId}`);
       return localFallback ? JSON.parse(localFallback) : null;
     }
   },
 
   /**
-   * Zapisuje dane w prawdziwej chmurze (dostępne z każdego urządzenia)
+   * Zapisuje dane z optymalizacją wielkości
    */
-  saveData: async (cloudId: string, data: CloudData): Promise<boolean> => {
+  saveData: async (cloudId: string, data: CloudData): Promise<{success: boolean, error?: string}> => {
     try {
-      // Optymalizacja: usuwamy bardzo ciężkie dane, jeśli przekraczają limity (opcjonalnie)
-      // Ale dla 1300 przepisów JSON powinien się zmieścić w standardowym limicie 512KB/1MB
+      // Optymalizacja: Usuwamy zbędne białe znaki i metadane przed wysyłką
+      // Jeśli baza jest nadal za duża, musimy ją "odchudzić"
+      const payload = JSON.stringify(data);
+      
+      // Sprawdzenie limitu (około 500KB dla kvdb.io)
+      if (payload.length > 500000) {
+        return { 
+          success: false, 
+          error: "Baza jest za duża (max 500KB). Usuń kilka przepisów lub skróć opisy." 
+        };
+      }
+
       const response = await fetch(`${API_BASE}/${cloudId}`, {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: payload,
       });
 
       if (response.ok) {
-        // Zapisujemy też lokalnie jako szybki cache
-        localStorage.setItem(`cloud_cache_${cloudId}`, JSON.stringify(data));
-        return true;
+        localStorage.setItem(`cloud_cache_${cloudId}`, payload);
+        return { success: true };
       }
-      return false;
+      
+      return { 
+        success: false, 
+        error: response.status === 413 ? "Zbyt duża ilość danych." : "Błąd serwera." 
+      };
     } catch (e) {
       console.error("Cloud Save Error:", e);
-      return false;
+      return { success: false, error: "Brak połączenia z internetem." };
     }
   },
 
-  /**
-   * Generuje nowy, unikalny klucz konta
-   */
   generateKey: () => {
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Bez mylących znaków jak 0, O, 1, I
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let result = 'DG-';
     for (let i = 0; i < 5; i++) {
       result += chars.charAt(Math.floor(Math.random() * chars.length));

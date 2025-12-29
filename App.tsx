@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { UserProfile, WeeklyPlan, Gender, ActivityLevel, Meal } from './types';
 import { Icons, APP_NAME } from './constants';
 import Header from './components/Header';
@@ -12,6 +12,10 @@ import { CloudService } from './services/cloudService';
 const App: React.FC = () => {
   const [cloudId, setCloudId] = useState<string | null>(() => localStorage.getItem('cloud_id'));
   const [syncStatus, setSyncStatus] = useState<'synced' | 'syncing' | 'error'>('synced');
+  const [syncError, setSyncError] = useState<string | null>(null);
+  
+  // Ref zapobiegający natychmiastowemu zapisowi po odczycie
+  const preventNextSave = useRef(false);
 
   const [profile, setProfile] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('user_profile');
@@ -33,7 +37,7 @@ const App: React.FC = () => {
 
   // --- LOGIKA SYNCHRONIZACJI ---
 
-  // 1. Ładowanie z chmury przy starcie lub zmianie klucza
+  // 1. Ładowanie z chmury
   useEffect(() => {
     const initCloud = async () => {
       if (!cloudId) return;
@@ -42,38 +46,50 @@ const App: React.FC = () => {
       try {
         const remote = await CloudService.loadData(cloudId);
         if (remote) {
-          // Jeśli znaleziono dane w chmurze, nadpisujemy lokalne
+          preventNextSave.current = true; // Blokujemy auto-zapis po pobraniu danych
           if (remote.profile) setProfile(remote.profile);
           if (remote.mealPlan) setMealPlan(remote.mealPlan);
           if (remote.customMeals) setCustomMeals(remote.customMeals);
           setSyncStatus('synced');
+          setSyncError(null);
         } else {
-          // Jeśli klucz jest nowy i nie ma go w chmurze, po prostu oznaczamy jako zsynchronizowany (pusty)
           setSyncStatus('synced');
         }
       } catch (err) {
         setSyncStatus('error');
+        setSyncError("Nie udało się pobrać danych.");
       }
     };
     initCloud();
   }, [cloudId]);
 
-  // 2. Automatyczny zapis w chmurze przy każdej zmianie
+  // 2. Automatyczny zapis (z zabezpieczeniem przed pętlą)
   useEffect(() => {
     if (!cloudId || !profile) return;
 
+    if (preventNextSave.current) {
+      preventNextSave.current = false;
+      return;
+    }
+
     const timer = setTimeout(async () => {
       setSyncStatus('syncing');
-      const success = await CloudService.saveData(cloudId, {
+      const result = await CloudService.saveData(cloudId, {
         profile,
         mealPlan,
         customMeals,
         lastUpdated: new Date().toISOString()
       });
-      setSyncStatus(success ? 'synced' : 'error');
-    }, 3000); // 3 sekundy zwłoki, żeby nie przeciążać API przy każdym kliknięciu
+      
+      if (result.success) {
+        setSyncStatus('synced');
+        setSyncError(null);
+      } else {
+        setSyncStatus('error');
+        setSyncError(result.error || "Błąd zapisu.");
+      }
+    }, 5000); // Wydłużone do 5s dla stabilności
 
-    // Zawsze robimy lokalny backup w localStorage
     localStorage.setItem('user_profile', JSON.stringify(profile));
     if (mealPlan) localStorage.setItem('weekly_plan', JSON.stringify(mealPlan));
     localStorage.setItem('custom_meals', JSON.stringify(customMeals));
@@ -168,7 +184,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header onReset={handleReset} showReset={!!profile} syncStatus={syncStatus} />
+      <Header onReset={handleReset} showReset={!!profile} syncStatus={syncStatus} syncError={syncError} />
       
       <main className="flex-grow container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-5xl">
         {!profile ? (
