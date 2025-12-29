@@ -5,7 +5,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   define: {
-    // To pozwala aplikacji widzieć klucz API ustawiony w panelu Vercel
     'process.env.API_KEY': JSON.stringify(process.env.API_KEY)
+  },
+  build: {
+    chunkSizeWarningLimit: 2000 // Zwiększone do 2MB ze względu na bazę przepisów
   }
 })
