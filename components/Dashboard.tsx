@@ -75,11 +75,12 @@ const Dashboard: React.FC<DashboardProps> = ({
       {/* Kontener Karty */}
       {!isLoading && (
         <div className="space-y-4">
+          {/* ZMNIEJSZONE TABY NA MOBILE */}
           <div className="flex bg-slate-200/50 p-1 rounded-xl w-full sm:w-fit overflow-x-auto scrollbar-hide">
-            <button onClick={() => setActiveTab('meals')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'meals' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ChefHat className="w-4 h-4" />Jadłospis</button>
-            <button onClick={() => setActiveTab('shopping')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'shopping' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ShoppingBag className="w-4 h-4" />Zakupy</button>
-            <button onClick={() => setActiveTab('inspirations')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'inspirations' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Plus className="w-4 h-4" />Baza</button>
-            <button onClick={() => setActiveTab('settings')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'settings' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Settings className="w-4 h-4" />Opcje</button>
+            <button onClick={() => setActiveTab('meals')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1 px-2.5 sm:px-4 py-2 rounded-lg transition-all text-[10px] sm:text-xs font-bold whitespace-nowrap ${activeTab === 'meals' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ChefHat className="w-3.5 h-3.5 sm:w-4 sm:h-4" />Jadłospis</button>
+            <button onClick={() => setActiveTab('shopping')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1 px-2.5 sm:px-4 py-2 rounded-lg transition-all text-[10px] sm:text-xs font-bold whitespace-nowrap ${activeTab === 'shopping' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />Zakupy</button>
+            <button onClick={() => setActiveTab('inspirations')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1 px-2.5 sm:px-4 py-2 rounded-lg transition-all text-[10px] sm:text-xs font-bold whitespace-nowrap ${activeTab === 'inspirations' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />Baza</button>
+            <button onClick={() => setActiveTab('settings')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1 px-2.5 sm:px-4 py-2 rounded-lg transition-all text-[10px] sm:text-xs font-bold whitespace-nowrap ${activeTab === 'settings' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.Settings className="w-3.5 h-3.5 sm:w-4 sm:h-4" />Opcje</button>
           </div>
 
           <div className="mt-2">

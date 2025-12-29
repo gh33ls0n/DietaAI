@@ -74,22 +74,23 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-20 z-40">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-20 z-40">
         <div className="text-center sm:text-left">
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight">Twoja Lista</h2>
-          <p className="text-slate-400 text-xs mt-0.5">Zaznacz co chcesz kupić i skopiuj.</p>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Twoja Lista</h2>
+          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Zaznacz co chcesz kupić i skopiuj.</p>
         </div>
         <button 
           onClick={handleCopy}
-          className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-[10px] uppercase transition-all shadow-xl active:scale-95 ${copied ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white'}`}
+          className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 sm:py-5 rounded-2xl font-black text-[10px] sm:text-xs uppercase transition-all shadow-xl active:scale-95 ${copied ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white'}`}
         >
-          {copied ? <Icons.Check /> : <Icons.Clipboard />}
+          {copied ? <Icons.Check className="w-4 h-4 sm:w-5 sm:h-5"/> : <Icons.Clipboard className="w-4 h-4 sm:w-5 sm:h-5"/>}
           Skopiuj listę
         </button>
       </div>
 
-      <div className="flex overflow-x-auto gap-1.5 pb-2 scrollbar-hide">
+      {/* POWIĘKSZONE PRZYCISKI DNI NA DESKTOP */}
+      <div className="flex overflow-x-auto gap-1.5 sm:gap-3 pb-2 scrollbar-hide">
         {dayNames.map((name, i) => (
           <button
             key={i}
@@ -97,45 +98,46 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
               const d = i + 1;
               setSelectedDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
             }}
-            className={`px-3 py-2 rounded-xl text-[9px] font-black uppercase border transition-all shrink-0 ${selectedDays.includes(i + 1) ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-slate-100 text-slate-400'}`}
+            className={`px-3 py-2 sm:px-6 sm:py-3.5 rounded-xl text-[9px] sm:text-[11px] font-black uppercase border transition-all shrink-0 ${selectedDays.includes(i + 1) ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-slate-100 text-slate-400'}`}
           >
             {name.substring(0, 3)}
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      {/* POWIĘKSZONE SEKCJE NA KOMPUTERZE (p-8 i gap-10) */}
+      <div className="grid grid-cols-1 gap-4 sm:gap-8">
         {mealPlan.days
           .filter(day => selectedDays.includes(day.day))
           .map(day => (
-            <section key={day.day} className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden animate-in fade-in duration-300">
-              <div className="bg-slate-50 p-3 px-5 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 bg-emerald-500 rounded-lg flex items-center justify-center text-white text-[9px] font-black">{day.day}</div>
-                  <h3 className="text-sm font-black text-slate-800">{dayNames[day.day - 1]}</h3>
+            <section key={day.day} className="bg-white rounded-[24px] sm:rounded-[32px] border border-slate-100 shadow-sm overflow-hidden animate-in fade-in duration-300">
+              <div className="bg-slate-50 p-4 sm:p-6 px-6 sm:px-10 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 sm:w-10 sm:h-10 bg-emerald-500 rounded-lg sm:rounded-2xl flex items-center justify-center text-white text-[10px] sm:text-xs font-black shadow-lg shadow-emerald-50">{day.day}</div>
+                  <h3 className="text-base sm:text-xl font-black text-slate-800 tracking-tight">{dayNames[day.day - 1]}</h3>
                 </div>
               </div>
 
-              <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-6 sm:p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12">
                 {day.meals.map((meal, mIdx) => (
-                  <div key={mIdx} className="space-y-3">
-                    <h4 className="text-[9px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-50 pb-1">{mealTypeLabels[meal.type]}</h4>
-                    <div className="space-y-2">
+                  <div key={mIdx} className="space-y-4 sm:space-y-6">
+                    <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-50 pb-2">{mealTypeLabels[meal.type]}</h4>
+                    <div className="space-y-3 sm:space-y-4">
                       {meal.ingredients.map((ing, iIdx) => {
                         const id = `${day.day}-${meal.type}-${ing.item}-${iIdx}`;
                         return (
-                          <label key={iIdx} className="flex items-start gap-3 cursor-pointer group">
+                          <label key={iIdx} className="flex items-start gap-3 sm:gap-4 cursor-pointer group">
                             <input 
                               type="checkbox" 
                               checked={!!checkedItems[id]} 
                               onChange={() => toggleItem(id)}
-                              className="mt-1 w-4 h-4 rounded border-slate-200 text-emerald-600 transition-all"
+                              className="mt-1 w-4 h-4 sm:w-5 sm:h-5 rounded-lg border-slate-200 text-emerald-600 transition-all"
                             />
                             <div className="flex-grow min-w-0">
-                              <span className={`block text-xs font-bold leading-tight ${checkedItems[id] ? 'text-slate-700' : 'text-slate-200 line-through'}`}>
+                              <span className={`block text-xs sm:text-sm font-bold leading-tight ${checkedItems[id] ? 'text-slate-700' : 'text-slate-200 line-through'}`}>
                                 {ing.item}
                               </span>
-                              <span className={`text-[9px] font-black ${checkedItems[id] ? 'text-emerald-500' : 'text-slate-100'}`}>
+                              <span className={`text-[10px] font-black ${checkedItems[id] ? 'text-emerald-500' : 'text-slate-100'}`}>
                                 {ing.amount}
                               </span>
                             </div>

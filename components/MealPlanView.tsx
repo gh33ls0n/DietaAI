@@ -78,16 +78,16 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-      {/* Nawigacja Dni - Kompaktowa góra dla mobile, Sidebar dla desktop */}
-      <div className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 lg:w-48 shrink-0 scrollbar-hide">
+      {/* Nawigacja Dni - ZMNIEJSZONE NA MOBILE, POWIĘKSZONE NA DESKTOP */}
+      <div className="flex lg:flex-col gap-1.5 lg:gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 lg:w-56 shrink-0 scrollbar-hide">
         {mealPlan.days.map((dayPlan) => (
           <button
             key={dayPlan.day}
             onClick={() => setSelectedDay(dayPlan.day)}
-            className={`flex flex-col items-center justify-center min-w-[54px] h-[54px] lg:min-w-0 lg:h-auto lg:items-start lg:p-4 rounded-xl lg:rounded-2xl border transition-all ${selectedDay === dayPlan.day ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm' : 'border-slate-100 bg-white text-slate-400 hover:border-slate-200'}`}
+            className={`flex flex-col items-center justify-center min-w-[46px] h-[46px] lg:min-w-0 lg:h-auto lg:items-start lg:p-4 rounded-xl lg:rounded-2xl border transition-all ${selectedDay === dayPlan.day ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm' : 'border-slate-100 bg-white text-slate-400 hover:border-slate-200'}`}
           >
-            <span className="text-[8px] font-black uppercase lg:mb-1">Dzień {dayPlan.day}</span>
-            <span className="text-sm font-bold lg:text-base leading-none">
+            <span className="text-[7px] lg:text-[8px] font-black uppercase lg:mb-1">Dzień {dayPlan.day}</span>
+            <span className="text-xs lg:text-base font-bold leading-none">
               <span className="lg:hidden">{dayShortNames[dayPlan.day - 1]}</span>
               <span className="hidden lg:inline">{['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'][dayPlan.day - 1]}</span>
             </span>
