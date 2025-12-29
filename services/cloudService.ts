@@ -12,19 +12,19 @@ interface CloudData {
 const BUCKET_ID = 'dietagilsona_v4_adaptive'; 
 const API_BASE = `https://kvdb.io/${BUCKET_ID}`;
 
-// Zmniejszamy rozmiar fragmentu dla stabilności (100 przepisów na paczkę)
-const CHUNK_SIZE = 100;
+// Ultra-bezpieczny rozmiar fragmentu (50 przepisów)
+const CHUNK_SIZE = 50;
 const MAX_RETRIES = 3;
 
-// Pomocnicza funkcja opóźnienia
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const CloudService = {
   /**
-   * Pobiera dane główne oraz fragmenty.
+   * Pobiera wszystkie rozproszone fragmenty danych.
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
     try {
+      // 1. Pobierz CORE
       const resCore = await fetch(`${API_BASE}/${cloudId}?t=${Date.now()}`);
       if (!resCore.ok) return null;
 
@@ -34,9 +34,24 @@ export const CloudService = {
 
       const chunkCount = coreData.libChunkCount || 0;
       let allCustomMeals: Meal[] = [];
+      let mealPlan: WeeklyPlan | null = coreData.mealPlan || null;
 
+      // 2. Jeśli plan jest w osobnym fragmencie, pobierz go
+      if (coreData.hasExternalPlan) {
+        try {
+          const resPlan = await fetch(`${API_BASE}/${cloudId}_plan?t=${Date.now()}`);
+          if (resPlan.ok) {
+            const rawPlan = await resPlan.text();
+            const decompressedPlan = LZString.decompressFromBase64(rawPlan);
+            mealPlan = JSON.parse(decompressedPlan || rawPlan);
+          }
+        } catch (e) {
+          console.warn("Nie udało się pobrać wydzielonego planu, używam cache lokalnego.");
+        }
+      }
+
+      // 3. Pobierz bibliotekę przepisów
       if (chunkCount > 0) {
-        // Pobieranie fragmentów (tutaj Promise.all zwykle działa ok, bo to GET)
         const chunkPromises = [];
         for (let i = 0; i < chunkCount; i++) {
           chunkPromises.push(
@@ -46,26 +61,21 @@ export const CloudService = {
         }
 
         const rawChunks = await Promise.all(chunkPromises);
-        
         rawChunks.forEach(raw => {
           if (!raw) return;
           try {
             const decompressed = LZString.decompressFromBase64(raw);
             const chunk = JSON.parse(decompressed || raw);
-            if (chunk.meals) {
-              allCustomMeals = [...allCustomMeals, ...chunk.meals];
-            }
+            if (chunk.meals) allCustomMeals = [...allCustomMeals, ...chunk.meals];
           } catch (e) {
             console.error("Błąd dekodowania fragmentu:", e);
           }
         });
-      } else if (coreData.customMeals) {
-        allCustomMeals = coreData.customMeals;
       }
 
       return {
         profile: coreData.profile || null,
-        mealPlan: coreData.mealPlan || null,
+        mealPlan,
         customMeals: allCustomMeals,
         lastUpdated: coreData.lastUpdated || new Date().toISOString()
       };
@@ -76,82 +86,90 @@ export const CloudService = {
   },
 
   /**
-   * Zapisuje dane sekwencyjnie z mechanizmem ponawiania prób.
+   * Zapisuje dane z maksymalną ostrożnością.
    */
   saveData: async (cloudId: string, data: CloudData): Promise<{success: boolean, error?: string}> => {
     try {
-      // 1. Podział na mniejsze fragmenty
+      // 1. Podział biblioteki na małe paczki
       const mealChunks: Meal[][] = [];
       for (let i = 0; i < data.customMeals.length; i += CHUNK_SIZE) {
         mealChunks.push(data.customMeals.slice(i, i + CHUNK_SIZE));
       }
 
-      // 2. Przygotowanie paczek do wysłania
-      const payloads: {url: string, body: string}[] = [];
+      // 2. Przygotowanie listy zadań do wykonania (sekwencyjnie)
+      const tasks: {url: string, body: string, label: string}[] = [];
       
-      const corePayload = JSON.stringify({
-        profile: data.profile,
-        mealPlan: data.mealPlan,
-        lastUpdated: data.lastUpdated,
-        libChunkCount: mealChunks.length
-      });
-      payloads.push({ url: `${API_BASE}/${cloudId}`, body: LZString.compressToBase64(corePayload) });
+      // Zadanie: Plan (osobno, bo bywa duży)
+      if (data.mealPlan) {
+        const planPayload = JSON.stringify(data.mealPlan);
+        tasks.push({
+          url: `${API_BASE}/${cloudId}_plan`,
+          body: LZString.compressToBase64(planPayload),
+          label: "Jadłospis"
+        });
+      }
 
+      // Zadanie: Biblioteka
       mealChunks.forEach((chunk, index) => {
         const chunkPayload = JSON.stringify({ meals: chunk });
-        payloads.push({ 
-          url: `${API_BASE}/${cloudId}_lib_${index}`, 
-          body: LZString.compressToBase64(chunkPayload) 
+        tasks.push({
+          url: `${API_BASE}/${cloudId}_lib_${index}`,
+          body: LZString.compressToBase64(chunkPayload),
+          label: `Paczka przepisów ${index + 1}/${mealChunks.length}`
         });
       });
 
-      // 3. Wysyłanie sekwencyjne z retry
-      console.log(`Starting sync of ${payloads.length} chunks...`);
-      
-      for (let i = 0; i < payloads.length; i++) {
-        const item = payloads[i];
+      // Zadanie: CORE (na samym końcu, jako potwierdzenie sukcesu reszty)
+      const corePayload = JSON.stringify({
+        profile: data.profile,
+        lastUpdated: data.lastUpdated,
+        libChunkCount: mealChunks.length,
+        hasExternalPlan: !!data.mealPlan
+      });
+      tasks.push({
+        url: `${API_BASE}/${cloudId}`,
+        body: LZString.compressToBase64(corePayload),
+        label: "Dane profilu"
+      });
+
+      // 3. Wykonanie sekwencyjne z dużym buforem bezpieczeństwa
+      for (const task of tasks) {
         let success = false;
-        let lastError = "";
+        let errorMsg = "";
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
           try {
-            const res = await fetch(item.url, { 
+            // Używamy prostego POST bez zbędnych nagłówków, które mogą powodować błędy CORS/Fetch
+            const res = await fetch(task.url, { 
               method: 'POST', 
-              body: item.body,
-              // Zapobieganie cache'owaniu
-              headers: { 'Cache-Control': 'no-cache' }
+              body: task.body,
+              cache: 'no-store'
             });
             
             if (res.ok) {
               success = true;
               break; 
             }
-            lastError = `Server returned ${res.status}`;
+            errorMsg = `Status ${res.status}`;
           } catch (e: any) {
-            lastError = e.message;
+            errorMsg = e.message || "Błąd sieci";
           }
           
           if (attempt < MAX_RETRIES) {
-            console.warn(`Retry ${attempt}/${MAX_RETRIES} for chunk ${i}...`);
-            await delay(500 * attempt); // Eksponencjalne oczekiwanie
+            await delay(1000 * attempt); // Dłuższe czekanie przy błędzie
           }
         }
 
         if (!success) {
-          return { 
-            success: false, 
-            error: `Błąd zapisu fragmentu ${i}: ${lastError}` 
-          };
+          return { success: false, error: `${task.label}: ${errorMsg}` };
         }
         
-        // Mała przerwa między chunkami, żeby nie przeciążyć API
-        await delay(100);
+        await delay(200); // 0.2s przerwy między paczkami
       }
 
       return { success: true };
     } catch (e) {
-      console.error("Cloud Save Error:", e);
-      return { success: false, error: "Krytyczny błąd połączenia." };
+      return { success: false, error: "Błąd krytyczny połączenia." };
     }
   },
 
