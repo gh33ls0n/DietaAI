@@ -19,7 +19,7 @@ interface DashboardProps {
   onGenerate: () => void;
   onUpdateMeal: (day: number, mealType: string, newMeal: Meal) => void;
   onCopyDay: (sourceDay: number, targetDays: number[]) => void;
-  onCopyMealToDays: (meal: Meal, targetDays: number[]) => void;
+  onCopyMultipleMealsToDays: (meals: Meal[], targetDays: number[]) => void;
   onUpdateProfile: (profile: UserProfile) => void;
   onAddCustomMeal: (meal: Meal) => void;
   onDeleteCustomMeal: (name: string) => void;
@@ -31,7 +31,7 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ 
   profile, mealPlan, allAvailableMeals, customMeals, calories, isLoading, error, cloudId,
-  onGenerate, onUpdateMeal, onCopyDay, onCopyMealToDays, onUpdateProfile, onAddCustomMeal, onDeleteCustomMeal, onReset, onSetCloudId,
+  onGenerate, onUpdateMeal, onCopyDay, onCopyMultipleMealsToDays, onUpdateProfile, onAddCustomMeal, onDeleteCustomMeal, onReset, onSetCloudId,
   onExportFile, onImportData
 }) => {
   const [activeTab, setActiveTab] = useState<'meals' | 'shopping' | 'inspirations' | 'settings'>('meals');
@@ -92,7 +92,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   onRegenerate={onGenerate} 
                   onUpdateMeal={onUpdateMeal} 
                   onCopyDay={onCopyDay} 
-                  onCopyMealToDays={onCopyMealToDays}
+                  onCopyMultipleMealsToDays={onCopyMultipleMealsToDays}
                   onAddCustomMeal={onAddCustomMeal} 
                 />
               ) : (

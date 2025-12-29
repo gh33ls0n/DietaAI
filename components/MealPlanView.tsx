@@ -9,20 +9,23 @@ interface MealPlanViewProps {
   onRegenerate: () => void;
   onUpdateMeal: (day: number, mealType: string, newMeal: Meal) => void;
   onCopyDay: (sourceDay: number, targetDays: number[]) => void;
-  onCopyMealToDays: (meal: Meal, targetDays: number[]) => void;
+  onCopyMultipleMealsToDays: (meals: Meal[], targetDays: number[]) => void;
   onAddCustomMeal: (meal: Meal) => void;
 }
 
 const MealPlanView: React.FC<MealPlanViewProps> = ({ 
-  mealPlan, allAvailableMeals, onRegenerate, onUpdateMeal, onCopyDay, onCopyMealToDays, onAddCustomMeal 
+  mealPlan, allAvailableMeals, onRegenerate, onUpdateMeal, onCopyDay, onCopyMultipleMealsToDays, onAddCustomMeal 
 }) => {
   const [selectedDay, setSelectedDay] = useState<number>(1);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [swappingMealType, setSwappingMealType] = useState<string | null>(null);
   
+  // Tryb wyboru (Selection Mode)
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedMealIndices, setSelectedMealIndices] = useState<number[]>([]);
+
   // Stany dla kopiowania
-  const [copyMode, setCopyMode] = useState<'day' | 'meal' | null>(null);
-  const [mealToCopy, setMealToCopy] = useState<Meal | null>(null);
+  const [copyMode, setCopyMode] = useState<'day' | 'multi-meal' | null>(null);
   const [copyTargetDays, setCopyTargetDays] = useState<number[]>([]);
   
   const [swapSearch, setSwapSearch] = useState("");
@@ -52,21 +55,26 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     if (copyMode === 'day') {
       onCopyDay(selectedDay, copyTargetDays);
       alert(`Skopiowano Dzień ${selectedDay} do wybranych dni!`);
-    } else if (copyMode === 'meal' && mealToCopy) {
-      onCopyMealToDays(mealToCopy, copyTargetDays);
-      alert(`Skopiowano posiłek "${mealToCopy.name}" do wybranych dni!`);
+    } else if (copyMode === 'multi-meal') {
+      const mealsToCopy = currentDayPlan.meals.filter((_, idx) => selectedMealIndices.includes(idx));
+      onCopyMultipleMealsToDays(mealsToCopy, copyTargetDays);
+      alert(`Skopiowano ${mealsToCopy.length} posiłki do wybranych dni!`);
     }
     
     setCopyMode(null);
-    setMealToCopy(null);
     setCopyTargetDays([]);
+    setIsSelectionMode(false);
+    setSelectedMealIndices([]);
   };
 
   const toggleTargetDay = (d: number) => {
     setCopyTargetDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
   };
 
-  // Fix: Added handleSwap function to resolve missing function error
+  const toggleMealSelection = (idx: number) => {
+    setSelectedMealIndices(prev => prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]);
+  };
+
   const handleSwap = (day: number, newMeal: Meal) => {
     if (swappingMealType) {
       onUpdateMeal(day, swappingMealType, newMeal);
@@ -91,7 +99,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
   }, [swappingMealType, allAvailableMeals, swapSearch]);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 relative">
       {/* Nawigacja Dni */}
       <div className="flex lg:flex-col gap-1.5 lg:gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 lg:w-56 shrink-0 scrollbar-hide">
         {mealPlan.days.map((dayPlan) => (
@@ -123,11 +131,14 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
           
           <div className="flex flex-col items-center sm:items-end gap-3 w-full sm:w-auto">
             <div className="flex gap-2 w-full sm:w-auto">
-              <button onClick={() => setCopyMode('day')} className="flex-1 bg-slate-50 text-slate-600 px-4 py-2 rounded-xl text-[9px] font-black uppercase border border-slate-200 hover:bg-emerald-50 hover:text-emerald-600 transition-colors">
-                Kopiuj Dzień
+              <button 
+                onClick={() => setIsSelectionMode(!isSelectionMode)} 
+                className={`flex-1 px-4 py-2 rounded-xl text-[9px] font-black uppercase border transition-all ${isSelectionMode ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600'}`}
+              >
+                {isSelectionMode ? 'Anuluj wybór' : 'Wybierz posiłki'}
               </button>
-              <button onClick={onRegenerate} className="flex-1 bg-emerald-600 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-md">
-                Nowy plan
+              <button onClick={() => setCopyMode('day')} className="flex-1 bg-slate-900 text-white px-4 py-2 rounded-xl text-[9px] font-black uppercase shadow-md">
+                Kopiuj Dzień
               </button>
             </div>
             <div className="flex gap-6">
@@ -139,10 +150,20 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         </div>
 
         {/* LISTA POSIŁKÓW */}
-        <div className="space-y-2">
+        <div className="space-y-2 pb-24 lg:pb-0">
           {currentDayPlan.meals.map((meal, idx) => (
-            <div key={idx} className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm flex items-center gap-3">
-                <div className="flex-grow min-w-0 cursor-pointer" onClick={() => setSelectedMeal(meal)}>
+            <div 
+              key={idx} 
+              onClick={() => isSelectionMode ? toggleMealSelection(idx) : setSelectedMeal(meal)}
+              className={`bg-white rounded-2xl border p-4 shadow-sm flex items-center gap-3 transition-all cursor-pointer ${isSelectionMode && selectedMealIndices.includes(idx) ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-100 hover:border-slate-200'}`}
+            >
+                {isSelectionMode && (
+                  <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${selectedMealIndices.includes(idx) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 bg-white'}`}>
+                    {selectedMealIndices.includes(idx) && <Icons.Check className="w-4 h-4" />}
+                  </div>
+                )}
+                
+                <div className="flex-grow min-w-0">
                    <div className="flex items-center gap-2 mb-0.5">
                      <span className="text-[8px] font-black text-emerald-600 uppercase bg-emerald-50 px-1.5 py-0.5 rounded">
                        {mealTypeLabels[meal.type]}
@@ -151,33 +172,48 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                    </div>
                    <h4 className="text-base font-bold text-slate-800 truncate">{meal.name}</h4>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  {/* PRZYCISK KOPIOWANIA POSIŁKU */}
-                  <button onClick={() => { setMealToCopy(meal); setCopyMode('meal'); }} className="p-2 bg-slate-50 text-slate-400 rounded-lg hover:text-emerald-600" title="Kopiuj ten posiłek">
-                    <Icons.Copy className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => setSwappingMealType(meal.type)} className="p-2 bg-slate-50 text-slate-400 rounded-lg hover:text-emerald-600" title="Wymień">
-                    <Icons.Swap className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => setSelectedMeal(meal)} className="p-2 bg-slate-900 text-white rounded-lg hover:bg-emerald-600">
-                    <Icons.ChefHat className="w-4 h-4" />
-                  </button>
-                </div>
+                
+                {!isSelectionMode && (
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={(e) => { e.stopPropagation(); setSwappingMealType(meal.type); }} className="p-2 bg-slate-50 text-slate-400 rounded-lg hover:text-emerald-600" title="Wymień">
+                      <Icons.Swap className="w-4 h-4" />
+                    </button>
+                    <button className="p-2 bg-slate-900 text-white rounded-lg hover:bg-emerald-600">
+                      <Icons.ChefHat className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
             </div>
           ))}
         </div>
+
+        {/* PANEL AKCJI DLA ZAZNACZONYCH */}
+        {isSelectionMode && selectedMealIndices.length > 0 && (
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-lg bg-slate-900 text-white p-4 rounded-3xl shadow-2xl z-[150] flex items-center justify-between animate-in slide-in-from-bottom-8">
+            <div className="pl-2">
+              <span className="text-xs font-bold text-emerald-400">Wybrano: {selectedMealIndices.length}</span>
+              <p className="text-[9px] opacity-60 uppercase font-black">Posiłki z dnia {selectedDay}</p>
+            </div>
+            <button 
+              onClick={() => setCopyMode('multi-meal')}
+              className="bg-emerald-600 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg active:scale-95"
+            >
+              Kopiuj do wielu dni
+            </button>
+          </div>
+        )}
       </div>
 
       {/* MODAL MULTI-WYBORU DNI (DO KOPIOWANIA) */}
       {copyMode && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => { setCopyMode(null); setCopyTargetDays([]); }}></div>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setCopyMode(null); setCopyTargetDays([]); }}></div>
           <div className="relative bg-white w-full max-w-sm rounded-3xl p-6 space-y-6 shadow-2xl animate-in zoom-in-95">
             <div className="text-center">
               <h2 className="text-xl font-bold text-slate-800">
-                {copyMode === 'day' ? `Kopiuj Dzień ${selectedDay}` : 'Kopiuj posiłek'}
+                {copyMode === 'day' ? `Kopiuj Dzień ${selectedDay}` : `Kopiuj ${selectedMealIndices.length} posiłki`}
               </h2>
-              <p className="text-slate-400 text-xs mt-1">Zaznacz dni docelowe (można kilka):</p>
+              <p className="text-slate-400 text-xs mt-1">Gdzie chcesz to wkleić?</p>
             </div>
             
             <div className="grid grid-cols-4 gap-2">
@@ -188,9 +224,9 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                   onClick={() => toggleTargetDay(d)}
                   className={`h-11 rounded-xl font-black text-xs border-2 transition-all ${
                     copyMode === 'day' && d === selectedDay 
-                      ? 'bg-slate-50 border-slate-100 text-slate-200 cursor-not-allowed' 
+                      ? 'bg-slate-50 border-slate-100 text-slate-100 cursor-not-allowed' 
                       : copyTargetDays.includes(d) 
-                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-100' 
+                        ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg' 
                         : 'bg-white border-slate-100 text-slate-400 hover:border-slate-300'
                   }`}
                 >
@@ -206,9 +242,9 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
               <button 
                 onClick={handleApplyCopy} 
                 disabled={copyTargetDays.length === 0} 
-                className="flex-1 py-4 bg-emerald-600 text-white font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-emerald-100 disabled:opacity-50 disabled:shadow-none"
+                className="flex-1 py-4 bg-emerald-600 text-white font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl disabled:opacity-50"
               >
-                Zastosuj ({copyTargetDays.length})
+                Wklej do {copyTargetDays.length} dni
               </button>
             </div>
           </div>

@@ -159,13 +159,17 @@ const App: React.FC = () => {
               const s = mealPlan.days.find(d => d.day === source);
               if (s) setMealPlan({ days: mealPlan.days.map(d => targets.includes(d.day) ? { ...d, meals: s.meals.map(m => ({ ...m })) } : d) });
             }}
-            onCopyMealToDays={(meal, targets) => {
+            onCopyMultipleMealsToDays={(meals, targets) => {
               if (!mealPlan) return;
               setMealPlan({ 
-                days: mealPlan.days.map(d => targets.includes(d.day) 
-                  ? { ...d, meals: d.meals.map(m => m.type === meal.type ? { ...meal } : m) } 
-                  : d
-                ) 
+                days: mealPlan.days.map(d => {
+                  if (!targets.includes(d.day)) return d;
+                  const newDayMeals = d.meals.map(m => {
+                    const foundSource = meals.find(sm => sm.type === m.type);
+                    return foundSource ? { ...foundSource } : m;
+                  });
+                  return { ...d, meals: newDayMeals };
+                }) 
               });
             }}
             onUpdateProfile={setProfile}
