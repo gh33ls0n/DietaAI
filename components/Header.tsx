@@ -7,9 +7,10 @@ interface HeaderProps {
   showReset: boolean;
   syncStatus?: 'synced' | 'syncing' | 'error';
   syncError?: string | null;
+  onRetrySync?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus, syncError }) => {
+const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus, syncError, onRetrySync }) => {
   return (
     <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 h-12 sm:h-16 flex items-center justify-between">
@@ -22,7 +23,10 @@ const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus, syncErr
               {APP_NAME}
             </span>
             {syncStatus && (
-              <div className="flex items-center gap-1.5 group cursor-help">
+              <button 
+                onClick={onRetrySync}
+                className="flex items-center gap-1.5 group cursor-pointer hover:opacity-80 transition-opacity text-left"
+              >
                 <div className={`w-2 h-2 rounded-full transition-all duration-500 ${
                   syncStatus === 'synced' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 
                   syncStatus === 'syncing' ? 'bg-amber-400 animate-pulse' : 
@@ -33,14 +37,9 @@ const Header: React.FC<HeaderProps> = ({ onReset, showReset, syncStatus, syncErr
                 }`}>
                   {syncStatus === 'synced' ? 'Zsynchronizowano' : 
                    syncStatus === 'syncing' ? 'Wysyłanie...' : 
-                   'Tryb Lokalny'}
+                   'Tryb Lokalny (Kliknij by połączyć)'}
                 </span>
-                {syncStatus === 'error' && (
-                  <div className="hidden group-hover:block absolute top-full left-0 mt-2 bg-slate-800 text-white text-[10px] p-2 rounded-lg whitespace-nowrap z-50">
-                    Błąd połączenia. Dane są bezpieczne na Twoim komputerze.
-                  </div>
-                )}
-              </div>
+              </button>
             )}
           </div>
         </div>

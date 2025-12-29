@@ -10,107 +10,80 @@ interface CloudData {
 }
 
 /**
- * CloudService V11 - Multi-Provider Resilient Architecture
- * Wykorzystuje dwa niezależne serwery, aby ominąć lokalne blokady DNS/CORS.
+ * CloudService V12 - npoint.io Provider
+ * npoint.io jest wyjątkowo odporny na blokady CORS i błędy preflight.
  */
-const PROVIDERS = {
-  KVDB: "https://kvdb.io/25vK8Zq3XmB8zS5Dk2FpTq", // Dedykowany bucket
-  JSONBLOB: "https://jsonblob.com/api/jsonBlob"
-};
+const API_BASE = "https://api.npoint.io";
 
 export const CloudService = {
   /**
-   * Pobiera dane z chmury, próbując różnych dostawców.
+   * Pobiera dane z chmury.
    */
   loadData: async (cloudId: string): Promise<CloudData | null> => {
-    if (!cloudId || cloudId.length < 4) return null;
+    if (!cloudId || cloudId.length < 5) return null;
 
-    // Próba 1: KVDB (Zazwyczaj szybszy i mniej blokowany w PL)
     try {
-      const res = await fetch(`${PROVIDERS.KVDB}/${cloudId}`, { 
+      const res = await fetch(`${API_BASE}/${cloudId}`, {
         method: 'GET',
-        cache: 'no-store'
-      });
-      if (res.ok) {
-        const raw = await res.text();
-        return CloudService.decompress(raw);
-      }
-    } catch (e) {
-      console.warn("KVDB Load Failed, trying fallback...");
-    }
-
-    // Próba 2: JSONBLOB (Zapas)
-    try {
-      const res = await fetch(`${PROVIDERS.JSONBLOB}/${cloudId}`, { method: 'GET' });
-      if (res.ok) {
-        const json = await res.json();
-        return CloudService.decompress(json.d || json);
-      }
-    } catch (e) {
-      console.error("All Cloud Providers Failed.");
-    }
-
-    return null;
-  },
-
-  /**
-   * Zapisuje dane. Jeśli cloudId nie istnieje, tworzy nowy zasób na KVDB.
-   */
-  saveData: async (cloudId: string | null, data: CloudData): Promise<{success: boolean, id?: string, error?: string}> => {
-    const compressed = CloudService.compress(data);
-    const activeId = cloudId || CloudService.generateShortId();
-
-    try {
-      // Używamy PUT na KVDB - jest najbardziej odporny na błędy "Failed to fetch"
-      const res = await fetch(`${PROVIDERS.KVDB}/${activeId}`, {
-        method: 'PUT',
-        body: compressed,
-        headers: { 'Content-Type': 'text/plain' }, // Simple Request - omija OPTIONS preflight
-        mode: 'cors'
-      });
-
-      if (res.ok) {
-        return { success: true, id: activeId };
-      }
-
-      // Fallback do JSONBLOB jeśli KVDB padnie
-      const blobRes = await fetch(cloudId ? `${PROVIDERS.JSONBLOB}/${cloudId}` : PROVIDERS.JSONBLOB, {
-        method: cloudId ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ d: compressed })
-      });
-
-      if (blobRes.ok) {
-        let newId = cloudId;
-        if (!cloudId) {
-          const loc = blobRes.headers.get('Location');
-          newId = loc ? loc.split('/').pop() || activeId : activeId;
+        headers: {
+          'Accept': 'application/json'
         }
-        return { success: true, id: newId || activeId };
-      }
+      });
 
-      return { success: false, error: "Błąd serwerów zapasowych." };
-    } catch (e) {
-      console.warn("Cloud Save Failed (Network/CORS block)");
-      return { success: false, error: "Sieć blokuje połączenie z chmurą." };
-    }
-  },
+      if (!res.ok) return null;
 
-  compress: (data: any): string => {
-    return LZString.compressToBase64(JSON.stringify(data));
-  },
+      const raw = await res.json();
+      // npoint przechowuje dane bezpośrednio
+      const content = raw.d || raw;
+      
+      if (typeof content !== 'string') return null;
 
-  decompress: (raw: string): CloudData | null => {
-    try {
-      if (!raw || raw.length < 10) return null;
-      const decompressed = LZString.decompressFromBase64(raw);
+      const decompressed = LZString.decompressFromBase64(content);
       return decompressed ? JSON.parse(decompressed) : null;
-    } catch {
+    } catch (e) {
+      console.warn("Npoint Load Error:", e);
       return null;
     }
   },
 
+  /**
+   * Zapisuje dane.
+   */
+  saveData: async (cloudId: string | null, data: CloudData): Promise<{success: boolean, id?: string, error?: string}> => {
+    try {
+      const payload = JSON.stringify(data);
+      const compressed = LZString.compressToBase64(payload);
+      
+      // Dla npoint.io używamy POST do tworzenia i POST/PUT do edycji (zależy od implementacji bin-u)
+      // Ale najbezpieczniejszy dla CORS jest POST na konkretny endpoint.
+      const url = cloudId ? `${API_BASE}/${cloudId}` : API_BASE;
+      
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ d: compressed })
+      });
+
+      if (res.ok) {
+        const result = await res.json();
+        // npoint zwraca ID w polu 'id' lub 'binId'
+        const newId = result.id || result.binId || cloudId;
+        return { success: true, id: newId };
+      }
+
+      return { success: false, error: `Serwer zwrócił błąd ${res.status}` };
+    } catch (e: any) {
+      console.error("Critical Sync Error:", e);
+      return { 
+        success: false, 
+        error: "Połączenie zablokowane przez Twoją sieć (CORS/Firewall)." 
+      };
+    }
+  },
+
   generateShortId: () => {
-    return Math.random().toString(36).substring(2, 10).toUpperCase();
+    return Math.random().toString(36).substring(2, 12).toLowerCase();
   }
 };

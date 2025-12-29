@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { UserProfile, WeeklyPlan, Gender, ActivityLevel, Meal } from './types';
 import { Icons, APP_NAME } from './constants';
 import Header from './components/Header';
@@ -15,7 +15,6 @@ const App: React.FC = () => {
   const [syncError, setSyncError] = useState<string | null>(null);
   
   const preventNextSave = useRef(false);
-  // Fix: Use ReturnType<typeof setTimeout> instead of NodeJS.Timeout to avoid "Cannot find namespace 'NodeJS'" error in browser environments.
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [profile, setProfile] = useState<UserProfile | null>(() => {
@@ -35,6 +34,31 @@ const App: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Funkcja manualnej synchronizacji
+  const forceSync = useCallback(async () => {
+    if (!profile) return;
+    setSyncStatus('syncing');
+    
+    const result = await CloudService.saveData(cloudId, {
+      profile,
+      mealPlan,
+      customMeals,
+      lastUpdated: new Date().toISOString()
+    });
+    
+    if (result.success) {
+      if (result.id && result.id !== cloudId) {
+        setCloudId(result.id);
+        localStorage.setItem('cloud_id', result.id);
+      }
+      setSyncStatus('synced');
+      setSyncError(null);
+    } else {
+      setSyncStatus('error');
+      setSyncError(result.error || "Błąd sieci.");
+    }
+  }, [profile, mealPlan, customMeals, cloudId]);
 
   // 1. Ładowanie z chmury (inicjalne)
   useEffect(() => {
@@ -60,11 +84,10 @@ const App: React.FC = () => {
     initCloud();
   }, [cloudId]);
 
-  // 2. Automatyczny zapis przy zmianach (Debounced & Resilient)
+  // 2. Automatyczny zapis przy zmianach
   useEffect(() => {
     if (!profile) return;
 
-    // Lokalne bezpieczeństwo danych
     localStorage.setItem('user_profile', JSON.stringify(profile));
     if (mealPlan) localStorage.setItem('weekly_plan', JSON.stringify(mealPlan));
     localStorage.setItem('custom_meals', JSON.stringify(customMeals));
@@ -75,34 +98,12 @@ const App: React.FC = () => {
     }
 
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-
-    saveTimeoutRef.current = setTimeout(async () => {
-      setSyncStatus('syncing');
-      const result = await CloudService.saveData(cloudId, {
-        profile,
-        mealPlan,
-        customMeals,
-        lastUpdated: new Date().toISOString()
-      });
-      
-      if (result.success) {
-        if (result.id && result.id !== cloudId) {
-          setCloudId(result.id);
-          localStorage.setItem('cloud_id', result.id);
-        }
-        setSyncStatus('synced');
-        setSyncError(null);
-      } else {
-        // Jeśli błąd, nie krzyczymy na użytkownika od razu, po prostu pokazujemy status
-        setSyncStatus('error');
-        setSyncError(result.error || "Błąd zapisu.");
-      }
-    }, 2000);
+    saveTimeoutRef.current = setTimeout(forceSync, 3000);
     
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
     };
-  }, [profile, mealPlan, customMeals, cloudId]);
+  }, [profile, mealPlan, customMeals, cloudId, forceSync]);
 
   const allAvailableMeals = useMemo(() => [...MEAL_DATABASE, ...customMeals], [customMeals]);
 
@@ -187,12 +188,18 @@ const App: React.FC = () => {
       localStorage.removeItem('cloud_id');
     }
     setCloudId(id);
-    window.location.reload(); // Przeładowanie, aby zainicjować pobieranie
+    window.location.reload();
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header onReset={handleReset} showReset={!!profile} syncStatus={syncStatus} syncError={syncError} />
+      <Header 
+        onReset={handleReset} 
+        showReset={!!profile} 
+        syncStatus={syncStatus} 
+        syncError={syncError} 
+        onRetrySync={forceSync}
+      />
       
       <main className="flex-grow container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-5xl">
         {!profile ? (
