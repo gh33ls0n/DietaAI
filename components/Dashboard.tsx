@@ -24,11 +24,14 @@ interface DashboardProps {
   onDeleteCustomMeal: (name: string) => void;
   onReset: () => void;
   onSetCloudId: (id: string | null) => void;
+  onExportFile: () => void;
+  onImportData: (data: any) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ 
   profile, mealPlan, allAvailableMeals, customMeals, calories, isLoading, error, cloudId,
-  onGenerate, onUpdateMeal, onCopyDay, onUpdateProfile, onAddCustomMeal, onDeleteCustomMeal, onReset, onSetCloudId
+  onGenerate, onUpdateMeal, onCopyDay, onUpdateProfile, onAddCustomMeal, onDeleteCustomMeal, onReset, onSetCloudId,
+  onExportFile, onImportData
 }) => {
   const [activeTab, setActiveTab] = useState<'meals' | 'shopping' | 'inspirations' | 'settings'>('meals');
 
@@ -72,7 +75,6 @@ const Dashboard: React.FC<DashboardProps> = ({
       {/* Kontener Karty */}
       {!isLoading && (
         <div className="space-y-4">
-          {/* Nawigacja Tabs */}
           <div className="flex bg-slate-200/50 p-1 rounded-xl w-full sm:w-fit overflow-x-auto scrollbar-hide">
             <button onClick={() => setActiveTab('meals')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'meals' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ChefHat className="w-4 h-4" />Jadłospis</button>
             <button onClick={() => setActiveTab('shopping')} className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg transition-all text-xs font-bold whitespace-nowrap ${activeTab === 'shopping' ? 'bg-white shadow-sm text-emerald-600' : 'text-slate-500'}`}><Icons.ShoppingBag className="w-4 h-4" />Zakupy</button>
@@ -83,7 +85,6 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="mt-2">
             {activeTab === 'meals' && (
               mealPlan ? (
-                /* Fix: Changed handleUpdateMeal to onUpdateMeal as it is passed from props */
                 <MealPlanView mealPlan={mealPlan} allAvailableMeals={allAvailableMeals} onRegenerate={onGenerate} onUpdateMeal={onUpdateMeal} onCopyDay={onCopyDay} onAddCustomMeal={onAddCustomMeal} />
               ) : (
                 <div className="bg-white p-12 rounded-3xl text-center border-2 border-dashed border-slate-100">
@@ -94,7 +95,19 @@ const Dashboard: React.FC<DashboardProps> = ({
             )}
             {activeTab === 'shopping' && mealPlan && <ShoppingListView mealPlan={mealPlan} />}
             {activeTab === 'inspirations' && <InspirationsView customMeals={customMeals} onAddCustomMeal={onAddCustomMeal} onDeleteCustomMeal={onDeleteCustomMeal} />}
-            {activeTab === 'settings' && <SettingsView profile={profile} mealPlan={mealPlan} customMeals={customMeals} cloudId={cloudId} onUpdateProfile={onUpdateProfile} onReset={onReset} onSetCloudId={onSetCloudId} />}
+            {activeTab === 'settings' && (
+              <SettingsView 
+                profile={profile} 
+                mealPlan={mealPlan} 
+                customMeals={customMeals} 
+                cloudId={cloudId} 
+                onUpdateProfile={onUpdateProfile} 
+                onReset={onReset} 
+                onSetCloudId={onSetCloudId}
+                onExportFile={onExportFile}
+                onImportData={onImportData}
+              />
+            )}
           </div>
         </div>
       )}

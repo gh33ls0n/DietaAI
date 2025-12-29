@@ -36,34 +36,30 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 1. OBSŁUGA MAGIC LINKU (URL SYNC)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const syncData = params.get('s');
-    
-    if (syncData) {
-      try {
-        const decompressed = LZString.decompressFromEncodedURIComponent(syncData);
-        if (decompressed) {
-          const data = JSON.parse(decompressed);
-          if (data.profile) {
-            if (confirm("Wykryto dane z Magic Linku. Czy chcesz je zaimportować i nadpisać obecny jadłospis?")) {
-              setProfile(data.profile);
-              setMealPlan(data.mealPlan);
-              setCustomMeals(data.customMeals || []);
-              // Czyścimy URL po imporcie
-              window.history.replaceState({}, document.title, window.location.pathname);
-              alert("Dane zaimportowane pomyślnie!");
-            }
-          }
-        }
-      } catch (e) {
-        console.error("Magic Link Error:", e);
-      }
-    }
-  }, []);
+  // Funkcja eksportu do pliku
+  const handleExportFile = () => {
+    const data = { profile, mealPlan, customMeals, version: '1.5' };
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `dieta_gilsona_${new Date().toISOString().split('T')[0]}.dieta`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
-  // Funkcja manualnej synchronizacji
+  // Funkcja importu z pliku
+  const handleImportData = (data: any) => {
+    if (data.profile) {
+      setProfile(data.profile);
+      setMealPlan(data.mealPlan || null);
+      setCustomMeals(data.customMeals || []);
+      alert("Dane wczytane pomyślnie!");
+    }
+  };
+
+  // Funkcja manualnej synchronizacji chmury
   const forceSync = useCallback(async () => {
     if (!profile) return;
     setSyncStatus('syncing');
@@ -110,7 +106,7 @@ const App: React.FC = () => {
     initCloud();
   }, [cloudId]);
 
-  // Automatyczny zapis lokalny
+  // Automatyczny zapis lokalny i chmura
   useEffect(() => {
     if (!profile) return;
     localStorage.setItem('user_profile', JSON.stringify(profile));
@@ -123,7 +119,7 @@ const App: React.FC = () => {
     }
 
     if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
-    saveTimeoutRef.current = setTimeout(forceSync, 5000);
+    saveTimeoutRef.current = setTimeout(forceSync, 10000); // Rzadszy zapis dla stabilności
     
     return () => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
@@ -236,6 +232,8 @@ const App: React.FC = () => {
             onDeleteCustomMeal={(n) => setCustomMeals(p => p.filter(m => m.name !== n))}
             onReset={handleReset}
             onSetCloudId={handleSetCloudId}
+            onExportFile={handleExportFile}
+            onImportData={handleImportData}
           />
         )}
       </main>
