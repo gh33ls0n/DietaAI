@@ -74,9 +74,13 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         meal.ingredients.forEach((ing, idx) => {
           const id = `${day.day}-${meal.type}-${ing.item}-${idx}`;
           if (checkedItems[id]) {
-            // Dla Listonic czyścimy nazwy ze zbędnych znaków
             const cleanItem = ing.item.replace(/[*_~`]/g, '').trim();
-            toCopy.push(`${cleanItem} ${ing.amount}`);
+            if (target === 'listonic') {
+              // Dodajemy myślnik i przecinek na końcu - to wymusza na Listonic rozpoznanie nowej pozycji
+              toCopy.push(`${cleanItem} ${ing.amount},`);
+            } else {
+              toCopy.push(`${cleanItem} (${ing.amount})`);
+            }
           }
         });
       });
@@ -90,17 +94,16 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     // Unikalna lista
     const uniqueListArray = Array.from(new Set(toCopy));
     
-    // KLUCZ: Listonic Mobile najlepiej radzi sobie z prostym \n (LF).
-    // Jeśli produkty wklejają się jako jeden, oznacza to, że aplikacja nie widzi "entera".
-    // Zastosowanie prostego złączenia każda linia = jeden produkt.
-    const uniqueList = uniqueListArray.join('\n');
+    // Używamy \r\n (CRLF) dla Listonic, co jest najbardziej zrozumiałym enterem dla mobilnych systemów
+    const uniqueList = uniqueListArray.join('\r\n');
 
     try {
       await navigator.clipboard.writeText(uniqueList);
       setCopied(target);
       setTimeout(() => setCopied(null), 2000);
+      
       if (target === 'listonic') {
-        alert("Skopiowano! Wklej listę w Listonic (opcja: Dodaj wiele produktów).");
+        alert("Skopiowano dla Listonic!\nWskazówka: W aplikacji Listonic kliknij przycisk '+', a następnie wklej listę.");
       }
     } catch (err) {
       alert("Błąd kopiowania.");
@@ -112,7 +115,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col lg:flex-row justify-between items-center gap-6 sticky top-20 z-40">
         <div className="text-center lg:text-left">
           <h2 className="text-2xl font-bold text-slate-800">Lista Zakupów</h2>
-          <p className="text-slate-500 text-sm mt-1">Zaznacz produkty i przenieś do Listonic.</p>
+          <p className="text-slate-500 text-sm mt-1">Przenieś wybrane produkty do Listonic.</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <button 
@@ -120,7 +123,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
             className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-bold transition-all shadow-md ${copied === 'standard' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'}`}
           >
             {copied === 'standard' ? <Icons.Check /> : <Icons.Clipboard />}
-            Kopiuj standard
+            Standard
           </button>
           <button 
             onClick={() => handleCopy('listonic')}
