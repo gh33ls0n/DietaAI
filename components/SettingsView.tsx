@@ -10,7 +10,7 @@ interface SettingsViewProps {
   cloudId: string | null;
   onUpdateProfile: (updatedProfile: UserProfile) => void;
   onReset: () => void;
-  onSetCloudId: (id: string) => void;
+  onSetCloudId: (id: string | null) => void;
   onBulkAddMeals?: (meals: Meal[]) => void;
 }
 
@@ -58,6 +58,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({ profile, cloudId, onUpdateP
     setTimeout(() => window.location.reload(), 1000);
   };
 
+  const handleDisconnectCloud = () => {
+    if (confirm("Czy chcesz rozłączyć to urządzenie z chmurą? Twoje dane zostaną na telefonie, ale przestaną się synchronizować.")) {
+      onSetCloudId(null);
+      showFeedback("Rozłączono z chmurą.");
+    }
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -89,6 +96,64 @@ const SettingsView: React.FC<SettingsViewProps> = ({ profile, cloudId, onUpdateP
         </div>
       )}
 
+      {/* Synchronizacja Sekcja */}
+      <section className="bg-slate-900 p-8 rounded-3xl text-white shadow-xl border border-white/5">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Icons.Swap className="text-emerald-400" />
+            <h2 className="text-xl font-bold">Synchronizacja</h2>
+          </div>
+          {cloudId && (
+            <button 
+              onClick={handleDisconnectCloud}
+              className="text-[10px] font-bold text-red-400 hover:text-red-300 uppercase tracking-widest bg-red-400/10 px-3 py-1 rounded-lg transition-all"
+            >
+              Rozłącz / Zmień klucz
+            </button>
+          )}
+        </div>
+        
+        {!cloudId ? (
+          <div className="space-y-4">
+            <p className="text-slate-400 text-sm">Masz już klucz z komputera? Wpisz go tutaj, aby pobrać swoją dietę.</p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-grow flex gap-2">
+                <input 
+                  value={inputCloudId}
+                  onChange={(e) => setInputCloudId(e.target.value)}
+                  placeholder="WPISZ KLUCZ (np. KOD-1234)"
+                  className="flex-grow bg-white/10 border border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:border-emerald-500 font-black tracking-widest uppercase"
+                />
+                <button onClick={handleConnectCloud} className="bg-emerald-600 hover:bg-emerald-500 px-6 py-3 rounded-xl font-bold transition-all text-sm">Połącz</button>
+              </div>
+              <div className="hidden sm:flex items-center text-slate-600 font-bold px-2">LUB</div>
+              <button onClick={handleCreateCloudAccount} className="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl font-bold transition-all text-sm border border-white/10">Generuj nowy klucz</button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="bg-white/10 p-5 rounded-2xl flex justify-between items-center border border-emerald-500/30">
+              <div>
+                <p className="text-[10px] font-bold text-emerald-400 uppercase mb-1">Twój aktywny klucz synchronizacji</p>
+                <p className="text-3xl font-black tracking-[0.2em] text-emerald-50">{cloudId}</p>
+              </div>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(cloudId);
+                  showFeedback("Skopiowano klucz!");
+                }}
+                className="p-4 bg-white/10 hover:bg-emerald-500 rounded-xl transition-all group"
+              >
+                <Icons.Clipboard className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
+            <p className="text-xs text-slate-400 bg-black/20 p-3 rounded-lg border border-white/5">
+              Wpisz ten klucz na innym urządzeniu w zakładce <strong>Opcje</strong>, aby mieć dostęp do tej samej diety i listy zakupów.
+            </p>
+          </div>
+        )}
+      </section>
+
       {/* Import Sekcja */}
       <section className="bg-emerald-50 p-8 rounded-3xl border-2 border-emerald-100 shadow-sm space-y-4">
         <div className="flex items-center gap-3">
@@ -97,7 +162,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ profile, cloudId, onUpdateP
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-800">Masowy Import Przepisów</h2>
-            <p className="text-slate-500 text-xs">Wgraj swój plik JSON (nawet 1300+ przepisów). Aplikacja automatycznie je skategoryzuje.</p>
+            <p className="text-slate-500 text-xs">Wgraj swój plik JSON. Aplikacja automatycznie go przetworzy.</p>
           </div>
         </div>
         
@@ -110,57 +175,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({ profile, cloudId, onUpdateP
                 <>
                   <Icons.Clipboard className="w-8 h-8 mb-3 text-emerald-500" />
                   <p className="mb-2 text-sm text-emerald-700 font-bold underline">Kliknij, aby wybrać plik .json</p>
-                  <p className="text-xs text-emerald-500">Przetworzymy go lokalnie w Twojej przeglądarce</p>
                 </>
               )}
             </div>
             <input type="file" className="hidden" accept=".json" onChange={handleFileUpload} disabled={isImporting} />
           </label>
         </div>
-      </section>
-
-      <section className="bg-slate-900 p-8 rounded-3xl text-white shadow-xl border border-white/5">
-        <div className="flex items-center gap-3 mb-4">
-          <Icons.Swap className="text-emerald-400" />
-          <h2 className="text-xl font-bold">Synchronizacja w chmurze</h2>
-        </div>
-        
-        {!cloudId ? (
-          <div className="space-y-4">
-            <p className="text-slate-400 text-sm">Twoje dane są obecnie zapisywane tylko na tym urządzeniu. Załóż darmowe konto chmurowe, aby mieć do nich dostęp wszędzie.</p>
-            <div className="flex flex-wrap gap-4">
-              <button onClick={handleCreateCloudAccount} className="bg-emerald-600 hover:bg-emerald-500 px-6 py-2 rounded-xl font-bold transition-all text-sm">Generuj mój klucz chmury</button>
-              <div className="flex-grow flex gap-2">
-                <input 
-                  value={inputCloudId}
-                  onChange={(e) => setInputCloudId(e.target.value)}
-                  placeholder="Wpisz klucz z innego urządzenia..."
-                  className="flex-grow bg-white/10 border border-white/10 rounded-xl px-4 py-2 text-sm outline-none focus:border-emerald-500"
-                />
-                <button onClick={handleConnectCloud} className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl font-bold text-sm">Połącz</button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="bg-white/10 p-4 rounded-2xl flex justify-between items-center">
-              <div>
-                <p className="text-[10px] font-bold text-emerald-400 uppercase">Twój aktywny klucz dostępu</p>
-                <p className="text-2xl font-black tracking-widest">{cloudId}</p>
-              </div>
-              <button 
-                onClick={() => {
-                  navigator.clipboard.writeText(cloudId);
-                  showFeedback("Skopiowano klucz!");
-                }}
-                className="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition-all"
-              >
-                <Icons.Clipboard className="w-5 h-5" />
-              </button>
-            </div>
-            <p className="text-xs text-slate-400">Zapisz ten klucz. Wpisz go na nowym urządzeniu, aby natychmiast wczytać swój jadłospis.</p>
-          </div>
-        )}
       </section>
 
       <section className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
@@ -187,7 +207,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ profile, cloudId, onUpdateP
             <input type="number" value={formData.age} onChange={(e) => setFormData({...formData, age: parseInt(e.target.value)})} className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none" />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-bold text-slate-400 uppercase">Wzrost</label>
+            <label className="text-xs font-bold text-slate-400 uppercase">Wzrost (cm)</label>
             <input type="number" value={formData.height} onChange={(e) => setFormData({...formData, height: parseInt(e.target.value)})} className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-100 rounded-xl outline-none" />
           </div>
           <div className="space-y-1">

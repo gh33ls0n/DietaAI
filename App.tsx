@@ -65,7 +65,7 @@ const App: React.FC = () => {
         lastUpdated: new Date().toISOString()
       });
       setSyncStatus(success ? 'synced' : 'error');
-    }, 2000); // Czekaj 2 sekundy po ostatniej zmianie przed wysłaniem
+    }, 2000); 
 
     // Lokalny backup
     localStorage.setItem('user_profile', JSON.stringify(profile));
@@ -142,7 +142,7 @@ const App: React.FC = () => {
   };
 
   const handleReset = () => {
-    if (confirm("Czy na pewno chcesz zresetować swoje dane? To usunie profil i jadłospis z tego urządzenia.")) {
+    if (confirm("Czy na pewno chcesz zresetować wszystkie dane? To usunie profil i jadłospis z tego urządzenia.")) {
       setProfile(null);
       setMealPlan(null);
       setCloudId(null);
@@ -151,8 +151,12 @@ const App: React.FC = () => {
     }
   };
 
-  const handleSetCloudId = (id: string) => {
-    localStorage.setItem('cloud_id', id);
+  const handleSetCloudId = (id: string | null) => {
+    if (id) {
+      localStorage.setItem('cloud_id', id);
+    } else {
+      localStorage.removeItem('cloud_id');
+    }
     setCloudId(id);
   };
 
