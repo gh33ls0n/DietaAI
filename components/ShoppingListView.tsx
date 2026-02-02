@@ -17,9 +17,10 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
   const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 
   const parseAmount = (amountStr: string, multiplier: number = 1) => {
-    // Normalizujemy jednostkę przed parsowaniem
-    const normalizedAmount = amountStr.replace(/\s*g$/, ' g').replace(/\s*ml$/, ' ml');
+    // Normalizujemy tekst - usuwamy zbędne spacje przed jednostką 'g' lub 'ml'
+    const normalizedAmount = amountStr.replace(/\s+/g, ' ').trim();
     const match = normalizedAmount.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
+    
     if (!match) return { val: 0, unit: normalizedAmount };
     
     let rawVal = match[1].replace(',', '.');
@@ -32,7 +33,10 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       val = parseFloat(rawVal);
     }
 
-    let unit = match[2].trim();
+    let unit = match[2].trim().toLowerCase();
+    // Ujednolicenie zapisu gramów
+    if (unit === 'gram' || unit === 'gramy' || unit === 'g') unit = 'g';
+
     let finalVal = val * multiplier;
     return { val: finalVal, unit };
   };
@@ -46,11 +50,10 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         day.meals.forEach(meal => {
           const mMult = meal.multiplier ?? 1;
           meal.ingredients.forEach(ing => {
-            // KLUCZOWE: Używamy ujednoliconej nazwy kanonicznej do grupowania
             const displayName = getCanonicalProductName(ing.item);
             const { val, unit } = parseAmount(ing.amount, mMult);
             
-            // Grupowanie po nazwie kanonicznej i jednostce
+            // Klucz grupowania: kanoniczna nazwa + jednostka
             const aggKey = `${displayName.toLowerCase()}_${unit.toLowerCase()}`;
             
             if (!totals[aggKey]) {
@@ -109,7 +112,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Automatyczne sumowanie produktów.</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Produkty sumowane automatycznie.</p>
           </div>
           <button 
             onClick={handleCopy}
@@ -138,7 +141,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         {viewType === 'aggregated' ? (
           <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
             <div className="bg-emerald-500 px-8 py-5 text-white flex justify-between items-center">
-              <span className="text-xs font-black uppercase tracking-widest">Wszystkie produkty</span>
+              <span className="text-xs font-black uppercase tracking-widest">Twoje produkty</span>
             </div>
             <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-4">
               {aggregatedList.map((item, idx) => {
