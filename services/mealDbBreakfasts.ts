@@ -65,9 +65,10 @@ export const BREAKFAST_MEALS: Meal[] = [
     ingredients: [
       { item: "Grahamka", amount: "1 szt" },
       { item: "Ser Mozzarella Light", amount: "60g" },
-      { item: "Pesto zielone", amount: "1 łyżeczka" }
+      { item: "Pesto zielone", amount: "1 łyżeczka" },
+      { item: "Pomidor", amount: "1 szt" }
     ],
-    recipe: "Pesto na grahamkę, potem mozzarella i pomidor."
+    recipe: "Pesto na grahamkę, potem mozzarella i plastry pomidora."
   },
   {
     name: "Guacamole z jajkiem sadzonym na grzankach",

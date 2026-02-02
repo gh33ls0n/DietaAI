@@ -56,6 +56,12 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       unit = 'kromka';
     }
 
+    // SPECJALNA LOGIKA POMIDORA: g -> szt (160g = 1 szt)
+    if (lowerName === 'pomidor' && (unit === 'g' || unit === 'gram')) {
+      finalVal = Math.round((finalVal / 160) * 2) / 2;
+      unit = 'szt';
+    }
+
     return { val: finalVal, unit };
   };
 
@@ -89,12 +95,17 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
               nameKey = 'chleb graham';
               displayName = 'Chleb graham';
             }
-            // 4. Jajka
+            // 4. Pomidor (ujednolicenie formy pomidora, pomidory itp.)
+            else if (nameKey.startsWith('pomidor')) {
+              nameKey = 'pomidor';
+              displayName = 'Pomidor';
+            }
+            // 5. Jajka
             else if (nameKey.includes('jaj') || nameKey.includes('jajo')) {
               nameKey = 'jajka';
               displayName = 'Jajka (rozmiar L)';
             }
-            // 5. Mozzarella
+            // 6. Mozzarella
             else if (nameKey.includes('mozzarella')) {
               nameKey = 'mozzarella';
               displayName = 'Ser Mozzarella';
@@ -149,7 +160,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      alert("Lista skopiowana! Chleby żytnie przeliczone na kromki, Grahamki zachowane jako bułki.");
+      alert("Lista skopiowana! Chleby i pomidory przeliczone na jednostki domowe.");
     } catch (err) { alert("Błąd kopiowania."); }
   };
 
@@ -163,7 +174,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicony chleb (kromki) i grahamki (bułki).</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicone pomidory, chleb i grahamki.</p>
           </div>
           <button 
             onClick={handleCopy}

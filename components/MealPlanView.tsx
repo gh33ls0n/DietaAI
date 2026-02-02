@@ -79,6 +79,12 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       unit = 'kromka';
     }
 
+    // 3. Specjalna konwersja dla pomidorów w gramach (1 szt = 160g)
+    if (lowerName === 'pomidor' && (unit === 'g' || unit === 'gram')) {
+      finalVal = Math.round((finalVal / 160) * 2) / 2;
+      unit = 'szt';
+    }
+
     const displayVal = finalVal % 1 === 0 ? finalVal.toString() : finalVal.toFixed(1).replace('.', ',');
     return `${displayVal} ${unit}`;
   };
