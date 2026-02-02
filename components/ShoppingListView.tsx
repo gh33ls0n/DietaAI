@@ -18,11 +18,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
   const normalizeUnit = (unit: string): string => {
     const u = unit.toLowerCase().trim().replace('.', '');
     if (['szt', 'sztuki', 'sztuka', 'jajko', 'jajka'].includes(u)) return 'szt';
-    if (['kulka', 'kulki'].includes(u)) return 'szt';
     if (['łyżka', 'łyżki'].includes(u)) return 'łyżka';
     if (['łyżeczka', 'łyżeczki'].includes(u)) return 'łyżeczka';
     if (['kromka', 'kromki'].includes(u)) return 'kromka';
-    if (['bułka', 'bułki'].includes(u)) return 'szt';
     if (['plaster', 'plastry', 'plastra'].includes(u)) return 'plaster';
     return u;
   };
@@ -46,13 +44,13 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     const lowerName = itemName.toLowerCase();
 
     // JAJKO: 55g = 1 szt
-    if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
+    if (lowerName.includes('jaj') && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round((finalVal / 55) * 2) / 2;
       unit = 'szt';
     }
 
-    // CHLEB ŻYTNIE: 30g = 1 kromka
-    if (lowerName.includes('chleb') && lowerName.includes('żytn') && (unit === 'g' || unit === 'gram')) {
+    // CHLEB ŻYTNI: 30g = 1 kromka
+    if (lowerName.includes('chleb żytni') && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round(finalVal / 30);
       unit = 'kromka';
     }
@@ -69,17 +67,11 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       unit = 'szt';
     }
 
-    // SZYNKA: 20g = 1 plaster
-    if (lowerName.includes('szynk') && (lowerName.includes('kurczak') || lowerName.includes('indyk') || lowerName.includes('drobiow')) && (unit === 'g' || unit === 'gram')) {
-      finalVal = Math.round(finalVal / 20);
-      unit = 'plaster';
-    }
-
     return { val: finalVal, unit };
   };
 
   const aggregatedList = useMemo(() => {
-    const totals: Record<string, { val: number; unit: string; originalName: string }> = {};
+    const totals: Record<string, { val: number; unit: string; displayName: string }> = {};
 
     mealPlan.days
       .filter(d => selectedDays.includes(d.day))
@@ -87,42 +79,12 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         day.meals.forEach(meal => {
           const mMult = meal.multiplier ?? 1;
           meal.ingredients.forEach(ing => {
-            let rawName = ing.item.toLowerCase().trim();
-            let nameKey = rawName;
-            let displayName = ing.item;
-
-            // --- INTELIGENTNE MAPOWANIE NAZW ---
-            
-            if (nameKey.includes('chleb') && nameKey.includes('żytn')) {
-              nameKey = 'chleb żytni';
-              displayName = 'Chleb żytni';
-            }
-            else if (nameKey.includes('grahamka')) {
-              nameKey = 'grahamka';
-              displayName = 'Grahamka (bułka)';
-            }
-            else if (nameKey.startsWith('pomidor')) {
-              nameKey = 'pomidor';
-              displayName = 'Pomidor';
-            }
-            else if (nameKey.includes('papryk')) {
-              nameKey = 'papryka';
-              displayName = 'Papryka (mix kolorów)';
-            }
-            else if (nameKey.includes('szynk') && (nameKey.includes('kurczak') || nameKey.includes('indyk') || nameKey.includes('drobiow'))) {
-              nameKey = 'szynka drobiowa';
-              displayName = 'Szynka drobiowa';
-            }
-            else if (nameKey.includes('jaj') || nameKey.includes('jajo')) {
-              nameKey = 'jajka';
-              displayName = 'Jajka (rozmiar L)';
-            }
-
-            const { val, unit } = parseAmount(ing.amount, nameKey, mMult);
-            const aggKey = `${nameKey}_${unit}`;
+            const displayName = ing.item; // AI przysyła już mianownik
+            const { val, unit } = parseAmount(ing.amount, displayName, mMult);
+            const aggKey = `${displayName.toLowerCase()}_${unit}`;
             
             if (!totals[aggKey]) {
-              totals[aggKey] = { val, unit, originalName: displayName };
+              totals[aggKey] = { val, unit, displayName };
             } else {
               totals[aggKey].val += val;
             }
@@ -130,9 +92,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         });
       });
 
-    return Object.entries(totals)
-      .map(([_, data]) => ({
-        name: data.originalName,
+    return Object.values(totals)
+      .map(data => ({
+        name: data.displayName,
         amount: data.val % 1 === 0 ? data.val : Math.round(data.val * 10) / 10,
         unit: data.unit
       }))
@@ -151,9 +113,8 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       mealPlan.days.filter(d => selectedDays.includes(d.day)).forEach(d => {
         dailyLines.push(`--- ${dayNames[d.day - 1].toUpperCase()} ---`);
         d.meals.forEach(m => {
-          const mMult = m.multiplier ?? 1;
-          m.ingredients.forEach((ing, idx) => {
-            const { val, unit } = parseAmount(ing.amount, ing.item, mMult);
+          m.ingredients.forEach(ing => {
+            const { val, unit } = parseAmount(ing.amount, ing.item, m.multiplier ?? 1);
             const valDisplay = val % 1 === 0 ? val : val.toFixed(1).replace('.', ',');
             dailyLines.push(`${ing.item}: ${valDisplay} ${unit}`);
           });
@@ -180,7 +141,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicone pomidory, papryka, chleb i szynka.</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Automatycznie ujednolicone ilości.</p>
           </div>
           <button 
             onClick={handleCopy}

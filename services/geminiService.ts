@@ -11,16 +11,16 @@ export const generateMealPlan = async (profile: UserProfile, targetCalories: num
   OSTRZEŻENIE: Użytkownik nienawidzi soczewicy (LENTILS) - ABSOLUTNY ZAKAZ UŻYWANIA.
   
   ZASADY KONSTRUKCJI POSIŁKÓW:
-  1. Śniadanie, II Śniadanie, Kolacja: Te posiłki MUSZĄ BYĆ KANAPKAMI (różne pieczywo: żytnie, grahams, bułki pełnoziarniste; różne dodatki: wędliny, sery, pasty jajeczne, ryby, twarożki, warzywa).
-  2. WYJĄTEK NIEDZIELA: Dzień 7, śniadanie to obowiązkowo Jajecznica lub Jajka na miękko (z pieczywem).
-  3. Obiad: Jedyny ciepły, większy posiłek. Klasyki polskie w wersji fit (schab pieczony, drób, makaron, ryż z mięsem, burgery wołowe fit, pizza fit na cienkim cieście).
-  4. Podwieczorek (snack2): Lekka przekąska (jogurt, owoc, serek wiejski na słodko, orzechy).
+  1. Śniadanie, II Śniadanie, Kolacja: Te posiłki MUSZĄ BYĆ KANAPKAMI (różne pieczywo; różne dodatki).
+  2. WYJĄTEK NIEDZIELA: Dzień 7, śniadanie to obowiązkowo Jajecznica lub Jajka na miękko.
+  3. Obiad: Jedyny ciepły, większy posiłek. Klasyki polskie w wersji fit.
+  4. Podwieczorek (snack2): Lekka przekąska.
   
-  JEDNOSTKI I MIARY (BARDZO WAŻNE):
-  - DLA PIECZYWA: Nigdy nie używaj gramów. Zawsze używaj jednostek domowych: "kromka", "bułka", "sztuka".
-  - DLA MIĘSA I RYB: Możesz używać gramów.
-  
-  DLA KAŻDEGO POSIŁKU WYLICZ MAKROSKŁADNIKI (Białko, Tłuszcze, Węglowodany).
+  ZASADY NAZEWNICTWA SKŁADNIKÓW (KRYTYCZNE):
+  - Nazwa składnika (item) MUSI być w mianowniku liczby pojedynczej (np. "Pomidor", a nie "Pomidora"; "Papryka czerwona", a nie "Papryki czerwonej"; "Jajko", a nie "Jajka").
+  - Ilość (amount) MUSI być w osobnym polu (np. "160g", "2 kromki", "1 sztuka").
+  - DLA PIECZYWA: Zawsze używaj jednostek domowych: "kromka", "bułka", "sztuka".
+  - DLA MIĘSA I RYB: Używaj gramów (np. "150g").
   
   Odpowiedz wyłącznie JSON zgodnym ze schematem.`;
 
@@ -45,9 +45,9 @@ export const generateMealPlan = async (profile: UserProfile, targetCalories: num
                     properties: {
                       name: { type: Type.STRING },
                       calories: { type: Type.INTEGER },
-                      protein: { type: Type.INTEGER, description: "Białko w gramach" },
-                      fats: { type: Type.INTEGER, description: "Tłuszcze w gramach" },
-                      carbs: { type: Type.INTEGER, description: "Węglowodany w gramach" },
+                      protein: { type: Type.INTEGER },
+                      fats: { type: Type.INTEGER },
+                      carbs: { type: Type.INTEGER },
                       type: { type: Type.STRING, enum: ['breakfast', 'snack1', 'lunch', 'snack2', 'dinner'] },
                       recipe: { type: Type.STRING },
                       ingredients: {
