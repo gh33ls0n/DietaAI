@@ -19,11 +19,11 @@ export const BREAKFAST_MEALS: Meal[] = [
     calories: 330, protein: 25, fats: 9, carbs: 38,
     type: "dinner",
     ingredients: [
-      { item: "Chleb graham", amount: "2 kromki" },
+      { item: "Grahamka", amount: "1 szt" },
       { item: "Pstrąg wędzony", amount: "60g" },
       { item: "Chrzan", amount: "1 łyżeczka" }
     ],
-    recipe: "Posmaruj chleb chrzanem, ułóż rybę i świeżego ogórka."
+    recipe: "Przekrój grahamkę, posmaruj chrzanem, ułóż rybę i świeżego ogórka."
   },
   {
     name: "Pasta z makreli wędzonej z twarogiem",
@@ -52,7 +52,7 @@ export const BREAKFAST_MEALS: Meal[] = [
     calories: 385, protein: 18, fats: 12, carbs: 54,
     type: "dinner",
     ingredients: [
-      { item: "Chleb żytni", amount: "2 kromki" },
+      { item: "Chleb żytni", amount: "3 kromki" },
       { item: "Fasola biała (puszka)", amount: "100g" },
       { item: "Pomidory suszone", amount: "3 szt" }
     ],
@@ -63,11 +63,11 @@ export const BREAKFAST_MEALS: Meal[] = [
     calories: 410, protein: 21, fats: 19, carbs: 42,
     type: "breakfast",
     ingredients: [
-      { item: "Chleb graham", amount: "2 kromki" },
+      { item: "Grahamka", amount: "1 szt" },
       { item: "Ser Mozzarella Light", amount: "60g" },
       { item: "Pesto zielone", amount: "1 łyżeczka" }
     ],
-    recipe: "Pesto na chleb, potem mozzarella i pomidor."
+    recipe: "Pesto na grahamkę, potem mozzarella i pomidor."
   },
   {
     name: "Guacamole z jajkiem sadzonym na grzankach",
@@ -85,11 +85,11 @@ export const BREAKFAST_MEALS: Meal[] = [
     calories: 340, protein: 12, fats: 14, carbs: 48,
     type: "snack1",
     ingredients: [
-      { item: "Chleb graham", amount: "2 kromki" },
+      { item: "Grahamka", amount: "1 szt" },
       { item: "Hummus", amount: "3 łyżki" },
       { item: "Rzodkiewka", amount: "4 szt" }
     ],
-    recipe: "Posmaruj chleb hummusem, ułóż rzodkiewkę i kiełki."
+    recipe: "Posmaruj bułkę hummusem, ułóż rzodkiewkę i kiełki."
   },
   {
     name: "Kanapka z camembertem light i żurawiną",
@@ -107,11 +107,11 @@ export const BREAKFAST_MEALS: Meal[] = [
     calories: 345, protein: 25, fats: 7, carbs: 48,
     type: "breakfast",
     ingredients: [
-      { item: "Chleb graham", amount: "2 kromki" },
+      { item: "Grahamka", amount: "1 szt" },
       { item: "Szynka drobiowa", amount: "60g" },
       { item: "Musztarda", amount: "1 łyżeczka" },
       { item: "Miód", amount: "1/2 łyżeczki" }
     ],
-    recipe: "Wymieszaj musztardę z miodem, posmaruj chleb. Ułóż wędlinę."
+    recipe: "Wymieszaj musztardę z miodem, posmaruj bułkę. Ułóż wędlinę."
   }
 ];

@@ -22,6 +22,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     if (['łyżka', 'łyżki'].includes(u)) return 'łyżka';
     if (['łyżeczka', 'łyżeczki'].includes(u)) return 'łyżeczka';
     if (['kromka', 'kromki'].includes(u)) return 'kromka';
+    if (['bułka', 'bułki'].includes(u)) return 'szt';
     return u;
   };
 
@@ -41,11 +42,18 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
     let unit = normalizeUnit(match[2]);
     let finalVal = val * multiplier;
-
     const lowerName = itemName.toLowerCase();
+
+    // SPECJALNA LOGIKA JAJEK: g -> szt (55g = 1 szt)
     if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round((finalVal / 55) * 2) / 2;
       unit = 'szt';
+    }
+
+    // SPECJALNA LOGIKA CHLEBA ŻYTNIEGO: g -> kromka (30g = 1 kromka)
+    if (lowerName.includes('chleb') && lowerName.includes('żytn') && (unit === 'g' || unit === 'gram')) {
+      finalVal = Math.round(finalVal / 30);
+      unit = 'kromka';
     }
 
     return { val: finalVal, unit };
@@ -64,26 +72,32 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
             let nameKey = rawName;
             let displayName = ing.item;
 
-            // --- INTELIGENTNE MAPOWANIE NAZW (ROZSZERZONE) ---
-            // Ujednolicenie chleba żytniego (obsługa odmiany: chleb, chleba, chlebem + przymiotniki)
+            // --- INTELIGENTNE MAPOWANIE NAZW ---
+            
+            // 1. Chleb żytni (ujednolicenie nazwy i jednostki do kromek)
             if (nameKey.includes('chleb') && nameKey.includes('żytn')) {
               nameKey = 'chleb żytni';
               displayName = 'Chleb żytni';
             }
-            // Ujednolicenie jajek
+            // 2. Grahamka (ZOSTAJE JAKO BUŁKA / SZTUKA)
+            else if (nameKey.includes('grahamka')) {
+              nameKey = 'grahamka';
+              displayName = 'Grahamka (bułka)';
+            }
+            // 3. Chleb Graham (kromki)
+            else if (nameKey.includes('chleb') && nameKey.includes('graham')) {
+              nameKey = 'chleb graham';
+              displayName = 'Chleb graham';
+            }
+            // 4. Jajka
             else if (nameKey.includes('jaj') || nameKey.includes('jajo')) {
               nameKey = 'jajka';
               displayName = 'Jajka (rozmiar L)';
             }
-            // Ujednolicenie mozzarelli
+            // 5. Mozzarella
             else if (nameKey.includes('mozzarella')) {
               nameKey = 'mozzarella';
               displayName = 'Ser Mozzarella';
-            }
-            // Ujednolicenie chleba graham
-            else if (nameKey.includes('graham')) {
-              nameKey = 'chleb graham';
-              displayName = 'Chleb graham';
             }
 
             const { val, unit } = parseAmount(ing.amount, nameKey, mMult);
@@ -135,7 +149,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      alert("Lista skopiowana! Chleby żytnie i jajka zostały ujednolicone.");
+      alert("Lista skopiowana! Chleby żytnie przeliczone na kromki, Grahamki zachowane jako bułki.");
     } catch (err) { alert("Błąd kopiowania."); }
   };
 
@@ -149,7 +163,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicone pieczywo i produkty (np. chleb żytni).</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicony chleb (kromki) i grahamki (bułki).</p>
           </div>
           <button 
             onClick={handleCopy}

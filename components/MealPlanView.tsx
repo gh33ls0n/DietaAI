@@ -65,13 +65,18 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     
     let unit = match[2].trim().toLowerCase();
     let finalVal = val * mult;
-
-    // Specjalna konwersja dla jajek w gramach
     const lowerName = itemName.toLowerCase();
+
+    // 1. Specjalna konwersja dla jajek w gramach (1 jajko = 55g)
     if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
-      // 1 jajko = 55g, zaokrąglamy do 0.5 sztuki
       finalVal = Math.round((finalVal / 55) * 2) / 2;
       unit = 'szt';
+    }
+
+    // 2. Specjalna konwersja dla chleba żytniego w gramach (1 kromka = 30g)
+    if (lowerName.includes('chleb') && lowerName.includes('żytn') && (unit === 'g' || unit === 'gram')) {
+      finalVal = Math.round(finalVal / 30);
+      unit = 'kromka';
     }
 
     const displayVal = finalVal % 1 === 0 ? finalVal.toString() : finalVal.toFixed(1).replace('.', ',');
