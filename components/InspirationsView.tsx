@@ -21,7 +21,6 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
   const [searchQuery, setSearchQuery] = useState<{index: number, query: string}>({ index: -1, query: '' });
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
   
-  // Stan dla wstawiania do jadłospisu
   const [insertDay, setInsertDay] = useState(1);
   const [insertType, setInsertType] = useState<string>('lunch');
 
@@ -30,11 +29,16 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
     ingredients: [{ item: '', amount: '' }]
   });
 
-  // Definicja grup wyświetlanych w UI
+  // Nowe definicje grup oparte na składnikach i typach dań
   const displayGroups = [
-    { id: 'cold_meals', label: 'Śniadania, II Śniadania i Kolacje', types: ['breakfast', 'snack1', 'dinner'] },
-    { id: 'lunch', label: 'Obiady', types: ['lunch'] },
-    { id: 'snack2', label: 'Podwieczorek / Przekąski', types: ['snack2'] }
+    { id: 'zupy', label: 'Zupy i Kremy', icon: <Icons.ChefHat className="w-5 h-5" /> },
+    { id: 'kurczak', label: 'Drób (Kurczak, Indyk, Kaczka)', icon: <Icons.Apple className="w-5 h-5" /> },
+    { id: 'wolowina', label: 'Wołowina', icon: <Icons.ChefHat className="w-5 h-5" /> },
+    { id: 'wieprzowina', label: 'Wieprzowina', icon: <Icons.ChefHat className="w-5 h-5" /> },
+    { id: 'ryby', label: 'Ryby i Owoce Morza', icon: <Icons.ChefHat className="w-5 h-5" /> },
+    { id: 'sniadania', label: 'Śniadania, Kolacje i Kanapki', icon: <Icons.Clipboard className="w-5 h-5" /> },
+    { id: 'koktajle', label: 'Koktajle, Skyry i Desery', icon: <Icons.Apple className="w-5 h-5" /> },
+    { id: 'inne', label: 'Inne i Dania Wege', icon: <Icons.Plus className="w-5 h-5" /> }
   ];
 
   const mealTypeLabels: Record<string, string> = {
@@ -45,26 +49,40 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
     dinner: 'Kolacja'
   };
 
-  // Grupowanie wszystkich dań (wbudowane + własne) do nowych 3 kategorii
+  // Logika przypisywania dania do kategorii na podstawie nazwy i składników
+  const getCategoryForMeal = (meal: Meal): string => {
+    const name = meal.name.toLowerCase();
+    const ingredients = meal.ingredients.map(i => i.item.toLowerCase()).join(' ');
+    const combined = `${name} ${ingredients}`;
+
+    if (name.includes('zupa') || name.includes('krem') || name.includes('harira') || name.includes('chowder') || name.includes('pho')) return 'zupy';
+    
+    if (combined.includes('kurczak') || combined.includes('indyk') || combined.includes('kaczka') || combined.includes('drób')) return 'kurczak';
+    
+    if (combined.includes('wołowin') || combined.includes('stek') || combined.includes('rostbef') || combined.includes('ligawa') || combined.includes('burger')) return 'wolowina';
+    
+    if (combined.includes('wieprzowin') || combined.includes('schab') || combined.includes('karkówk') || combined.includes('szynka') || combined.includes('boczek') || combined.includes('polędwiczka wieprzowa')) return 'wieprzowina';
+    
+    if (combined.includes('ryba') || combined.includes('łosoś') || combined.includes('tuńczyk') || combined.includes('pstrąg') || combined.includes('makrela') || combined.includes('krewetki')) return 'ryby';
+    
+    if (meal.type === 'snack2' || name.includes('koktajl') || name.includes('shake') || name.includes('smoothie') || name.includes('jogurt') || name.includes('skyr') || name.includes('deser')) return 'koktajle';
+    
+    if (['breakfast', 'snack1', 'dinner'].includes(meal.type) || name.includes('kanapka') || name.includes('tost') || name.includes('pasta') || name.includes('jajecz') || name.includes('twarożek')) return 'sniadania';
+    
+    return 'inne';
+  };
+
   const groupedMeals = useMemo(() => {
     const all = [...MEAL_DATABASE, ...customMeals];
     const groups: Record<string, Meal[]> = {
-      cold_meals: [],
-      lunch: [],
-      snack2: []
+      zupy: [], kurczak: [], wolowina: [], wieprzowina: [], ryby: [], sniadania: [], koktajle: [], inne: []
     };
     
     all.forEach(m => {
-      if (['breakfast', 'snack1', 'dinner'].includes(m.type)) {
-        groups.cold_meals.push(m);
-      } else if (m.type === 'lunch') {
-        groups.lunch.push(m);
-      } else if (m.type === 'snack2') {
-        groups.snack2.push(m);
-      }
+      const cat = getCategoryForMeal(m);
+      groups[cat].push(m);
     });
 
-    // Sortowanie alfabetyczne
     Object.keys(groups).forEach(key => {
       groups[key].sort((a, b) => a.name.localeCompare(b.name));
     });
@@ -107,14 +125,13 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-black text-slate-800 tracking-tight">Biblioteka Dań</h2>
-          <p className="text-slate-400 text-sm mt-0.5">Twoje centrum inspiracji i własnych przepisów.</p>
+          <p className="text-slate-400 text-sm mt-0.5">Twoje centrum inspiracji pogrupowane według składników.</p>
         </div>
         <button onClick={() => setIsAdding(true)} className="bg-emerald-600 text-white font-bold px-6 py-3 rounded-2xl shadow-lg flex items-center gap-2 transition-all active:scale-95">
           <Icons.Plus /> Nowe danie
         </button>
       </div>
 
-      {/* LISTA KATEGORII (3 AKORDEONY) */}
       <div className="space-y-3">
         {displayGroups.map((group) => {
           const meals = groupedMeals[group.id] || [];
@@ -130,7 +147,7 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center ${isOpen ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
-                    <Icons.ChefHat className="w-4 h-4 sm:w-5 sm:h-5" />
+                    {group.icon}
                   </div>
                   <div className="text-left">
                     <h3 className="font-black text-slate-800 tracking-tight text-sm sm:text-base leading-tight">{group.label}</h3>
@@ -177,7 +194,6 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
         })}
       </div>
 
-      {/* FORMULARZ DODAWANIA NOWEGO DANIA */}
       {isAdding && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsAdding(false)}></div>
@@ -240,7 +256,6 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
         </div>
       )}
 
-      {/* MODAL PODGLĄDU DANIA I WSTAWIANIA DO JADŁOSPISU */}
       {selectedMeal && (
         <div className="fixed inset-0 z-[160] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedMeal(null)}></div>
@@ -258,7 +273,6 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
             </div>
 
             <div className="p-6 overflow-y-auto space-y-8">
-              {/* Sekcja wstawiania */}
               <section className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
                 <h3 className="text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-4 flex items-center gap-2">
                   <Icons.Swap className="w-4 h-4"/> Wstaw do jadłospisu
