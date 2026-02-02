@@ -15,6 +15,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
   const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 
+  // Normalizacja nazw jednostek dla lepszego sumowania
   const normalizeUnit = (unit: string): string => {
     const u = unit.toLowerCase().trim().replace('.', '');
     if (['szt', 'sztuki', 'sztuka', 'jajko', 'jajka'].includes(u)) return 'szt';
@@ -42,8 +43,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     let unit = normalizeUnit(match[2]);
     let finalVal = val * multiplier;
 
+    // SPECJALNA LOGIKA DLA JAJEK: Jeśli są w gramach, zamień na sztuki (1 jajko = 55g)
     const lowerName = itemName.toLowerCase();
-    if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && unit === 'g') {
+    if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
       // Przelicznik: 1 jajko = 55g, zaokrąglamy do połówek
       finalVal = Math.round((finalVal / 55) * 2) / 2;
       unit = 'szt';
@@ -53,7 +55,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
   };
 
   const aggregatedList = useMemo(() => {
-    const totals: Record<string, { val: number; unit: string }> = {};
+    const totals: Record<string, { val: number; unit: string; originalName: string }> = {};
 
     mealPlan.days
       .filter(d => selectedDays.includes(d.day))
@@ -61,31 +63,52 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         day.meals.forEach(meal => {
           const mMult = meal.multiplier ?? 1;
           meal.ingredients.forEach(ing => {
-            let nameKey = ing.item.toLowerCase().trim();
-            if (nameKey.includes('jaj') || nameKey.includes('jajo')) nameKey = 'jajka';
-            if (nameKey.includes('mozzarella')) nameKey = 'mozzarella';
-            
+            let rawName = ing.item.toLowerCase().trim();
+            let nameKey = rawName;
+            let displayName = ing.item;
+
+            // --- INTELIGENTNE MAPOWANIE NAZW ---
+            // Ujednolicenie chleba żytniego
+            if (nameKey.includes('chleb żytni')) {
+              nameKey = 'chleb żytni';
+              displayName = 'Chleb żytni';
+            }
+            // Ujednolicenie jajek
+            else if (nameKey.includes('jaj') || nameKey.includes('jajo')) {
+              nameKey = 'jajka';
+              displayName = 'Jajka (rozmiar L)';
+            }
+            // Ujednolicenie mozzarelli
+            else if (nameKey.includes('mozzarella')) {
+              nameKey = 'mozzarella';
+              displayName = 'Ser Mozzarella';
+            }
+            // Ujednolicenie chleba graham
+            else if (nameKey.includes('graham')) {
+              nameKey = 'chleb graham';
+              displayName = 'Chleb graham';
+            }
+
             const { val, unit } = parseAmount(ing.amount, nameKey, mMult);
 
-            const key = `${nameKey}_${unit}`;
-            if (!totals[key]) {
-              totals[key] = { val, unit };
+            // Klucz agregacji uwzględnia nazwę i jednostkę (żeby nie sumować g i szt)
+            const aggKey = `${nameKey}_${unit}`;
+            
+            if (!totals[aggKey]) {
+              totals[aggKey] = { val, unit, originalName: displayName };
             } else {
-              totals[key].val += val;
+              totals[aggKey].val += val;
             }
           });
         });
       });
 
     return Object.entries(totals)
-      .map(([fullKey, data]) => {
-        const namePart = fullKey.split('_')[0];
-        return {
-          name: namePart.charAt(0).toUpperCase() + namePart.slice(1),
-          amount: data.val % 1 === 0 ? data.val : Math.round(data.val * 10) / 10,
-          unit: data.unit
-        };
-      })
+      .map(([_, data]) => ({
+        name: data.originalName,
+        amount: data.val % 1 === 0 ? data.val : Math.round(data.val * 10) / 10,
+        unit: data.unit
+      }))
       .sort((a, b) => a.name.localeCompare(b.name));
   }, [mealPlan, selectedDays]);
 
@@ -117,7 +140,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      alert("Lista skopiowana! Pamiętaj, że jajka zostały przeliczone na sztuki.");
+      alert("Lista skopiowana! Chleby żytnie i jajka zostały ujednolicone.");
     } catch (err) { alert("Błąd kopiowania."); }
   };
 
@@ -131,7 +154,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Jajka przeliczamy na sztuki (1 szt = 55g).</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicone pieczywo i produkty (np. chleb żytni).</p>
           </div>
           <button 
             onClick={handleCopy}
@@ -178,6 +201,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                 );
               })}
             </div>
+            {aggregatedList.length === 0 && (
+              <div className="p-20 text-center text-slate-300 font-bold">Wybierz dni powyżej, aby zobaczyć listę.</div>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
