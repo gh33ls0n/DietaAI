@@ -49,6 +49,7 @@ export interface Meal {
   ingredients: Ingredient[];
   recipe: string;
   type: 'breakfast' | 'snack1' | 'lunch' | 'snack2' | 'dinner';
+  multiplier?: number; // Skala porcji (np. 0.5, 1.0, 1.5)
 }
 
 export interface DayPlan {

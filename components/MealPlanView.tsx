@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { WeeklyPlan, DayPlan, Meal } from '../types';
+import { WeeklyPlan, DayPlan, Meal, Ingredient } from '../types';
 import { Icons } from '../constants';
 
 interface MealPlanViewProps {
@@ -32,12 +32,16 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
   const currentDayPlan = mealPlan.days.find(d => d.day === selectedDay) || mealPlan.days[0];
 
-  const totals = currentDayPlan.meals.reduce((acc, m) => ({
-    calories: acc.calories + (m.calories || 0),
-    protein: acc.protein + (m.protein || 0),
-    fats: acc.fats + (m.fats || 0),
-    carbs: acc.carbs + (m.carbs || 0),
-  }), { calories: 0, protein: 0, fats: 0, carbs: 0 });
+  // Obliczanie sum dnia z uwzględnieniem mnożników porcji
+  const totals = currentDayPlan.meals.reduce((acc, m) => {
+    const mult = m.multiplier ?? 1;
+    return {
+      calories: acc.calories + Math.round((m.calories || 0) * mult),
+      protein: acc.protein + Math.round((m.protein || 0) * mult),
+      fats: acc.fats + Math.round((m.fats || 0) * mult),
+      carbs: acc.carbs + Math.round((m.carbs || 0) * mult),
+    };
+  }, { calories: 0, protein: 0, fats: 0, carbs: 0 });
 
   const mealTypeLabels: Record<string, string> = {
     breakfast: 'Śniadanie',
@@ -83,6 +87,26 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     }
   };
 
+  const handleMultiplierChange = (mealType: string, newMult: number) => {
+    const meal = currentDayPlan.meals.find(m => m.type === mealType);
+    if (meal) {
+      onUpdateMeal(selectedDay, mealType, { ...meal, multiplier: newMult });
+    }
+  };
+
+  // Helper do przeliczania ilości składnika
+  const formatAmount = (amount: string, mult: number): string => {
+    if (mult === 1) return amount;
+    // Szukamy liczby na początku (np. "200g", "2 kromki")
+    const match = amount.match(/^(\d+([.,]\d+)?)\s*(.*)$/);
+    if (!match) return amount;
+    
+    const num = parseFloat(match[1].replace(',', '.'));
+    const unit = match[3];
+    const newNum = Math.round(num * mult * 10) / 10; // Zaokrąglamy do 1 miejsca
+    return `${newNum.toString().replace('.', ',')} ${unit}`;
+  };
+
   const swappableMeals = useMemo(() => {
     if (!swappingMealType) return [];
     const sharedTypes = ['breakfast', 'snack1', 'dinner'];
@@ -122,7 +146,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         {/* PODSUMOWANIE DNIA */}
         <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4 border-l-8 border-l-emerald-500">
           <div className="text-center sm:text-left">
-            <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Suma kalorii</p>
+            <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Suma kalorii po zmianach</p>
             <div className="flex items-baseline gap-1.5 justify-center sm:justify-start">
               <span className="text-4xl font-black text-slate-800 tracking-tighter">{totals.calories}</span>
               <span className="text-xs font-black text-emerald-500 uppercase">kcal</span>
@@ -150,41 +174,78 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         </div>
 
         {/* LISTA POSIŁKÓW */}
-        <div className="space-y-2 pb-24 lg:pb-0">
-          {currentDayPlan.meals.map((meal, idx) => (
-            <div 
-              key={idx} 
-              onClick={() => isSelectionMode ? toggleMealSelection(idx) : setSelectedMeal(meal)}
-              className={`bg-white rounded-2xl border p-4 shadow-sm flex items-center gap-3 transition-all cursor-pointer ${isSelectionMode && selectedMealIndices.includes(idx) ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-100 hover:border-slate-200'}`}
-            >
-                {isSelectionMode && (
-                  <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${selectedMealIndices.includes(idx) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 bg-white'}`}>
-                    {selectedMealIndices.includes(idx) && <Icons.Check className="w-4 h-4" />}
+        <div className="space-y-3 pb-24 lg:pb-0">
+          {currentDayPlan.meals.map((meal, idx) => {
+            const mMult = meal.multiplier ?? 1;
+            return (
+              <div 
+                key={idx} 
+                onClick={() => isSelectionMode ? toggleMealSelection(idx) : setSelectedMeal(meal)}
+                className={`bg-white rounded-2xl border p-4 shadow-sm transition-all cursor-pointer ${isSelectionMode && selectedMealIndices.includes(idx) ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-100 hover:border-slate-200'}`}
+              >
+                <div className="flex items-center gap-3">
+                  {isSelectionMode && (
+                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${selectedMealIndices.includes(idx) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 bg-white'}`}>
+                      {selectedMealIndices.includes(idx) && <Icons.Check className="w-4 h-4" />}
+                    </div>
+                  )}
+                  
+                  <div className="flex-grow min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-[8px] font-black text-emerald-600 uppercase bg-emerald-50 px-1.5 py-0.5 rounded">
+                        {mealTypeLabels[meal.type]}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-300">
+                        {Math.round(meal.calories * mMult)} kcal {mMult !== 1 && `(${meal.calories})`}
+                      </span>
+                    </div>
+                    <h4 className="text-base font-bold text-slate-800 truncate">{meal.name}</h4>
                   </div>
-                )}
-                
-                <div className="flex-grow min-w-0">
-                   <div className="flex items-center gap-2 mb-0.5">
-                     <span className="text-[8px] font-black text-emerald-600 uppercase bg-emerald-50 px-1.5 py-0.5 rounded">
-                       {mealTypeLabels[meal.type]}
-                     </span>
-                     <span className="text-[10px] font-bold text-slate-300">{meal.calories} kcal</span>
-                   </div>
-                   <h4 className="text-base font-bold text-slate-800 truncate">{meal.name}</h4>
+                  
+                  {!isSelectionMode && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button onClick={(e) => { e.stopPropagation(); setSwappingMealType(meal.type); }} className="p-2 bg-slate-50 text-slate-400 rounded-lg hover:text-emerald-600" title="Wymień">
+                        <Icons.Swap className="w-4 h-4" />
+                      </button>
+                      <button className="p-2 bg-slate-900 text-white rounded-lg hover:bg-emerald-600">
+                        <Icons.ChefHat className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
                 </div>
-                
+
+                {/* SUWAK PORCJI */}
                 {!isSelectionMode && (
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={(e) => { e.stopPropagation(); setSwappingMealType(meal.type); }} className="p-2 bg-slate-50 text-slate-400 rounded-lg hover:text-emerald-600" title="Wymień">
-                      <Icons.Swap className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 bg-slate-900 text-white rounded-lg hover:bg-emerald-600">
-                      <Icons.ChefHat className="w-4 h-4" />
-                    </button>
+                  <div className="mt-4 pt-3 border-t border-slate-50 space-y-2">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      <span>Wielkość porcji: <span className="text-emerald-600">{mMult.toFixed(1)}x</span></span>
+                      {mMult !== 1 && (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleMultiplierChange(meal.type, 1); }}
+                          className="text-slate-300 hover:text-emerald-500"
+                        >
+                          Reset
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 px-1" onClick={e => e.stopPropagation()}>
+                       <span className="text-[9px] font-bold text-slate-300">0.1</span>
+                       <input 
+                         type="range" 
+                         min="0.1" 
+                         max="2.0" 
+                         step="0.1" 
+                         value={mMult} 
+                         onChange={(e) => handleMultiplierChange(meal.type, parseFloat(e.target.value))}
+                         className="flex-grow h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                       />
+                       <span className="text-[9px] font-bold text-slate-300">2.0</span>
+                    </div>
                   </div>
                 )}
-            </div>
-          ))}
+              </div>
+            );
+          })}
         </div>
 
         {/* PANEL AKCJI DLA ZAZNACZONYCH */}
@@ -287,18 +348,25 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
               <span className="text-[9px] font-black opacity-70 uppercase tracking-widest">{mealTypeLabels[selectedMeal.type]}</span>
               <h2 className="text-xl font-bold mb-1 leading-tight">{selectedMeal.name}</h2>
               <div className="flex gap-3 mt-3">
-                <p className="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-lg">{selectedMeal.calories} kcal</p>
-                <p className="text-[10px] font-medium bg-white/10 px-3 py-1 rounded-lg">B: {selectedMeal.protein}g • T: {selectedMeal.fats}g • W: {selectedMeal.carbs}g</p>
+                <p className="text-[10px] font-bold bg-white/20 px-3 py-1 rounded-lg">
+                  {Math.round(selectedMeal.calories * (selectedMeal.multiplier ?? 1))} kcal 
+                  {(selectedMeal.multiplier ?? 1) !== 1 && ` (Porcja: ${(selectedMeal.multiplier ?? 1).toFixed(1)}x)`}
+                </p>
+                <p className="text-[10px] font-medium bg-white/10 px-3 py-1 rounded-lg">
+                  B: {Math.round(selectedMeal.protein * (selectedMeal.multiplier ?? 1))}g • 
+                  T: {Math.round(selectedMeal.fats * (selectedMeal.multiplier ?? 1))}g • 
+                  W: {Math.round(selectedMeal.carbs * (selectedMeal.multiplier ?? 1))}g
+                </p>
               </div>
             </div>
             <div className="p-6 overflow-y-auto space-y-6">
               <section>
-                <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Składniki</h3>
+                <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Składniki (przeliczone)</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {selectedMeal.ingredients.map((ing, i) => (
                     <div key={i} className="bg-slate-50 p-2.5 rounded-xl border border-slate-100 text-xs flex justify-between">
                       <span className="text-slate-600">{ing.item}</span>
-                      <span className="font-bold text-emerald-600">{ing.amount}</span>
+                      <span className="font-bold text-emerald-600">{formatAmount(ing.amount, selectedMeal.multiplier ?? 1)}</span>
                     </div>
                   ))}
                 </div>

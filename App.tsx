@@ -43,7 +43,7 @@ const App: React.FC = () => {
   };
 
   const handleExportFile = () => {
-    const data = { profile, mealPlan, customMeals, version: '1.6', exportDate: new Date().toISOString() };
+    const data = { profile, mealPlan, customMeals, version: '1.7', exportDate: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -152,7 +152,13 @@ const App: React.FC = () => {
             }}
             onUpdateMeal={(day, type, newMeal) => {
               if (!mealPlan) return;
-              setMealPlan({ days: mealPlan.days.map(d => d.day === day ? { ...d, meals: d.meals.map(m => m.type === type ? newMeal : m) } : d) });
+              setMealPlan({ 
+                days: mealPlan.days.map(d => 
+                  d.day === day 
+                    ? { ...d, meals: d.meals.map(m => m.type === type ? { ...newMeal, multiplier: newMeal.multiplier ?? 1 } : m) } 
+                    : d
+                ) 
+              });
             }}
             onCopyDay={(source, targets) => {
               if (!mealPlan) return;
