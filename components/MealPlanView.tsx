@@ -54,12 +54,10 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
   const findProductInDatabase = (itemName: string) => {
     const normalized = itemName.toLowerCase().trim();
-    // 1. Dokładne dopasowanie (najszybsze i najdokładniejsze przy mianowniku)
     let match = PRODUCT_DATABASE.find(p => p.name.toLowerCase() === normalized);
     if (match) return match;
 
-    // 2. Fuzzing dla pozostałych odmian (np. papryka czerwona -> papryk)
-    const root = normalized.replace(/(ę|ą|y|a|i|u|m|ej|ego)$/, '');
+    const root = normalized.replace(/(ę|ą|y|a|i|u|m|ej|ego|kurze|kurzych)$/, '');
     match = PRODUCT_DATABASE.find(p => 
       p.name.toLowerCase().includes(root) || 
       normalized.includes(p.name.toLowerCase())
@@ -68,6 +66,8 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
   };
 
   const formatAmount = (amount: string, itemName: string, mult: number): string => {
+    if (mult === 1) return amount;
+
     const match = amount.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
     if (!match) return amount;
 
@@ -80,31 +80,9 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       val = parseFloat(valStr);
     }
     
-    let unit = match[2].trim().toLowerCase();
+    let unit = match[2].trim();
     let finalVal = val * mult;
-    const lowerName = itemName.toLowerCase();
-
-    if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
-      finalVal = Math.round((finalVal / 55) * 2) / 2;
-      unit = 'szt';
-    }
-    if (lowerName.includes('chleb') && lowerName.includes('żytn') && (unit === 'g' || unit === 'gram')) {
-      finalVal = Math.round(finalVal / 30);
-      unit = 'kromka';
-    }
-    if (lowerName.includes('pomidor') && (unit === 'g' || unit === 'gram')) {
-      finalVal = Math.round((finalVal / 160) * 2) / 2;
-      unit = 'szt';
-    }
-    if (lowerName.includes('papryk') && (unit === 'g' || unit === 'gram')) {
-      finalVal = Math.round((finalVal / 140) * 2) / 2;
-      unit = 'szt';
-    }
-    if (lowerName.includes('szynk') && (lowerName.includes('kurczak') || lowerName.includes('indyk') || lowerName.includes('drobiow')) && (unit === 'g' || unit === 'gram')) {
-      finalVal = Math.round(finalVal / 20);
-      unit = 'plaster';
-    }
-
+    
     const displayVal = finalVal % 1 === 0 ? finalVal.toString() : finalVal.toFixed(1).replace('.', ',');
     return `${displayVal} ${unit}`;
   };
@@ -118,16 +96,15 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
     if (unit === 'g' || unit === 'gram' || unit === 'ml') return val;
     if (unit === 'kromka' || unit === 'kromki') return val * 30;
-    if (unit === 'szt' || unit === 'sztuka') {
-      if (lowerName.includes('jaj')) return val * 55;
-      if (lowerName.includes('pomidor')) return val * 160;
-      if (lowerName.includes('papryk')) return val * 140;
-      if (lowerName.includes('grahamka')) return val * 70;
-      return val * 100;
-    }
     if (unit === 'plaster' || unit === 'plastry') return val * 20;
     if (unit === 'łyżka' || unit === 'łyżki') return val * 15;
     if (unit === 'łyżeczka' || unit === 'łyżeczki') return val * 5;
+    if (unit.includes('szt')) {
+      if (lowerName.includes('jaj')) return val * 55;
+      if (lowerName.includes('pomidor')) return val * 160;
+      if (lowerName.includes('papryk')) return val * 140;
+      return val * 100;
+    }
     return val;
   };
 
@@ -177,7 +154,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     const originalProduct = findProductInDatabase(originalIng.item);
 
     if (!originalProduct) {
-      alert(`Błąd: Produkt "${originalIng.item}" nie został rozpoznany w bazie. Spróbuj wybrać zamiennik ręcznie.`);
+      alert(`Błąd: Produkt "${originalIng.item}" nie został rozpoznany w bazie.`);
       setSwappingIngredient(null);
       return;
     }
@@ -356,7 +333,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                   </button>
                 ))
               ) : (
-                <div className="p-8 text-center text-slate-400 italic">Brak pasujących zamienników dla tego produktu w bazie.</div>
+                <div className="p-8 text-center text-slate-400 italic">Brak pasujących zamienników.</div>
               )}
             </div>
             <button onClick={() => setSwappingIngredient(null)} className="m-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl text-xs uppercase tracking-widest">Anuluj</button>
@@ -376,43 +353,19 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                 </div>
                 <button onClick={() => setSwappingMealType(null)} className="p-2 bg-slate-50 rounded-full text-slate-400"><Icons.Plus className="rotate-45" /></button>
               </div>
-              <div className="relative">
-                <input 
-                  type="text" 
-                  autoFocus
-                  placeholder="Czego szukasz?" 
-                  value={swapSearch} 
-                  onChange={(e) => setSwapSearch(e.target.value)} 
-                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none text-sm font-medium focus:ring-2 focus:ring-emerald-500/20" 
-                />
-                <Icons.Apple className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
-              </div>
             </div>
             
             <div className="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3">
               {swappableMeals.map((meal, idx) => (
-                <div 
-                  key={idx} 
-                  onClick={() => handleSwap(selectedDay, meal)} 
-                  className="group bg-white border border-slate-100 rounded-2xl p-4 hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer flex flex-col gap-2"
-                >
+                <div key={idx} onClick={() => handleSwap(selectedDay, meal)} className="group bg-white border border-slate-100 rounded-2xl p-4 hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer flex flex-col gap-2">
                   <div className="flex justify-between items-start gap-2">
                     <div className="min-w-0">
-                      <h4 className="font-bold text-slate-800 text-sm group-hover:text-emerald-700 truncate transition-colors">{meal.name}</h4>
+                      <h4 className="font-bold text-slate-800 text-sm group-hover:text-emerald-700 truncate">{meal.name}</h4>
                       <div className="flex gap-2 items-center">
                         <span className="text-[9px] font-black text-emerald-600 uppercase tracking-tighter">{meal.calories} kcal</span>
-                        <span className="text-[8px] font-medium text-slate-400">B:{meal.protein}g T:{meal.fats}g W:{meal.carbs}g</span>
                       </div>
                     </div>
-                    <Icons.ArrowRight className="w-4 h-4 text-slate-200 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all shrink-0" />
-                  </div>
-                  
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {meal.ingredients.slice(0, 4).map((ing, i) => (
-                      <span key={i} className="text-[9px] text-slate-500 bg-slate-100/50 px-2 py-0.5 rounded-lg border border-slate-100/50">
-                        {ing.item}
-                      </span>
-                    ))}
+                    <Icons.ArrowRight className="w-4 h-4 text-slate-200 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
                   </div>
                 </div>
               ))}
@@ -428,9 +381,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
             <div className="bg-emerald-600 p-6 text-white shrink-0">
               <span className="text-[10px] font-black opacity-70 uppercase tracking-widest">{mealTypeLabels[selectedMeal.type]}</span>
               <h2 className="text-2xl font-bold mb-3 tracking-tight">{selectedMeal.name}</h2>
-              <div className="flex flex-wrap gap-2">
-                <span className="bg-white/20 px-3 py-1 rounded-lg text-xs font-bold">{Math.round(selectedMeal.calories * (selectedMeal.multiplier ?? 1))} kcal</span>
-              </div>
             </div>
             <div className="p-8 overflow-y-auto space-y-8">
               <section>
@@ -457,14 +407,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
             <h2 className="text-lg font-bold text-slate-800 text-center mb-4">Kopiowanie</h2>
             <div className="grid grid-cols-4 gap-2 mb-6">
               {[1, 2, 3, 4, 5, 6, 7].map(d => (
-                <button 
-                  key={d} 
-                  disabled={copyMode === 'day' && d === selectedDay} 
-                  onClick={() => toggleTargetDay(d)} 
-                  className={`h-10 rounded-xl font-bold text-xs border-2 transition-all ${copyMode === 'day' && d === selectedDay ? 'bg-slate-50 border-slate-100 text-slate-100' : copyTargetDays.includes(d) ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-100 text-slate-400'}`}
-                >
-                  {dayShortNames[d-1]}
-                </button>
+                <button key={d} disabled={copyMode === 'day' && d === selectedDay} onClick={() => toggleTargetDay(d)} className={`h-10 rounded-xl font-bold text-xs border-2 transition-all ${copyMode === 'day' && d === selectedDay ? 'bg-slate-50 border-slate-100 text-slate-100' : copyTargetDays.includes(d) ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-100 text-slate-400'}`}>{dayShortNames[d-1]}</button>
               ))}
             </div>
             <button onClick={handleApplyCopy} disabled={copyTargetDays.length === 0} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl text-xs uppercase shadow-xl disabled:opacity-50">Zastosuj</button>

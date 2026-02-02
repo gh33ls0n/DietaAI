@@ -16,11 +16,12 @@ export const generateMealPlan = async (profile: UserProfile, targetCalories: num
   3. Obiad: Jedyny ciepły, większy posiłek. Klasyki polskie w wersji fit.
   4. Podwieczorek (snack2): Lekka przekąska.
   
-  ZASADY NAZEWNICTWA SKŁADNIKÓW (KRYTYCZNE):
-  - Nazwa składnika (item) MUSI być w mianowniku liczby pojedynczej (np. "Pomidor", a nie "Pomidora"; "Papryka czerwona", a nie "Papryki czerwonej"; "Jajko", a nie "Jajka").
-  - Ilość (amount) MUSI być w osobnym polu (np. "160g", "2 kromki", "1 sztuka").
-  - DLA PIECZYWA: Zawsze używaj jednostek domowych: "kromka", "bułka", "sztuka".
-  - DLA MIĘSA I RYB: Używaj gramów (np. "150g").
+  ZASADY NAZEWNICTWA (KRYTYCZNE):
+  - Pole "item" (produkt): Zawsze mianownik liczby pojedynczej (np. "Chleb żytni", "Serek kanapkowy", "Szynka z kurczaka", "Jajko kurze", "Papryka czerwona").
+  - Pole "amount" (ilość): Zawsze naturalna, odmieniona forma z jednostką (np. "2 kromki", "3 plastry", "1/2 sztuki", "150g").
+  
+  DLA PIECZYWA: Zawsze używaj jednostek: "kromka", "bułka", "sztuka".
+  DLA MIĘSA/RYB: Używaj "g".
   
   Odpowiedz wyłącznie JSON zgodnym ze schematem.`;
 
