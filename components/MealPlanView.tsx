@@ -84,8 +84,9 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
   const handleSwap = (day: number, newMeal: Meal) => {
     if (swappingMealType) {
-      onUpdateMeal(day, swappingMealType, newMeal);
+      onUpdateMeal(day, swappingMealType, { ...newMeal, multiplier: 1 });
       setSwappingMealType(null);
+      setSwapSearch("");
     }
   };
 
@@ -154,7 +155,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
           </div>
         </div>
 
-        {/* LISTA POSIŁKÓW */}
+        {/* LISTA POSIŁKÓW W JADŁOSPISIE */}
         <div className="space-y-4 pb-24 lg:pb-0">
           {currentDayPlan.meals.map((meal, idx) => {
             const mMult = meal.multiplier ?? 1;
@@ -169,7 +170,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                     </div>
                     <h4 className="text-lg font-bold text-slate-800 mb-3">{meal.name}</h4>
                     
-                    {/* SKŁADNIKI NA KARCIE */}
+                    {/* SKŁADNIKI NA KARCIE GŁÓWNEJ */}
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {meal.ingredients.map((ing, i) => (
                         <div key={i} className="bg-slate-50 border border-slate-100 px-2 py-1 rounded-lg flex items-center gap-1.5">
@@ -195,51 +196,69 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
             );
           })}
         </div>
-
-        {/* PANEL AKCJI DLA ZAZNACZONYCH */}
-        {isSelectionMode && selectedMealIndices.length > 0 && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-lg bg-slate-900 text-white p-4 rounded-3xl shadow-2xl z-[150] flex items-center justify-between animate-in slide-in-from-bottom-8">
-            <div className="pl-2"><span className="text-xs font-bold text-emerald-400">Wybrano: {selectedMealIndices.length}</span></div>
-            <button onClick={() => setCopyMode('multi-meal')} className="bg-emerald-600 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg active:scale-95">Kopiuj do wielu dni</button>
-          </div>
-        )}
       </div>
 
-      {/* MODALE (Dni, Wymiana, PRZEPIS) */}
-      {copyMode && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setCopyMode(null); setCopyTargetDays([]); }}></div>
-          <div className="relative bg-white w-full max-w-sm rounded-3xl p-6 space-y-6 shadow-2xl animate-in zoom-in-95">
-            <div className="text-center"><h2 className="text-xl font-bold text-slate-800">Kopiowanie</h2><p className="text-slate-400 text-xs mt-1">Gdzie wkleić zaznaczone?</p></div>
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4, 5, 6, 7].map(d => (
-                <button key={d} disabled={copyMode === 'day' && d === selectedDay} onClick={() => toggleTargetDay(d)} className={`h-11 rounded-xl font-black text-xs border-2 transition-all ${copyMode === 'day' && d === selectedDay ? 'bg-slate-50 border-slate-100 text-slate-100' : copyTargetDays.includes(d) ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-400'}`}>{dayShortNames[d-1]}</button>
-              ))}
-            </div>
-            <div className="flex gap-2 pt-2">
-              <button onClick={() => { setCopyMode(null); setCopyTargetDays([]); }} className="flex-1 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl text-xs uppercase tracking-widest">Anuluj</button>
-              <button onClick={handleApplyCopy} disabled={copyTargetDays.length === 0} className="flex-1 py-4 bg-emerald-600 text-white font-black rounded-2xl text-xs uppercase tracking-widest shadow-xl">Wklej</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Wymiany */}
+      {/* MODAL WYMIANY - TERAZ ZE SKŁADNIKAMI NA KARTACH */}
       {swappingMealType && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setSwappingMealType(null)}></div>
-          <div className="relative bg-white w-full max-w-4xl rounded-3xl overflow-hidden max-h-[85vh] flex flex-col shadow-2xl">
-            <div className="p-4 border-b border-slate-100 space-y-3">
-              <div className="flex items-center justify-between"><h2 className="text-lg font-bold text-slate-800">Wymień posiłek</h2><button onClick={() => setSwappingMealType(null)} className="p-2"><Icons.Plus className="rotate-45" /></button></div>
-              <input type="text" placeholder="Szukaj..." value={swapSearch} onChange={(e) => setSwapSearch(e.target.value)} className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none text-sm" />
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSwappingMealType(null)}></div>
+          <div className="relative bg-white w-full max-w-4xl rounded-3xl overflow-hidden max-h-[85vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom-4">
+            <div className="p-5 border-b border-slate-100 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-slate-800">Wymień posiłek</h2>
+                  <p className="text-[10px] font-bold text-emerald-600 uppercase">Sekcja: {mealTypeLabels[swappingMealType]}</p>
+                </div>
+                <button onClick={() => setSwappingMealType(null)} className="p-2 bg-slate-50 rounded-full text-slate-400"><Icons.Plus className="rotate-45" /></button>
+              </div>
+              <div className="relative">
+                <input 
+                  type="text" 
+                  autoFocus
+                  placeholder="Czego szukasz? (np. kurczak, zupa...)" 
+                  value={swapSearch} 
+                  onChange={(e) => setSwapSearch(e.target.value)} 
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none text-sm font-medium focus:ring-2 focus:ring-emerald-500/20" 
+                />
+                <Icons.Apple className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+              </div>
             </div>
-            <div className="p-4 overflow-y-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+            
+            <div className="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3">
               {swappableMeals.map((meal, idx) => (
-                <div key={idx} onClick={() => handleSwap(selectedDay, meal)} className="border border-slate-50 rounded-xl p-3 hover:border-emerald-500 hover:bg-emerald-50 cursor-pointer flex justify-between items-center group">
-                  <div className="min-w-0"><h4 className="font-bold text-slate-800 text-sm truncate">{meal.name}</h4><span className="text-[9px] font-bold text-emerald-600 uppercase">{meal.calories} kcal</span></div>
-                  <Icons.ArrowRight className="w-3 h-3 text-slate-200" />
+                <div 
+                  key={idx} 
+                  onClick={() => handleSwap(selectedDay, meal)} 
+                  className="group bg-white border border-slate-100 rounded-2xl p-4 hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer flex flex-col gap-2"
+                >
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-slate-800 text-sm group-hover:text-emerald-700 truncate transition-colors">{meal.name}</h4>
+                      <div className="flex gap-2 items-center">
+                        <span className="text-[9px] font-black text-emerald-600 uppercase tracking-tighter">{meal.calories} kcal</span>
+                        <span className="text-[8px] font-medium text-slate-400">B:{meal.protein}g T:{meal.fats}g W:{meal.carbs}g</span>
+                      </div>
+                    </div>
+                    <Icons.ArrowRight className="w-4 h-4 text-slate-200 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all shrink-0" />
+                  </div>
+                  
+                  {/* SKŁADNIKI W MODALU WYMIANY */}
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {meal.ingredients.slice(0, 4).map((ing, i) => (
+                      <span key={i} className="text-[9px] text-slate-500 bg-slate-100/50 px-2 py-0.5 rounded-lg border border-slate-100/50">
+                        {ing.item}
+                      </span>
+                    ))}
+                    {meal.ingredients.length > 4 && (
+                      <span className="text-[9px] font-black text-emerald-600 px-1">+ {meal.ingredients.length - 4}</span>
+                    )}
+                  </div>
                 </div>
               ))}
+            </div>
+            
+            <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Wybierz posiłek, aby zastąpić aktualny</p>
             </div>
           </div>
         </div>
@@ -284,6 +303,29 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
             <div className="p-4 border-t border-slate-50 shrink-0">
               <button onClick={() => setSelectedMeal(null)} className="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl text-sm shadow-xl active:scale-95">Zamknij instrukcję</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL KOPIOWANIA DNI */}
+      {copyMode && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setCopyMode(null); setCopyTargetDays([]); }}></div>
+          <div className="relative bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl animate-in zoom-in-95">
+            <h2 className="text-lg font-bold text-slate-800 text-center mb-4">Kopiowanie</h2>
+            <div className="grid grid-cols-4 gap-2 mb-6">
+              {[1, 2, 3, 4, 5, 6, 7].map(d => (
+                <button 
+                  key={d} 
+                  disabled={copyMode === 'day' && d === selectedDay} 
+                  onClick={() => toggleTargetDay(d)} 
+                  className={`h-10 rounded-xl font-bold text-xs border-2 transition-all ${copyMode === 'day' && d === selectedDay ? 'bg-slate-50 border-slate-100 text-slate-100' : copyTargetDays.includes(d) ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-100 text-slate-400'}`}
+                >
+                  {dayShortNames[d-1]}
+                </button>
+              ))}
+            </div>
+            <button onClick={handleApplyCopy} disabled={copyTargetDays.length === 0} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl text-xs uppercase shadow-xl disabled:opacity-50">Zastosuj kopiowanie</button>
           </div>
         </div>
       )}
