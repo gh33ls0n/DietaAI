@@ -14,6 +14,44 @@ interface MealPlanViewProps {
   onAddCustomMeal: (meal: Meal) => void;
 }
 
+// Globalna funkcja pomocnicza do ujednolicania nazw produktów
+export const getCanonicalProductName = (itemName: string): string => {
+  const normalized = itemName.toLowerCase().trim();
+  
+  // 1. Sprawdź dokładne dopasowanie
+  let match = PRODUCT_DATABASE.find(p => p.name.toLowerCase() === normalized);
+  if (match) return match.name;
+
+  // 2. Agresywne czyszczenie końcówek polskich przypadków (dopełniacz itp.)
+  // Przykłady: pomidora -> pomidor, chleba -> chleb, jajek -> jajk (potem szukamy po prefixie)
+  const root = normalized
+    .replace(/a$/, '') // pomidora -> pomidor, cebula -> cebul (szukamy startsWith)
+    .replace(/u$/, '') // serku -> serk
+    .replace(/ego$/, '') // żytniego -> żytni
+    .replace(/iej$/, '')
+    .replace(/ej$/, '')
+    .replace(/ych$/, '')
+    .replace(/ich$/, '')
+    .replace(/m$/, '')
+    .replace(/mi$/, '')
+    .replace(/ach$/, '')
+    .replace(/ów$/, '')
+    .replace(/ę$/, '')
+    .replace(/ą$/, '');
+
+  // Szukaj produktu, którego nazwa zaczyna się od wyczyszczonego rdzenia
+  match = PRODUCT_DATABASE.find(p => 
+    p.name.toLowerCase().startsWith(root) || 
+    normalized.includes(p.name.toLowerCase()) ||
+    p.name.toLowerCase().includes(root)
+  );
+
+  if (match) return match.name;
+
+  // 3. Jeśli nic nie znaleziono, zwróć oryginał z wielką literą
+  return itemName.charAt(0).toUpperCase() + itemName.slice(1);
+};
+
 const MealPlanView: React.FC<MealPlanViewProps> = ({ 
   mealPlan, allAvailableMeals, onRegenerate, onUpdateMeal, onCopyDay, onCopyMultipleMealsToDays, onAddCustomMeal 
 }) => {
@@ -21,13 +59,10 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [swappingMealType, setSwappingMealType] = useState<string | null>(null);
   const [swappingIngredient, setSwappingIngredient] = useState<{ mealIndex: number, ingIndex: number } | null>(null);
-  
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedMealIndices, setSelectedMealIndices] = useState<number[]>([]);
-
   const [copyMode, setCopyMode] = useState<'day' | 'multi-meal' | null>(null);
   const [copyTargetDays, setCopyTargetDays] = useState<number[]>([]);
-  
   const [swapSearch, setSwapSearch] = useState("");
 
   const currentDayPlan = mealPlan.days.find(d => d.day === selectedDay) || mealPlan.days[0];
@@ -53,25 +88,15 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
   const dayShortNames = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'];
 
   const findProductInDatabase = (itemName: string) => {
-    const normalized = itemName.toLowerCase().trim();
-    // 1. Dokładne dopasowanie
-    let match = PRODUCT_DATABASE.find(p => p.name.toLowerCase() === normalized);
-    if (match) return match;
-
-    // 2. Korekta końcówek (usuwanie odmiany przez przypadki)
-    // Jeśli AI przyśle "Pomidora", to root zostanie "pomidor"
-    const root = normalized.replace(/(a|u|ego|iej|ej|ych|ich|m|mi|ach|ów|ę|ą)$/, '');
-    match = PRODUCT_DATABASE.find(p => 
-      p.name.toLowerCase().startsWith(root) || 
-      normalized.includes(p.name.toLowerCase())
-    );
-    return match;
+    const canonicalName = getCanonicalProductName(itemName).toLowerCase();
+    return PRODUCT_DATABASE.find(p => p.name.toLowerCase() === canonicalName);
   };
 
   const formatAmount = (amount: string, itemName: string, mult: number): string => {
-    if (mult === 1) return amount;
-    const match = amount.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
-    if (!match) return amount;
+    const cleanAmount = amount.replace(/\s*g$/, ' g').replace(/\s*ml$/, ' ml');
+    if (mult === 1) return cleanAmount;
+    const match = cleanAmount.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
+    if (!match) return cleanAmount;
     let val = parseFloat(match[1].replace(',', '.'));
     let unit = match[2].trim();
     let finalVal = val * mult;
@@ -249,7 +274,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {meal.ingredients.map((ing, ingIdx) => (
                         <div key={ingIdx} className="bg-slate-50 border border-slate-100 px-2 py-1 rounded-lg flex items-center gap-1.5 group/ing relative">
-                          <span className="text-[10px] text-slate-600 font-medium">{ing.item}</span>
+                          <span className="text-[10px] text-slate-600 font-medium">{getCanonicalProductName(ing.item)}</span>
                           <span className="text-[10px] font-black text-emerald-600">{formatAmount(ing.amount, ing.item, mMult)}</span>
                           {!isSelectionMode && (
                             <button 
@@ -316,7 +341,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
           <div className="relative bg-white w-full max-w-2xl rounded-3xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
             <div className="bg-emerald-600 p-6 text-white shrink-0">
               <span className="text-[10px] font-black opacity-70 uppercase tracking-widest">{mealTypeLabels[selectedMeal.type]}</span>
-              <h2 className="text-2xl font-bold mb-3 tracking-tight">{selectedMeal.name}</h2>
+              <h2 className="text-2xl font-bold mb-3 tracking-tight leading-tight">{selectedMeal.name}</h2>
             </div>
             <div className="p-8 overflow-y-auto space-y-8">
               <section>
@@ -330,11 +355,11 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
               </section>
 
               <section className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Produkty</h3>
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Składniki</h3>
                 <div className="space-y-2">
                   {selectedMeal.ingredients.map((ing, i) => (
                     <div key={i} className="flex justify-between items-center py-2 border-b border-slate-200 last:border-0">
-                      <span className="text-sm text-slate-600">{ing.item}</span>
+                      <span className="text-sm text-slate-600">{getCanonicalProductName(ing.item)}</span>
                       <span className="text-sm font-bold text-emerald-600">{formatAmount(ing.amount, ing.item, selectedMeal.multiplier || 1)}</span>
                     </div>
                   ))}

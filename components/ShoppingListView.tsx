@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { WeeklyPlan, Meal, Ingredient } from '../types';
 import { Icons } from '../constants';
+import { getCanonicalProductName } from './MealPlanView';
 
 interface ShoppingListViewProps {
   mealPlan: WeeklyPlan;
@@ -16,8 +17,10 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
   const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 
   const parseAmount = (amountStr: string, multiplier: number = 1) => {
-    const match = amountStr.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
-    if (!match) return { val: 0, unit: amountStr };
+    // Normalizujemy jednostkę przed parsowaniem
+    const normalizedAmount = amountStr.replace(/\s*g$/, ' g').replace(/\s*ml$/, ' ml');
+    const match = normalizedAmount.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
+    if (!match) return { val: 0, unit: normalizedAmount };
     
     let rawVal = match[1].replace(',', '.');
     let val = 0;
@@ -43,8 +46,11 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         day.meals.forEach(meal => {
           const mMult = meal.multiplier ?? 1;
           meal.ingredients.forEach(ing => {
-            const displayName = ing.item; // To jest już w mianowniku (np. "Chleb żytni")
+            // KLUCZOWE: Używamy ujednoliconej nazwy kanonicznej do grupowania
+            const displayName = getCanonicalProductName(ing.item);
             const { val, unit } = parseAmount(ing.amount, mMult);
+            
+            // Grupowanie po nazwie kanonicznej i jednostce
             const aggKey = `${displayName.toLowerCase()}_${unit.toLowerCase()}`;
             
             if (!totals[aggKey]) {
@@ -78,7 +84,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         dailyLines.push(`--- ${dayNames[d.day - 1].toUpperCase()} ---`);
         d.meals.forEach(m => {
           m.ingredients.forEach(ing => {
-            dailyLines.push(`${ing.item}: ${ing.amount}`);
+            dailyLines.push(`${getCanonicalProductName(ing.item)}: ${ing.amount}`);
           });
         });
       });
@@ -103,7 +109,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicone nazwy produktów.</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Automatyczne sumowanie produktów.</p>
           </div>
           <button 
             onClick={handleCopy}
@@ -115,8 +121,8 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         </div>
 
         <div className="flex bg-slate-100 p-1 rounded-xl w-full sm:w-fit mx-auto sm:mx-0">
-          <button onClick={() => setViewType('aggregated')} className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${viewType === 'aggregated' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}>Suma</button>
-          <button onClick={() => setViewType('daily')} className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${viewType === 'daily' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}>Dni</button>
+          <button onClick={() => setViewType('aggregated')} className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${viewType === 'aggregated' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}>Sumaryczna</button>
+          <button onClick={() => setViewType('daily')} className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${viewType === 'daily' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}>Dniowa</button>
         </div>
       </div>
 
@@ -132,7 +138,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         {viewType === 'aggregated' ? (
           <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
             <div className="bg-emerald-500 px-8 py-5 text-white flex justify-between items-center">
-              <span className="text-xs font-black uppercase tracking-widest">Suma produktów</span>
+              <span className="text-xs font-black uppercase tracking-widest">Wszystkie produkty</span>
             </div>
             <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-4">
               {aggregatedList.map((item, idx) => {
@@ -164,7 +170,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                           <div className="space-y-3">
                             {meal.ingredients.map((ing, iIdx) => (
                                 <div key={iIdx}>
-                                  <span className="block text-xs font-bold text-slate-700">{ing.item}</span>
+                                  <span className="block text-xs font-bold text-slate-700">{getCanonicalProductName(ing.item)}</span>
                                   <span className="text-[10px] font-black text-emerald-500">{ing.amount}</span>
                                 </div>
                             ))}
