@@ -58,7 +58,8 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     let match = PRODUCT_DATABASE.find(p => p.name.toLowerCase() === normalized);
     if (match) return match;
 
-    // 2. Agresywna normalizacja końcówek (obsługa dopełniacza)
+    // 2. Korekta końcówek (usuwanie odmiany przez przypadki)
+    // Jeśli AI przyśle "Pomidora", to root zostanie "pomidor"
     const root = normalized.replace(/(a|u|ego|iej|ej|ych|ich|m|mi|ach|ów|ę|ą)$/, '');
     match = PRODUCT_DATABASE.find(p => 
       p.name.toLowerCase().startsWith(root) || 

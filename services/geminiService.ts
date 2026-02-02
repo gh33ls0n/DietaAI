@@ -14,13 +14,20 @@ export const generateMealPlan = async (profile: UserProfile, targetCalories: num
   3. Obiad: Jedyny ciepły posiłek. Klasyki polskie fit.
   
   ZASADY NAZEWNICTWA (KRYTYCZNE DLA LISTY ZAKUPÓW):
-  - Pole "item" (Produkt): TYLKO MIANOWNIK LICZBY POJEDYNCZEJ. Nigdy nie odmieniaj!
-    * BŁĄD: "Pomidora", "Szynki z kurczaka", "Chleba żytniego", "Jajek kurzych".
-    * POPRAWNIE: "Pomidor", "Szynka z kurczaka", "Chleb żytni", "Jajko kurze".
+  - Pole "item" (Produkt): TYLKO MIANOWNIK LICZBY POJEDYNCZEJ (nazwa jak z etykiety w sklepie).
+  - Pole "amount" (Ilość): POPRAWNA ODMIANA gramatyczna pasująca do liczby.
   
-  - Pole "amount" (Ilość): NATURALNA ODMIANA pasująca do liczby.
-    * BŁĄD: "2 kromka", "160 g", "3 plaster".
-    * POPRAWNIE: "2 kromki", "160g", "3 plastry", "1/2 sztuki", "2 sztuki".
+  TABELA POPRAWNOŚCI:
+  | BŁĄD (nie używaj w 'item') | POPRAWNIE ('item')      | POPRAWNIE ('amount') |
+  |----------------------------|-------------------------|----------------------|
+  | Chleba żytniego            | Chleb żytni             | 2 kromki             |
+  | Szynki z kurczaka          | Szynka z kurczaka       | 3 plastry            |
+  | Pomidora                   | Pomidor                 | 160g                 |
+  | Jajek kurzych              | Jajko kurze             | 2 sztuki             |
+  | Ryżu basmati               | Ryż basmati             | 50g                  |
+  | Oliwy z oliwek             | Oliwa z oliwek          | 10g                  |
+  | Mięsa z piersi kurczaka    | Pierś kurczaka          | 150g                 |
+  | Sosu sojowego              | Sos sojowy              | 20g                  |
   
   OSTRZEŻENIE: ABSOLUTNY ZAKAZ używania soczewicy (LENTILS).
   
