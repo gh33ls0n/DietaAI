@@ -50,9 +50,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
   const dayShortNames = ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'];
 
-  const formatAmount = (amount: string, mult: number): string => {
-    if (mult === 1) return amount;
-    // Obsługa formatu ułamka (1/2) oraz standardowych liczb
+  const formatAmount = (amount: string, itemName: string, mult: number): string => {
     const match = amount.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
     if (!match) return amount;
 
@@ -65,9 +63,19 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       val = parseFloat(valStr);
     }
     
-    const unit = match[2];
-    const newNum = Math.round(val * mult * 10) / 10;
-    return `${newNum.toString().replace('.', ',')} ${unit}`;
+    let unit = match[2].trim().toLowerCase();
+    let finalVal = val * mult;
+
+    // Specjalna konwersja dla jajek w gramach
+    const lowerName = itemName.toLowerCase();
+    if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
+      // 1 jajko = 55g, zaokrąglamy do 0.5 sztuki
+      finalVal = Math.round((finalVal / 55) * 2) / 2;
+      unit = 'szt';
+    }
+
+    const displayVal = finalVal % 1 === 0 ? finalVal.toString() : finalVal.toFixed(1).replace('.', ',');
+    return `${displayVal} ${unit}`;
   };
 
   const handleApplyCopy = () => {
@@ -184,7 +192,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                       {meal.ingredients.map((ing, i) => (
                         <div key={i} className="bg-slate-50 border border-slate-100 px-2 py-1 rounded-lg flex items-center gap-1.5">
                           <span className="text-[10px] text-slate-600 font-medium">{ing.item}</span>
-                          <span className="text-[10px] font-black text-emerald-600">{formatAmount(ing.amount, mMult)}</span>
+                          <span className="text-[10px] font-black text-emerald-600">{formatAmount(ing.amount, ing.item, mMult)}</span>
                         </div>
                       ))}
                     </div>
@@ -298,7 +306,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                   {selectedMeal.ingredients.map((ing, i) => (
                     <div key={i} className="text-[10px] flex justify-between border-b border-slate-100 pb-1">
                       <span className="text-slate-500">{ing.item}</span>
-                      <span className="font-bold text-slate-800">{formatAmount(ing.amount, selectedMeal.multiplier ?? 1)}</span>
+                      <span className="font-bold text-slate-800">{formatAmount(ing.amount, ing.item, selectedMeal.multiplier ?? 1)}</span>
                     </div>
                   ))}
                 </div>

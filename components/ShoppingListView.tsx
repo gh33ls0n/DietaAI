@@ -15,7 +15,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
   const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 
-  // Normalizacja nazw jednostek dla lepszego sumowania
   const normalizeUnit = (unit: string): string => {
     const u = unit.toLowerCase().trim().replace('.', '');
     if (['szt', 'sztuki', 'sztuka', 'jajko', 'jajka'].includes(u)) return 'szt';
@@ -43,10 +42,10 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     let unit = normalizeUnit(match[2]);
     let finalVal = val * multiplier;
 
-    // SPECJALNA LOGIKA DLA JAJEK: Jeśli są w gramach, zamień na sztuki (1 jajko = 55g)
     const lowerName = itemName.toLowerCase();
-    if ((lowerName.includes('jajko') || lowerName.includes('jaja') || lowerName.includes('jajek')) && unit === 'g') {
-      finalVal = finalVal / 55;
+    if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && unit === 'g') {
+      // Przelicznik: 1 jajko = 55g, zaokrąglamy do połówek
+      finalVal = Math.round((finalVal / 55) * 2) / 2;
       unit = 'szt';
     }
 
@@ -62,9 +61,8 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         day.meals.forEach(meal => {
           const mMult = meal.multiplier ?? 1;
           meal.ingredients.forEach(ing => {
-            // Normalizacja klucza produktu (np. "Jajka (rozmiar L)" i "Jaja" -> "Jajka")
             let nameKey = ing.item.toLowerCase().trim();
-            if (nameKey.includes('jaj')) nameKey = 'jajka';
+            if (nameKey.includes('jaj') || nameKey.includes('jajo')) nameKey = 'jajka';
             if (nameKey.includes('mozzarella')) nameKey = 'mozzarella';
             
             const { val, unit } = parseAmount(ing.amount, nameKey, mMult);
@@ -84,7 +82,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         const namePart = fullKey.split('_')[0];
         return {
           name: namePart.charAt(0).toUpperCase() + namePart.slice(1),
-          amount: Math.round(data.val * 10) / 10, // Zaokrąglamy do 1 miejsca po przecinku (np. 1.5 szt)
+          amount: data.val % 1 === 0 ? data.val : Math.round(data.val * 10) / 10,
           unit: data.unit
         };
       })
@@ -96,7 +94,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     if (viewType === 'aggregated') {
       text = aggregatedList
         .filter(item => !checkedItems[`agg-${item.name}-${item.unit}`])
-        .map(item => `${item.name}: ${item.amount} ${item.unit}`)
+        .map(item => `${item.name}: ${item.amount.toString().replace('.', ',')} ${item.unit}`)
         .join('\n');
     } else {
       const dailyLines: string[] = [];
@@ -106,7 +104,8 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
           const mMult = m.multiplier ?? 1;
           m.ingredients.forEach((ing, idx) => {
             const { val, unit } = parseAmount(ing.amount, ing.item, mMult);
-            dailyLines.push(`${ing.item}: ${Math.round(val * 10) / 10} ${unit}`);
+            const valDisplay = val % 1 === 0 ? val : val.toFixed(1).replace('.', ',');
+            dailyLines.push(`${ing.item}: ${valDisplay} ${unit}`);
           });
         });
       });
@@ -118,7 +117,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      alert("Lista skopiowana! Wszystkie produkty zostały przeliczone i zsumowane.");
+      alert("Lista skopiowana! Pamiętaj, że jajka zostały przeliczone na sztuki.");
     } catch (err) { alert("Błąd kopiowania."); }
   };
 
@@ -132,7 +131,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Automatyczne przeliczanie jajek i sumowanie produktów.</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Jajka przeliczamy na sztuki (1 szt = 55g).</p>
           </div>
           <button 
             onClick={handleCopy}
@@ -161,8 +160,8 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         {viewType === 'aggregated' ? (
           <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
             <div className="bg-emerald-500 px-8 py-5 text-white flex justify-between items-center">
-              <span className="text-xs font-black uppercase tracking-widest">Podsumowanie zakupów ({aggregatedList.length})</span>
-              <span className="text-[10px] bg-white/20 px-2 py-1 rounded-lg">Dni: {selectedDays.length}</span>
+              <span className="text-xs font-black uppercase tracking-widest">Twoje zakupy ({aggregatedList.length})</span>
+              <span className="text-[10px] bg-white/20 px-2 py-1 rounded-lg">Wybrane dni: {selectedDays.length}</span>
             </div>
             <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-4">
               {aggregatedList.map((item, idx) => {
@@ -173,7 +172,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                     <input type="checkbox" checked={isChecked} onChange={() => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }))} className="w-5 h-5 rounded-lg border-slate-200 text-emerald-600 focus:ring-emerald-500" />
                     <div className="flex-grow min-w-0">
                       <span className={`block text-sm font-bold leading-tight transition-all ${isChecked ? 'text-slate-300 line-through opacity-50' : 'text-slate-700'}`}>{item.name}</span>
-                      <span className={`text-[11px] font-black ${isChecked ? 'text-slate-200' : 'text-emerald-500'}`}>{item.amount} {item.unit}</span>
+                      <span className={`text-[11px] font-black ${isChecked ? 'text-slate-200' : 'text-emerald-500'}`}>{item.amount.toString().replace('.', ',')} {item.unit}</span>
                     </div>
                   </label>
                 );
@@ -195,10 +194,11 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                           <div className="space-y-3">
                             {meal.ingredients.map((ing, iIdx) => {
                               const { val, unit } = parseAmount(ing.amount, ing.item, meal.multiplier ?? 1);
+                              const valDisplay = val % 1 === 0 ? val : val.toFixed(1).replace('.', ',');
                               return (
                                 <div key={iIdx} className="flex-grow min-w-0">
                                   <span className="block text-xs font-bold text-slate-700">{ing.item}</span>
-                                  <span className="text-[10px] font-black text-emerald-500">{Math.round(val * 10) / 10} {unit}</span>
+                                  <span className="text-[10px] font-black text-emerald-500">{valDisplay} {unit}</span>
                                 </div>
                               );
                             })}
