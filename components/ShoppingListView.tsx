@@ -23,6 +23,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     if (['łyżeczka', 'łyżeczki'].includes(u)) return 'łyżeczka';
     if (['kromka', 'kromki'].includes(u)) return 'kromka';
     if (['bułka', 'bułki'].includes(u)) return 'szt';
+    if (['plaster', 'plastry', 'plastra'].includes(u)) return 'plaster';
     return u;
   };
 
@@ -60,6 +61,12 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     if (lowerName === 'pomidor' && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round((finalVal / 160) * 2) / 2;
       unit = 'szt';
+    }
+
+    // SPECJALNA LOGIKA SZYNKI: g -> plastry (20g = 1 plaster)
+    if (lowerName.includes('szynk') && (lowerName.includes('kurczak') || lowerName.includes('indyk') || lowerName.includes('drobiow')) && (unit === 'g' || unit === 'gram')) {
+      finalVal = Math.round(finalVal / 20);
+      unit = 'plaster';
     }
 
     return { val: finalVal, unit };
@@ -100,12 +107,17 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
               nameKey = 'pomidor';
               displayName = 'Pomidor';
             }
-            // 5. Jajka
+            // 5. Szynka drobiowa (ujednolicenie kurczaka/indyka/drobiowej do plastrów)
+            else if (nameKey.includes('szynk') && (nameKey.includes('kurczak') || nameKey.includes('indyk') || nameKey.includes('drobiow'))) {
+              nameKey = 'szynka drobiowa';
+              displayName = 'Szynka drobiowa';
+            }
+            // 6. Jajka
             else if (nameKey.includes('jaj') || nameKey.includes('jajo')) {
               nameKey = 'jajka';
               displayName = 'Jajka (rozmiar L)';
             }
-            // 6. Mozzarella
+            // 7. Mozzarella
             else if (nameKey.includes('mozzarella')) {
               nameKey = 'mozzarella';
               displayName = 'Ser Mozzarella';
@@ -160,7 +172,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      alert("Lista skopiowana! Chleby i pomidory przeliczone na jednostki domowe.");
+      alert("Lista skopiowana! Chleby, pomidory i szynka przeliczone na jednostki domowe.");
     } catch (err) { alert("Błąd kopiowania."); }
   };
 
@@ -174,7 +186,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicone pomidory, chleb i grahamki.</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicone pomidory, chleb, szynka i grahamki.</p>
           </div>
           <button 
             onClick={handleCopy}

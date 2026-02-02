@@ -109,7 +109,7 @@ export const BREAKFAST_MEALS: Meal[] = [
     type: "breakfast",
     ingredients: [
       { item: "Grahamka", amount: "1 szt" },
-      { item: "Szynka drobiowa", amount: "60g" },
+      { item: "Szynka drobiowa", amount: "3 plastry" },
       { item: "Musztarda", amount: "1 łyżeczka" },
       { item: "Miód", amount: "1/2 łyżeczki" }
     ],

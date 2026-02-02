@@ -85,6 +85,12 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       unit = 'szt';
     }
 
+    // 4. Specjalna konwersja dla szynki drobiowej w gramach (1 plaster = 20g)
+    if (lowerName.includes('szynk') && (lowerName.includes('kurczak') || lowerName.includes('indyk') || lowerName.includes('drobiow')) && (unit === 'g' || unit === 'gram')) {
+      finalVal = Math.round(finalVal / 20);
+      unit = 'plaster';
+    }
+
     const displayVal = finalVal % 1 === 0 ? finalVal.toString() : finalVal.toFixed(1).replace('.', ',');
     return `${displayVal} ${unit}`;
   };
