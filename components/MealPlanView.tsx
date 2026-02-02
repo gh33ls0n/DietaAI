@@ -24,11 +24,10 @@ export const getCanonicalProductName = (itemName: string): string => {
   if (match) return match.name;
 
   // 2. Szukanie po rdzeniu każdego słowa (agresywne usuwanie końcówek polskich)
-  const stripSuffix = (word: string) => word.replace(/(a|u|ego|iej|ej|ych|ich|m|mi|ach|ów|ę|ą|y)$/, '');
+  const stripSuffix = (word: string) => word.replace(/(a|u|ego|iej|ej|ych|ich|m|mi|ach|ów|ę|ą|y|ki|ek)$/, '');
   
   const itemRoot = normalized.split(/\s+/).map(stripSuffix).join(' ');
 
-  // Szukaj produktu, którego znormalizowana nazwa (bez końcówek) najbardziej pasuje
   // Sortujemy DB od najdłuższych nazw, żeby "Chleb żytni pełnoziarnisty" złapać przed "Chleb"
   const sortedDb = [...PRODUCT_DATABASE].sort((a, b) => b.name.length - a.name.length);
 
@@ -208,7 +207,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 relative">
-      {/* Sidebar Dni */}
       <div className="flex lg:flex-col gap-1.5 lg:gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 lg:w-56 shrink-0 scrollbar-hide">
         {mealPlan.days.map((dayPlan) => (
           <button
@@ -226,7 +224,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       </div>
 
       <div className="flex-grow space-y-4">
-        {/* Suma Dnia */}
         <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4 border-l-8 border-l-emerald-500">
           <div className="text-center sm:text-left">
             <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Suma dnia</p>
@@ -248,7 +245,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
           </div>
         </div>
 
-        {/* Lista Posiłków */}
         <div className="space-y-4 pb-24 lg:pb-0">
           {currentDayPlan.meals.map((meal, mealIdx) => {
             const mMult = meal.multiplier ?? 1;
@@ -264,9 +260,18 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                     
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {meal.ingredients.map((ing, ingIdx) => (
-                        <div key={ingIdx} className="bg-slate-50 border border-slate-100 px-2 py-1 rounded-lg flex items-center gap-1.5 relative">
+                        <div key={ingIdx} className="bg-slate-50 border border-slate-100 px-2 py-1 rounded-lg flex items-center gap-1.5 group/ing relative">
                           <span className="text-[10px] text-slate-600 font-medium">{getCanonicalProductName(ing.item)}</span>
                           <span className="text-[10px] font-black text-emerald-600">{formatAmount(ing.amount, ing.item, mMult)}</span>
+                          {!isSelectionMode && (
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setSwappingIngredient({ mealIndex: mealIdx, ingIndex: ingIdx }); }} 
+                              className="ml-1 text-slate-300 hover:text-emerald-500 transition-colors"
+                              title="Zamień składnik"
+                            >
+                              <Icons.Swap className="w-3 h-3" />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -278,7 +283,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                           <input type="range" min="0.1" max="2.0" step="0.1" value={mMult} onChange={(e) => handleMultiplierChange(meal.type, parseFloat(e.target.value))} className="flex-grow h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-emerald-500" />
                           <span className="text-[10px] font-black text-emerald-600 w-8">{mMult.toFixed(1)}x</span>
                         </div>
-                        <button onClick={(e) => { e.stopPropagation(); setSwappingMealType(meal.type); }} className="p-2 text-slate-300 hover:text-emerald-500 transition-colors"><Icons.Swap className="w-5 h-5" /></button>
+                        <button onClick={(e) => { e.stopPropagation(); setSwappingMealType(meal.type); }} className="p-2 text-slate-300 hover:text-emerald-500 transition-colors" title="Wymień całe danie"><Icons.Swap className="w-5 h-5" /></button>
                       </div>
                     )}
                   </div>
@@ -289,7 +294,34 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         </div>
       </div>
 
-      {/* Modal Wymiany Posiłku */}
+      {swappingIngredient && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSwappingIngredient(null)}></div>
+          <div className="relative bg-white w-full max-w-lg rounded-3xl overflow-hidden max-h-[80vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom-4">
+            <div className="p-6 border-b border-slate-100">
+              <h2 className="text-xl font-bold text-slate-800">Czym zastąpić?</h2>
+              <p className="text-xs text-slate-400 mt-1">Zamiennik zostanie automatycznie przeliczony wagowo.</p>
+            </div>
+            <div className="p-4 overflow-y-auto space-y-2">
+              {ingredientSubstituteOptions.length > 0 ? (
+                ingredientSubstituteOptions.map((prod, idx) => (
+                  <button key={idx} onClick={() => handleIngredientSwap(prod)} className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left">
+                    <div>
+                      <span className="block font-bold text-slate-800">{prod.name}</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{prod.calories} kcal / 100g</span>
+                    </div>
+                    <Icons.Plus className="text-emerald-500" />
+                  </button>
+                ))
+              ) : (
+                <div className="p-8 text-center text-slate-400 italic">Brak pasujących zamienników.</div>
+              )}
+            </div>
+            <button onClick={() => setSwappingIngredient(null)} className="m-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl text-xs uppercase tracking-widest">Anuluj</button>
+          </div>
+        </div>
+      )}
+
       {swappingMealType && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSwappingMealType(null)}></div>
@@ -297,7 +329,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
             <div className="p-5 border-b border-slate-100 space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-slate-800">Wymień cały posiłek</h2>
+                  <h2 className="text-xl font-bold text-slate-800">Wymień całe danie</h2>
                   <p className="text-[10px] font-bold text-emerald-600 uppercase">Sekcja: {mealTypeLabels[swappingMealType]}</p>
                 </div>
                 <button onClick={() => setSwappingMealType(null)} className="p-2 bg-slate-50 rounded-full text-slate-400"><Icons.Plus className="rotate-45" /></button>
@@ -324,7 +356,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         </div>
       )}
 
-      {/* Modal Szczegółów Posiłku */}
       {selectedMeal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedMeal(null)}></div>
@@ -345,7 +376,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
               </section>
 
               <section className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Produkty i ilości</h3>
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Składniki</h3>
                 <div className="space-y-2">
                   {selectedMeal.ingredients.map((ing, i) => (
                     <div key={i} className="flex justify-between items-center py-2 border-b border-slate-200 last:border-0">
@@ -363,7 +394,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         </div>
       )}
 
-      {/* Modal Kopiowania */}
       {copyMode && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setCopyMode(null); setCopyTargetDays([]); }}></div>
