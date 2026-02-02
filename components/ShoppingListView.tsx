@@ -21,14 +21,24 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
   const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 
-  // Helper do wyciągania liczby i jednostki z napisu (np. "200g" -> {val: 200, unit: "g"})
+  // Inteligentny parser obsługujący liczby całkowite, dziesiętne i ułamki (np. 1/2)
   const parseAmount = (amountStr: string, multiplier: number = 1) => {
-    const match = amountStr.match(/^(\d+([.,]\d+)?)\s*(.*)$/);
+    // Regex szukający ułamka (np. 1/2) lub liczby (np. 200 lub 1.5)
+    const match = amountStr.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
     if (!match) return { val: 0, unit: amountStr };
     
-    const val = parseFloat(match[1].replace(',', '.')) * multiplier;
-    const unit = match[3].trim();
-    return { val, unit };
+    let rawVal = match[1].replace(',', '.');
+    let val = 0;
+
+    if (rawVal.includes('/')) {
+      const [num, den] = rawVal.split('/').map(Number);
+      val = num / den;
+    } else {
+      val = parseFloat(rawVal);
+    }
+
+    const unit = match[2].trim();
+    return { val: val * multiplier, unit };
   };
 
   // Logika sumowania produktów
@@ -47,11 +57,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
             if (!totals[key]) {
               totals[key] = { val, unit };
             } else {
-              // Jeśli jednostki są takie same, sumujemy. Jeśli inne (rzadkie), traktujemy jako oddzielne lub doklejamy
               if (totals[key].unit === unit) {
                 totals[key].val += val;
               } else {
-                // Sytuacja gdy np. raz jest 'g' a raz 'szt' - tworzymy unikalny klucz
                 const altKey = `${key} (${unit})`;
                 if (!totals[altKey]) totals[altKey] = { val, unit };
                 else totals[altKey].val += val;
@@ -103,7 +111,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      alert("Lista skopiowana! Produkty zostały zsumowane.");
+      alert("Lista skopiowana i zsumowana!");
     } catch (err) {
       alert("Błąd kopiowania.");
     }
@@ -115,23 +123,21 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
   return (
     <div className="space-y-6">
-      {/* Nagłówek i Akcje */}
       <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6 sticky top-20 z-40">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Automatycznie sumujemy te same produkty.</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Automatyczna agregacja tych samych produktów.</p>
           </div>
           <button 
             onClick={handleCopy}
             className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-xs uppercase transition-all shadow-xl active:scale-95 ${copied ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white'}`}
           >
             {copied ? <Icons.Check className="w-5 h-5"/> : <Icons.Clipboard className="w-5 h-5"/>}
-            Kopiuj do Listonic
+            Kopiuj listę
           </button>
         </div>
 
-        {/* Przełącznik widoku */}
         <div className="flex bg-slate-100 p-1 rounded-xl w-full sm:w-fit mx-auto sm:mx-0">
           <button 
             onClick={() => setViewType('aggregated')}
@@ -148,7 +154,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         </div>
       </div>
 
-      {/* Wybór dni */}
       <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
         {dayNames.map((name, i) => (
           <button
@@ -161,12 +166,11 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         ))}
       </div>
 
-      {/* Wyświetlanie listy */}
       <div className="animate-in fade-in duration-500">
         {viewType === 'aggregated' ? (
           <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
             <div className="bg-emerald-500 px-8 py-5 text-white flex justify-between items-center">
-              <span className="text-xs font-black uppercase tracking-widest">Wszystkie produkty ({aggregatedList.length})</span>
+              <span className="text-xs font-black uppercase tracking-widest">Twoje zakupy ({aggregatedList.length})</span>
               <span className="text-[10px] bg-white/20 px-2 py-1 rounded-lg">Wybrane dni: {selectedDays.length}</span>
             </div>
             <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-4">
@@ -186,7 +190,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                         {item.name}
                       </span>
                       <span className={`text-[11px] font-black ${isChecked ? 'text-slate-200' : 'text-emerald-500'}`}>
-                        {item.amount}{item.unit}
+                        {item.amount} {item.unit}
                       </span>
                     </div>
                   </label>
@@ -194,7 +198,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
               })}
             </div>
             {aggregatedList.length === 0 && (
-              <div className="p-20 text-center text-slate-300 font-bold">Wybierz dni powyżej, aby wygenerować listę.</div>
+              <div className="p-20 text-center text-slate-300 font-bold">Wybierz dni powyżej.</div>
             )}
           </div>
         ) : (
@@ -204,7 +208,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
               .map(day => (
                 <section key={day.day} className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
                   <div className="bg-slate-50 p-6 px-10 border-b border-slate-100 flex items-center gap-4">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-xs font-black shadow-lg shadow-emerald-50">{day.day}</div>
+                    <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-xs font-black shadow-lg">{day.day}</div>
                     <h3 className="text-xl font-black text-slate-800 tracking-tight">{dayNames[day.day - 1]}</h3>
                   </div>
                   <div className="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
@@ -233,7 +237,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
                                       {ing.item}
                                     </span>
                                     <span className={`text-[10px] font-black ${isChecked ? 'text-slate-100' : 'text-emerald-500'}`}>
-                                      {val}{unit}
+                                      {Math.round(val * 10) / 10} {unit}
                                     </span>
                                   </div>
                                 </label>

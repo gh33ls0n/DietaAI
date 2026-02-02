@@ -52,11 +52,21 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
   const formatAmount = (amount: string, mult: number): string => {
     if (mult === 1) return amount;
-    const match = amount.match(/^(\d+([.,]\d+)?)\s*(.*)$/);
+    // Obsługa formatu ułamka (1/2) oraz standardowych liczb
+    const match = amount.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
     if (!match) return amount;
-    const num = parseFloat(match[1].replace(',', '.'));
-    const unit = match[3];
-    const newNum = Math.round(num * mult * 10) / 10;
+
+    let valStr = match[1].replace(',', '.');
+    let val = 0;
+    if (valStr.includes('/')) {
+      const [num, den] = valStr.split('/').map(Number);
+      val = num / den;
+    } else {
+      val = parseFloat(valStr);
+    }
+    
+    const unit = match[2];
+    const newNum = Math.round(val * mult * 10) / 10;
     return `${newNum.toString().replace('.', ',')} ${unit}`;
   };
 
@@ -170,7 +180,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                     </div>
                     <h4 className="text-lg font-bold text-slate-800 mb-3">{meal.name}</h4>
                     
-                    {/* SKŁADNIKI NA KARCIE GŁÓWNEJ */}
                     <div className="flex flex-wrap gap-1.5 mb-4">
                       {meal.ingredients.map((ing, i) => (
                         <div key={i} className="bg-slate-50 border border-slate-100 px-2 py-1 rounded-lg flex items-center gap-1.5">
@@ -198,7 +207,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         </div>
       </div>
 
-      {/* MODAL WYMIANY - TERAZ ZE SKŁADNIKAMI NA KARTACH */}
+      {/* MODAL WYMIANY */}
       {swappingMealType && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSwappingMealType(null)}></div>
@@ -242,7 +251,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                     <Icons.ArrowRight className="w-4 h-4 text-slate-200 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all shrink-0" />
                   </div>
                   
-                  {/* SKŁADNIKI W MODALU WYMIANY */}
                   <div className="flex flex-wrap gap-1 mt-1">
                     {meal.ingredients.slice(0, 4).map((ing, i) => (
                       <span key={i} className="text-[9px] text-slate-500 bg-slate-100/50 px-2 py-0.5 rounded-lg border border-slate-100/50">
@@ -256,15 +264,11 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                 </div>
               ))}
             </div>
-            
-            <div className="p-4 bg-slate-50 border-t border-slate-100 text-center">
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Wybierz posiłek, aby zastąpić aktualny</p>
-            </div>
           </div>
         </div>
       )}
 
-      {/* MODAL PRZEPISU (SPOSÓB WYKONANIA) */}
+      {/* MODAL PRZEPISU */}
       {selectedMeal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedMeal(null)}></div>
@@ -284,7 +288,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                   <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Sposób przygotowania</h3>
                 </div>
                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-slate-700 text-sm leading-relaxed whitespace-pre-wrap italic">
-                  {selectedMeal.recipe || "Brak szczegółowego opisu przygotowania dla tego dania."}
+                  {selectedMeal.recipe || "Brak instrukcji."}
                 </div>
               </section>
               
@@ -307,7 +311,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         </div>
       )}
 
-      {/* MODAL KOPIOWANIA DNI */}
+      {/* MODAL KOPIOWANIA */}
       {copyMode && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => { setCopyMode(null); setCopyTargetDays([]); }}></div>
@@ -325,7 +329,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                 </button>
               ))}
             </div>
-            <button onClick={handleApplyCopy} disabled={copyTargetDays.length === 0} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl text-xs uppercase shadow-xl disabled:opacity-50">Zastosuj kopiowanie</button>
+            <button onClick={handleApplyCopy} disabled={copyTargetDays.length === 0} className="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl text-xs uppercase shadow-xl disabled:opacity-50">Zastosuj</button>
           </div>
         </div>
       )}
