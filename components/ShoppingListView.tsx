@@ -1,155 +1,253 @@
 
-import React, { useState, useEffect } from 'react';
-import { WeeklyPlan } from '../types';
+import React, { useState, useMemo } from 'react';
+import { WeeklyPlan, Meal, Ingredient } from '../types';
 import { Icons } from '../constants';
 
 interface ShoppingListViewProps {
   mealPlan: WeeklyPlan;
 }
 
+interface AggregatedItem {
+  name: string;
+  amount: number;
+  unit: string;
+}
+
 const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
   const [selectedDays, setSelectedDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
+  const [viewType, setViewType] = useState<'aggregated' | 'daily'>('aggregated');
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [copied, setCopied] = useState<boolean>(false);
 
-  const mealTypeLabels: Record<string, string> = {
-    breakfast: 'Śniadanie',
-    snack1: 'II Śniadanie',
-    lunch: 'Obiad',
-    snack2: 'Podwieczorek',
-    dinner: 'Kolacja'
-  };
-
   const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 
-  useEffect(() => {
-    const initialState: Record<string, boolean> = {};
-    mealPlan.days.forEach(day => {
-      day.meals.forEach(meal => {
-        meal.ingredients.forEach((ing, idx) => {
-          const id = `${day.day}-${meal.type}-${ing.item}-${idx}`;
-          if (checkedItems[id] === undefined) {
-            initialState[id] = true;
-          }
-        });
-      });
-    });
-    if (Object.keys(initialState).length > 0) {
-      setCheckedItems(prev => ({ ...prev, ...initialState }));
-    }
-  }, [mealPlan]);
-
-  const toggleItem = (id: string) => {
-    setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }));
+  // Helper do wyciągania liczby i jednostki z napisu (np. "200g" -> {val: 200, unit: "g"})
+  const parseAmount = (amountStr: string, multiplier: number = 1) => {
+    const match = amountStr.match(/^(\d+([.,]\d+)?)\s*(.*)$/);
+    if (!match) return { val: 0, unit: amountStr };
+    
+    const val = parseFloat(match[1].replace(',', '.')) * multiplier;
+    const unit = match[3].trim();
+    return { val, unit };
   };
 
-  const handleCopy = async () => {
-    const toCopy: string[] = [];
-    
-    mealPlan.days.forEach(day => {
-      if (!selectedDays.includes(day.day)) return;
-      day.meals.forEach(meal => {
-        meal.ingredients.forEach((ing, idx) => {
-          const id = `${day.day}-${meal.type}-${ing.item}-${idx}`;
-          if (checkedItems[id]) {
-            const cleanItem = ing.item.replace(/[*_~`]/g, '').trim();
-            toCopy.push(`${cleanItem} ${ing.amount}`);
-          }
+  // Logika sumowania produktów
+  const aggregatedList = useMemo(() => {
+    const totals: Record<string, { val: number; unit: string }> = {};
+
+    mealPlan.days
+      .filter(d => selectedDays.includes(d.day))
+      .forEach(day => {
+        day.meals.forEach(meal => {
+          const mMult = meal.multiplier ?? 1;
+          meal.ingredients.forEach(ing => {
+            const key = ing.item.toLowerCase().trim();
+            const { val, unit } = parseAmount(ing.amount, mMult);
+
+            if (!totals[key]) {
+              totals[key] = { val, unit };
+            } else {
+              // Jeśli jednostki są takie same, sumujemy. Jeśli inne (rzadkie), traktujemy jako oddzielne lub doklejamy
+              if (totals[key].unit === unit) {
+                totals[key].val += val;
+              } else {
+                // Sytuacja gdy np. raz jest 'g' a raz 'szt' - tworzymy unikalny klucz
+                const altKey = `${key} (${unit})`;
+                if (!totals[altKey]) totals[altKey] = { val, unit };
+                else totals[altKey].val += val;
+              }
+            }
+          });
         });
       });
-    });
 
-    if (toCopy.length === 0) return;
+    return Object.entries(totals)
+      .map(([name, data]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1),
+        amount: Math.round(data.val * 100) / 100,
+        unit: data.unit
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [mealPlan, selectedDays]);
 
-    const uniqueList = Array.from(new Set(toCopy)).join('\n');
+  const handleCopy = async () => {
+    let text = "";
+    if (viewType === 'aggregated') {
+      text = aggregatedList
+        .filter(item => !checkedItems[`agg-${item.name}`])
+        .map(item => `${item.name}: ${item.amount}${item.unit}`)
+        .join('\n');
+    } else {
+      const dailyLines: string[] = [];
+      mealPlan.days
+        .filter(d => selectedDays.includes(d.day))
+        .forEach(d => {
+          dailyLines.push(`--- ${dayNames[d.day - 1].toUpperCase()} ---`);
+          d.meals.forEach(m => {
+            const mMult = m.multiplier ?? 1;
+            m.ingredients.forEach((ing, idx) => {
+              const id = `${d.day}-${m.type}-${ing.item}-${idx}`;
+              if (!checkedItems[id]) {
+                const { val, unit } = parseAmount(ing.amount, mMult);
+                dailyLines.push(`${ing.item}: ${val}${unit}`);
+              }
+            });
+          });
+        });
+      text = dailyLines.join('\n');
+    }
+
+    if (!text) return;
 
     try {
-      await navigator.clipboard.writeText(uniqueList);
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      alert("Skopiowano listę! Możesz ją teraz wkleić w Listonic.");
+      alert("Lista skopiowana! Produkty zostały zsumowane.");
     } catch (err) {
       alert("Błąd kopiowania.");
     }
   };
 
+  const toggleDay = (d: number) => {
+    setSelectedDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
+  };
+
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col sm:flex-row justify-between items-center gap-4 sticky top-20 z-40">
-        <div className="text-center sm:text-left">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Twoja Lista</h2>
-          <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Zaznacz co chcesz kupić i skopiuj.</p>
+    <div className="space-y-6">
+      {/* Nagłówek i Akcje */}
+      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6 sticky top-20 z-40">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="text-center sm:text-left">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Automatycznie sumujemy te same produkty.</p>
+          </div>
+          <button 
+            onClick={handleCopy}
+            className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-black text-xs uppercase transition-all shadow-xl active:scale-95 ${copied ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white'}`}
+          >
+            {copied ? <Icons.Check className="w-5 h-5"/> : <Icons.Clipboard className="w-5 h-5"/>}
+            Kopiuj do Listonic
+          </button>
         </div>
-        <button 
-          onClick={handleCopy}
-          className={`w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 sm:py-5 rounded-2xl font-black text-[10px] sm:text-xs uppercase transition-all shadow-xl active:scale-95 ${copied ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white'}`}
-        >
-          {copied ? <Icons.Check className="w-4 h-4 sm:w-5 sm:h-5"/> : <Icons.Clipboard className="w-4 h-4 sm:w-5 sm:h-5"/>}
-          Skopiuj listę
-        </button>
+
+        {/* Przełącznik widoku */}
+        <div className="flex bg-slate-100 p-1 rounded-xl w-full sm:w-fit mx-auto sm:mx-0">
+          <button 
+            onClick={() => setViewType('aggregated')}
+            className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${viewType === 'aggregated' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}
+          >
+            Suma (Agregacja)
+          </button>
+          <button 
+            onClick={() => setViewType('daily')}
+            className={`flex-1 sm:flex-none px-6 py-2 rounded-lg text-[10px] font-black uppercase transition-all ${viewType === 'daily' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-400'}`}
+          >
+            Widok Dni
+          </button>
+        </div>
       </div>
 
-      {/* POWIĘKSZONE PRZYCISKI DNI NA DESKTOP */}
-      <div className="flex overflow-x-auto gap-1.5 sm:gap-3 pb-2 scrollbar-hide">
+      {/* Wybór dni */}
+      <div className="flex overflow-x-auto gap-2 pb-2 scrollbar-hide">
         {dayNames.map((name, i) => (
           <button
             key={i}
-            onClick={() => {
-              const d = i + 1;
-              setSelectedDays(prev => prev.includes(d) ? prev.filter(x => x !== d) : [...prev, d]);
-            }}
-            className={`px-3 py-2 sm:px-6 sm:py-3.5 rounded-xl text-[9px] sm:text-[11px] font-black uppercase border transition-all shrink-0 ${selectedDays.includes(i + 1) ? 'bg-emerald-50 border-emerald-500 text-emerald-700' : 'bg-white border-slate-100 text-slate-400'}`}
+            onClick={() => toggleDay(i + 1)}
+            className={`px-4 py-3 rounded-xl text-[10px] font-black uppercase border transition-all shrink-0 ${selectedDays.includes(i + 1) ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm' : 'bg-white border-slate-100 text-slate-400'}`}
           >
             {name.substring(0, 3)}
           </button>
         ))}
       </div>
 
-      {/* POWIĘKSZONE SEKCJE NA KOMPUTERZE (p-8 i gap-10) */}
-      <div className="grid grid-cols-1 gap-4 sm:gap-8">
-        {mealPlan.days
-          .filter(day => selectedDays.includes(day.day))
-          .map(day => (
-            <section key={day.day} className="bg-white rounded-[24px] sm:rounded-[32px] border border-slate-100 shadow-sm overflow-hidden animate-in fade-in duration-300">
-              <div className="bg-slate-50 p-4 sm:p-6 px-6 sm:px-10 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-7 h-7 sm:w-10 sm:h-10 bg-emerald-500 rounded-lg sm:rounded-2xl flex items-center justify-center text-white text-[10px] sm:text-xs font-black shadow-lg shadow-emerald-50">{day.day}</div>
-                  <h3 className="text-base sm:text-xl font-black text-slate-800 tracking-tight">{dayNames[day.day - 1]}</h3>
-                </div>
-              </div>
-
-              <div className="p-6 sm:p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-12">
-                {day.meals.map((meal, mIdx) => (
-                  <div key={mIdx} className="space-y-4 sm:space-y-6">
-                    <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-50 pb-2">{mealTypeLabels[meal.type]}</h4>
-                    <div className="space-y-3 sm:space-y-4">
-                      {meal.ingredients.map((ing, iIdx) => {
-                        const id = `${day.day}-${meal.type}-${ing.item}-${iIdx}`;
-                        return (
-                          <label key={iIdx} className="flex items-start gap-3 sm:gap-4 cursor-pointer group">
-                            <input 
-                              type="checkbox" 
-                              checked={!!checkedItems[id]} 
-                              onChange={() => toggleItem(id)}
-                              className="mt-1 w-4 h-4 sm:w-5 sm:h-5 rounded-lg border-slate-200 text-emerald-600 transition-all"
-                            />
-                            <div className="flex-grow min-w-0">
-                              <span className={`block text-xs sm:text-sm font-bold leading-tight ${checkedItems[id] ? 'text-slate-700' : 'text-slate-200 line-through'}`}>
-                                {ing.item}
-                              </span>
-                              <span className={`text-[10px] font-black ${checkedItems[id] ? 'text-emerald-500' : 'text-slate-100'}`}>
-                                {ing.amount}
-                              </span>
-                            </div>
-                          </label>
-                        );
-                      })}
+      {/* Wyświetlanie listy */}
+      <div className="animate-in fade-in duration-500">
+        {viewType === 'aggregated' ? (
+          <div className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+            <div className="bg-emerald-500 px-8 py-5 text-white flex justify-between items-center">
+              <span className="text-xs font-black uppercase tracking-widest">Wszystkie produkty ({aggregatedList.length})</span>
+              <span className="text-[10px] bg-white/20 px-2 py-1 rounded-lg">Wybrane dni: {selectedDays.length}</span>
+            </div>
+            <div className="p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-4">
+              {aggregatedList.map((item, idx) => {
+                const id = `agg-${item.name}`;
+                const isChecked = !!checkedItems[id];
+                return (
+                  <label key={idx} className="flex items-center gap-4 cursor-pointer group py-2 border-b border-slate-50 last:border-0">
+                    <input 
+                      type="checkbox" 
+                      checked={isChecked} 
+                      onChange={() => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }))}
+                      className="w-5 h-5 rounded-lg border-slate-200 text-emerald-600 focus:ring-emerald-500"
+                    />
+                    <div className="flex-grow min-w-0">
+                      <span className={`block text-sm font-bold leading-tight transition-all ${isChecked ? 'text-slate-300 line-through opacity-50' : 'text-slate-700'}`}>
+                        {item.name}
+                      </span>
+                      <span className={`text-[11px] font-black ${isChecked ? 'text-slate-200' : 'text-emerald-500'}`}>
+                        {item.amount}{item.unit}
+                      </span>
                     </div>
+                  </label>
+                );
+              })}
+            </div>
+            {aggregatedList.length === 0 && (
+              <div className="p-20 text-center text-slate-300 font-bold">Wybierz dni powyżej, aby wygenerować listę.</div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {mealPlan.days
+              .filter(day => selectedDays.includes(day.day))
+              .map(day => (
+                <section key={day.day} className="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden">
+                  <div className="bg-slate-50 p-6 px-10 border-b border-slate-100 flex items-center gap-4">
+                    <div className="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-xs font-black shadow-lg shadow-emerald-50">{day.day}</div>
+                    <h3 className="text-xl font-black text-slate-800 tracking-tight">{dayNames[day.day - 1]}</h3>
                   </div>
-                ))}
-              </div>
-            </section>
-          ))}
+                  <div className="p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+                    {day.meals.map((meal, mIdx) => {
+                      const mMult = meal.multiplier ?? 1;
+                      return (
+                        <div key={mIdx} className="space-y-4">
+                          <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-widest border-b border-slate-50 pb-2">
+                            {meal.name.length > 20 ? meal.name.substring(0, 20) + '...' : meal.name}
+                          </h4>
+                          <div className="space-y-3">
+                            {meal.ingredients.map((ing, iIdx) => {
+                              const id = `${day.day}-${meal.type}-${ing.item}-${iIdx}`;
+                              const isChecked = !!checkedItems[id];
+                              const { val, unit } = parseAmount(ing.amount, mMult);
+                              return (
+                                <label key={iIdx} className="flex items-start gap-4 cursor-pointer group">
+                                  <input 
+                                    type="checkbox" 
+                                    checked={isChecked} 
+                                    onChange={() => setCheckedItems(prev => ({ ...prev, [id]: !prev[id] }))}
+                                    className="mt-1 w-4 h-4 rounded-lg border-slate-200 text-emerald-600"
+                                  />
+                                  <div className="flex-grow min-w-0">
+                                    <span className={`block text-xs font-bold leading-tight ${isChecked ? 'text-slate-200 line-through' : 'text-slate-700'}`}>
+                                      {ing.item}
+                                    </span>
+                                    <span className={`text-[10px] font-black ${isChecked ? 'text-slate-100' : 'text-emerald-500'}`}>
+                                      {val}{unit}
+                                    </span>
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
+          </div>
+        )}
       </div>
     </div>
   );
