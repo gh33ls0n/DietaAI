@@ -54,12 +54,14 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
   const findProductInDatabase = (itemName: string) => {
     const normalized = itemName.toLowerCase().trim();
+    // 1. Dokładne dopasowanie
     let match = PRODUCT_DATABASE.find(p => p.name.toLowerCase() === normalized);
     if (match) return match;
 
-    const root = normalized.replace(/(ę|ą|y|a|i|u|m|ej|ego|kurze|kurzych)$/, '');
+    // 2. Agresywna normalizacja końcówek (obsługa dopełniacza)
+    const root = normalized.replace(/(a|u|ego|iej|ej|ych|ich|m|mi|ach|ów|ę|ą)$/, '');
     match = PRODUCT_DATABASE.find(p => 
-      p.name.toLowerCase().includes(root) || 
+      p.name.toLowerCase().startsWith(root) || 
       normalized.includes(p.name.toLowerCase())
     );
     return match;
@@ -67,22 +69,11 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
   const formatAmount = (amount: string, itemName: string, mult: number): string => {
     if (mult === 1) return amount;
-
     const match = amount.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
     if (!match) return amount;
-
-    let valStr = match[1].replace(',', '.');
-    let val = 0;
-    if (valStr.includes('/')) {
-      const [num, den] = valStr.split('/').map(Number);
-      val = num / den;
-    } else {
-      val = parseFloat(valStr);
-    }
-    
+    let val = parseFloat(match[1].replace(',', '.'));
     let unit = match[2].trim();
     let finalVal = val * mult;
-    
     const displayVal = finalVal % 1 === 0 ? finalVal.toString() : finalVal.toFixed(1).replace('.', ',');
     return `${displayVal} ${unit}`;
   };
@@ -93,12 +84,10 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     let val = parseFloat(match[1].replace(',', '.'));
     const unit = match[2].trim().toLowerCase();
     const lowerName = itemName.toLowerCase();
-
     if (unit === 'g' || unit === 'gram' || unit === 'ml') return val;
-    if (unit === 'kromka' || unit === 'kromki') return val * 30;
-    if (unit === 'plaster' || unit === 'plastry') return val * 20;
-    if (unit === 'łyżka' || unit === 'łyżki') return val * 15;
-    if (unit === 'łyżeczka' || unit === 'łyżeczki') return val * 5;
+    if (unit.includes('kromk')) return val * 30;
+    if (unit.includes('plast')) return val * 20;
+    if (unit.includes('łyż')) return unit.includes('ecz') ? val * 5 : val * 15;
     if (unit.includes('szt')) {
       if (lowerName.includes('jaj')) return val * 55;
       if (lowerName.includes('pomidor')) return val * 160;
@@ -150,24 +139,18 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     const { mealIndex, ingIndex } = swappingIngredient;
     const meal = currentDayPlan.meals[mealIndex];
     const originalIng = meal.ingredients[ingIndex];
-    
     const originalProduct = findProductInDatabase(originalIng.item);
-
     if (!originalProduct) {
-      alert(`Błąd: Produkt "${originalIng.item}" nie został rozpoznany w bazie.`);
+      alert(`Błąd dopasowania produktu: ${originalIng.item}`);
       setSwappingIngredient(null);
       return;
     }
-
     const originalWeight = parseToGrams(originalIng.amount, originalIng.item);
     const originalCals = (originalWeight / 100) * originalProduct.calories;
-
     const newWeight = (originalCals * 100) / substituteProduct.calories;
     const newAmount = `${Math.round(newWeight)}${substituteProduct.unit}`;
-
     const newIngredients = [...meal.ingredients];
     newIngredients[ingIndex] = { item: substituteProduct.name, amount: newAmount };
-
     let totalCals = 0, totalP = 0, totalF = 0, totalC = 0;
     newIngredients.forEach(ing => {
       const p = findProductInDatabase(ing.item);
@@ -179,16 +162,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         totalC += (w / 100) * p.carbs;
       }
     });
-
-    const updatedMeal: Meal = {
-      ...meal,
-      ingredients: newIngredients,
-      calories: Math.round(totalCals),
-      protein: Math.round(totalP),
-      fats: Math.round(totalF),
-      carbs: Math.round(totalC)
-    };
-
+    const updatedMeal: Meal = { ...meal, ingredients: newIngredients, calories: Math.round(totalCals), protein: Math.round(totalP), fats: Math.round(totalF), carbs: Math.round(totalC) };
     onUpdateMeal(selectedDay, meal.type, updatedMeal);
     setSwappingIngredient(null);
   };
@@ -197,9 +171,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     if (!swappingIngredient) return [];
     const meal = currentDayPlan.meals[swappingIngredient.mealIndex];
     const ing = meal.ingredients[swappingIngredient.ingIndex];
-    
     const matchedProduct = findProductInDatabase(ing.item);
-
     if (!matchedProduct) return [];
     return PRODUCT_DATABASE.filter(p => p.category === matchedProduct.category && p.name !== matchedProduct.name);
   }, [swappingIngredient, currentDayPlan]);
@@ -320,11 +292,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
             <div className="p-4 overflow-y-auto space-y-2">
               {ingredientSubstituteOptions.length > 0 ? (
                 ingredientSubstituteOptions.map((prod, idx) => (
-                  <button 
-                    key={idx} 
-                    onClick={() => handleIngredientSwap(prod)}
-                    className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left"
-                  >
+                  <button key={idx} onClick={() => handleIngredientSwap(prod)} className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left">
                     <div>
                       <span className="block font-bold text-slate-800">{prod.name}</span>
                       <span className="text-[10px] text-slate-400 font-bold uppercase">{prod.calories} kcal / 100g</span>
@@ -337,39 +305,6 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
               )}
             </div>
             <button onClick={() => setSwappingIngredient(null)} className="m-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl text-xs uppercase tracking-widest">Anuluj</button>
-          </div>
-        </div>
-      )}
-
-      {swappingMealType && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSwappingMealType(null)}></div>
-          <div className="relative bg-white w-full max-w-4xl rounded-3xl overflow-hidden max-h-[85vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom-4">
-            <div className="p-5 border-b border-slate-100 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl font-bold text-slate-800">Wymień posiłek</h2>
-                  <p className="text-[10px] font-bold text-emerald-600 uppercase">Sekcja: {mealTypeLabels[swappingMealType]}</p>
-                </div>
-                <button onClick={() => setSwappingMealType(null)} className="p-2 bg-slate-50 rounded-full text-slate-400"><Icons.Plus className="rotate-45" /></button>
-              </div>
-            </div>
-            
-            <div className="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3">
-              {swappableMeals.map((meal, idx) => (
-                <div key={idx} onClick={() => handleSwap(selectedDay, meal)} className="group bg-white border border-slate-100 rounded-2xl p-4 hover:border-emerald-500 hover:bg-emerald-50 transition-all cursor-pointer flex flex-col gap-2">
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="min-w-0">
-                      <h4 className="font-bold text-slate-800 text-sm group-hover:text-emerald-700 truncate">{meal.name}</h4>
-                      <div className="flex gap-2 items-center">
-                        <span className="text-[9px] font-black text-emerald-600 uppercase tracking-tighter">{meal.calories} kcal</span>
-                      </div>
-                    </div>
-                    <Icons.ArrowRight className="w-4 h-4 text-slate-200 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       )}
@@ -390,6 +325,18 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                 </div>
                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-slate-700 text-sm leading-relaxed whitespace-pre-wrap italic">
                   {selectedMeal.recipe || "Brak instrukcji."}
+                </div>
+              </section>
+
+              <section className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Produkty</h3>
+                <div className="space-y-2">
+                  {selectedMeal.ingredients.map((ing, i) => (
+                    <div key={i} className="flex justify-between items-center py-2 border-b border-slate-200 last:border-0">
+                      <span className="text-sm text-slate-600">{ing.item}</span>
+                      <span className="text-sm font-bold text-emerald-600">{formatAmount(ing.amount, ing.item, selectedMeal.multiplier || 1)}</span>
+                    </div>
+                  ))}
                 </div>
               </section>
             </div>

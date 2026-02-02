@@ -6,22 +6,23 @@ import { APP_NAME } from "../constants";
 export const generateMealPlan = async (profile: UserProfile, targetCalories: number): Promise<WeeklyPlan> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  const prompt = `Jesteś profesjonalnym dietetykiem tworzącym plany dla aplikacji ${APP_NAME}. Stwórz jadłospis na 7 dni dla osoby o zapotrzebowaniu ${targetCalories} kcal.
+  const prompt = `Jesteś profesjonalnym dietetykiem aplikacji ${APP_NAME}. Stwórz jadłospis na 7 dni (${targetCalories} kcal).
   
-  OSTRZEŻENIE: Użytkownik nienawidzi soczewicy (LENTILS) - ABSOLUTNY ZAKAZ UŻYWANIA.
+  ZASADY KONSTRUKCJI:
+  1. Śniadanie, II Śniadanie, Kolacja: KANAPKI (różne pieczywo i dodatki).
+  2. NIEDZIELA (Dzień 7) Śniadanie: Jajecznica lub Jajka na miękko.
+  3. Obiad: Jedyny ciepły posiłek. Klasyki polskie fit.
   
-  ZASADY KONSTRUKCJI POSIŁKÓW:
-  1. Śniadanie, II Śniadanie, Kolacja: Te posiłki MUSZĄ BYĆ KANAPKAMI (różne pieczywo; różne dodatki).
-  2. WYJĄTEK NIEDZIELA: Dzień 7, śniadanie to obowiązkowo Jajecznica lub Jajka na miękko.
-  3. Obiad: Jedyny ciepły, większy posiłek. Klasyki polskie w wersji fit.
-  4. Podwieczorek (snack2): Lekka przekąska.
+  ZASADY NAZEWNICTWA (KRYTYCZNE DLA LISTY ZAKUPÓW):
+  - Pole "item" (Produkt): TYLKO MIANOWNIK LICZBY POJEDYNCZEJ. Nigdy nie odmieniaj!
+    * BŁĄD: "Pomidora", "Szynki z kurczaka", "Chleba żytniego", "Jajek kurzych".
+    * POPRAWNIE: "Pomidor", "Szynka z kurczaka", "Chleb żytni", "Jajko kurze".
   
-  ZASADY NAZEWNICTWA (KRYTYCZNE):
-  - Pole "item" (produkt): Zawsze mianownik liczby pojedynczej (np. "Chleb żytni", "Serek kanapkowy", "Szynka z kurczaka", "Jajko kurze", "Papryka czerwona").
-  - Pole "amount" (ilość): Zawsze naturalna, odmieniona forma z jednostką (np. "2 kromki", "3 plastry", "1/2 sztuki", "150g").
+  - Pole "amount" (Ilość): NATURALNA ODMIANA pasująca do liczby.
+    * BŁĄD: "2 kromka", "160 g", "3 plaster".
+    * POPRAWNIE: "2 kromki", "160g", "3 plastry", "1/2 sztuki", "2 sztuki".
   
-  DLA PIECZYWA: Zawsze używaj jednostek: "kromka", "bułka", "sztuka".
-  DLA MIĘSA/RYB: Używaj "g".
+  OSTRZEŻENIE: ABSOLUTNY ZAKAZ używania soczewicy (LENTILS).
   
   Odpowiedz wyłącznie JSON zgodnym ze schematem.`;
 

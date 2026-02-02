@@ -74,24 +74,6 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
     setOpenCategories(prev => ({ ...prev, [catId]: !prev[catId] }));
   };
 
-  useEffect(() => {
-    const totals = (newMeal.ingredients || []).reduce((acc, ing) => {
-      const weight = parseFloat(ing.amount);
-      const product = PRODUCT_DATABASE.find(p => p.name.toLowerCase() === ing.item.toLowerCase());
-      if (product && !isNaN(weight)) {
-        const r = weight / 100;
-        return { cal: acc.cal + (product.calories * r), p: acc.p + (product.protein * r), f: acc.f + (product.fats * r), c: acc.c + (product.carbs * r) };
-      }
-      return acc;
-    }, { cal: 0, p: 0, f: 0, c: 0 });
-    setNewMeal(prev => ({ ...prev, calories: Math.round(totals.cal), protein: Math.round(totals.p), fats: Math.round(totals.f), carbs: Math.round(totals.c) }));
-  }, [newMeal.ingredients]);
-
-  const filteredProducts = useMemo(() => {
-    if (!searchQuery.query) return [];
-    return PRODUCT_DATABASE.filter(p => p.name.toLowerCase().includes(searchQuery.query.toLowerCase())).slice(0, 8);
-  }, [searchQuery.query]);
-
   const handleInsert = () => {
     if (!selectedMeal || !mealPlan) return;
     onUpdateMeal(insertDay, insertType, { ...selectedMeal, type: insertType as any, multiplier: 1 });
@@ -132,20 +114,8 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
                             <h4 className="font-bold text-slate-800 text-sm sm:text-base leading-tight mb-1">{meal.name}</h4>
                             <div className="flex items-center gap-2">
                               <span className="text-[10px] font-black text-emerald-600 uppercase tracking-tighter">{meal.calories} kcal</span>
-                              <span className="text-[9px] text-slate-300 font-bold uppercase">{mealTypeLabels[meal.type]}</span>
                             </div>
                           </div>
-                          {isCustom && <button onClick={(e) => { e.stopPropagation(); onDeleteCustomMeal(meal.name); }} className="p-2 text-slate-200 hover:text-red-500 transition-colors"><Icons.Plus className="rotate-45 w-4 h-4" /></button>}
-                        </div>
-                        
-                        {/* SKŁADNIKI W KARTACH BIBLIOTEKI */}
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                          {meal.ingredients.map((ing, i) => (
-                            <div key={i} className="bg-slate-50/80 border border-slate-100 px-2 py-0.5 rounded-lg flex items-center gap-1">
-                              <span className="text-[9px] text-slate-500 font-medium truncate max-w-[80px]">{ing.item}</span>
-                              <span className="text-[9px] font-black text-emerald-500">{ing.amount}</span>
-                            </div>
-                          ))}
                         </div>
                       </div>
                     );
@@ -157,52 +127,47 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
         })}
       </div>
 
-      {/* MODAL PRZEPISU (Baza/Biblioteka) */}
       {selectedMeal && (
         <div className="fixed inset-0 z-[160] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSelectedMeal(null)}></div>
           <div className="relative bg-white w-full max-w-2xl rounded-3xl overflow-hidden max-h-[90vh] flex flex-col shadow-2xl animate-in zoom-in-95">
             <div className="bg-emerald-600 p-6 text-white shrink-0">
-              <span className="text-[10px] font-black opacity-70 uppercase tracking-widest">Szczegóły posiłku</span>
+              <span className="text-[10px] font-black opacity-70 uppercase tracking-widest">{mealTypeLabels[selectedMeal.type]}</span>
               <h2 className="text-xl sm:text-2xl font-bold leading-tight tracking-tight">{selectedMeal.name}</h2>
               <div className="flex gap-2 mt-3">
                 <span className="bg-white/20 px-3 py-1 rounded-lg text-[10px] font-bold uppercase">{selectedMeal.calories} kcal</span>
-                <span className="bg-white/10 px-3 py-1 rounded-lg text-[10px] font-medium uppercase tracking-tight">B:{selectedMeal.protein}g T:{selectedMeal.fats}g W:{selectedMeal.carbs}g</span>
               </div>
             </div>
             
             <div className="p-6 overflow-y-auto space-y-8">
-              {/* Sekcja Wstawiania do planu */}
               {mealPlan && (
                 <section className="bg-emerald-50 p-5 rounded-2xl border border-emerald-100">
-                  <h3 className="text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-4 flex items-center gap-2"><Icons.Swap className="w-4 h-4"/> Dodaj do jadłospisu</h3>
+                  <h3 className="text-[10px] font-black text-emerald-800 uppercase tracking-widest mb-4">Dodaj do jadłospisu</h3>
                   <div className="grid grid-cols-2 gap-3 mb-4">
                     <div className="space-y-1"><label className="text-[9px] font-bold text-slate-400 uppercase">Który dzień?</label><select value={insertDay} onChange={e => setInsertDay(parseInt(e.target.value))} className="w-full px-3 py-2 bg-white border border-emerald-200 rounded-xl text-sm font-bold outline-none">{[1,2,3,4,5,6,7].map(d => <option key={d} value={d}>Dzień {d}</option>)}</select></div>
                     <div className="space-y-1"><label className="text-[9px] font-bold text-slate-400 uppercase">Jaki posiłek?</label><select value={insertType} onChange={e => setInsertType(e.target.value)} className="w-full px-3 py-2 bg-white border border-emerald-200 rounded-xl text-sm font-bold outline-none">{Object.entries(mealTypeLabels).map(([val, label]) => <option key={val} value={val}>{label}</option>)}</select></div>
                   </div>
-                  <button onClick={handleInsert} className="w-full bg-emerald-600 text-white font-black py-4 rounded-xl text-xs shadow-md active:scale-95 transition-all">POTWIERDŹ DODANIE</button>
+                  <button onClick={handleInsert} className="w-full bg-emerald-600 text-white font-black py-4 rounded-xl text-xs shadow-md">POTWIERDŹ DODANIE</button>
                 </section>
               )}
 
-              {/* Sekcja Przygotowania - Sposób wykonania */}
               <section>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center"><Icons.ChefHat className="w-5 h-5"/></div>
                   <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest">Sposób przygotowania</h3>
                 </div>
-                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-slate-700 text-sm leading-relaxed whitespace-pre-wrap italic">
-                  {selectedMeal.recipe || "Dla tego posiłku nie wprowadzono jeszcze instrukcji przygotowania."}
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-slate-700 text-sm italic">
+                  {selectedMeal.recipe || "Brak instrukcji."}
                 </div>
               </section>
               
-              {/* Podgląd składników (z ilościami) */}
-              <section className="opacity-70">
-                <h3 className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Lista produktów</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <section className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                <h3 className="text-sm font-black text-slate-800 uppercase tracking-widest mb-4">Składniki</h3>
+                <div className="space-y-2">
                   {selectedMeal.ingredients.map((ing, i) => (
-                    <div key={i} className="flex justify-between items-center text-[10px] py-1 border-b border-slate-100">
-                      <span className="text-slate-600">{ing.item}</span>
-                      <span className="font-bold text-slate-800">{ing.amount}</span>
+                    <div key={i} className="flex justify-between items-center py-2 border-b border-slate-200 last:border-0">
+                      <span className="text-sm text-slate-600">{ing.item}</span>
+                      <span className="text-sm font-bold text-emerald-600">{ing.amount}</span>
                     </div>
                   ))}
                 </div>
@@ -210,13 +175,12 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
             </div>
             
             <div className="p-4 border-t border-slate-50 shrink-0">
-              <button onClick={() => setSelectedMeal(null)} className="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl text-sm shadow-xl active:scale-95 transition-all">Zamknij podgląd</button>
+              <button onClick={() => setSelectedMeal(null)} className="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl text-sm active:scale-95 transition-all">Zamknij</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* KALKULATOR NOWEGO DANIA */}
       {isAdding && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsAdding(false)}></div>
@@ -227,8 +191,7 @@ const InspirationsView: React.FC<InspirationsViewProps> = ({
              </div>
              <form onSubmit={(e) => { e.preventDefault(); if (newMeal.name) { onAddCustomMeal(newMeal as Meal); setIsAdding(false); } }} className="p-6 overflow-y-auto space-y-4">
                 <input required placeholder="Nazwa Twojego posiłku..." value={newMeal.name} onChange={e => setNewMeal({...newMeal, name: e.target.value})} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold" />
-                <p className="text-[10px] text-slate-400 font-bold uppercase text-center">Dodaj to danie do swojej bazy, by móc je wybierać w jadłospisie.</p>
-                <button type="submit" className="w-full bg-emerald-600 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all">ZAPISZ W MOJEJ BAZIE</button>
+                <button type="submit" className="w-full bg-emerald-600 text-white font-black py-4 rounded-2xl shadow-lg">ZAPISZ W MOJEJ BAZIE</button>
              </form>
           </div>
         </div>
