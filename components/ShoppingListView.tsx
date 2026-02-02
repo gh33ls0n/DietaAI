@@ -45,25 +45,31 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     let finalVal = val * multiplier;
     const lowerName = itemName.toLowerCase();
 
-    // SPECJALNA LOGIKA JAJEK: g -> szt (55g = 1 szt)
+    // JAJKO: 55g = 1 szt
     if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round((finalVal / 55) * 2) / 2;
       unit = 'szt';
     }
 
-    // SPECJALNA LOGIKA CHLEBA ŻYTNIEGO: g -> kromka (30g = 1 kromka)
+    // CHLEB ŻYTNIE: 30g = 1 kromka
     if (lowerName.includes('chleb') && lowerName.includes('żytn') && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round(finalVal / 30);
       unit = 'kromka';
     }
 
-    // SPECJALNA LOGIKA POMIDORA: g -> szt (160g = 1 szt)
+    // POMIDOR: 160g = 1 szt
     if (lowerName === 'pomidor' && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round((finalVal / 160) * 2) / 2;
       unit = 'szt';
     }
 
-    // SPECJALNA LOGIKA SZYNKI: g -> plastry (20g = 1 plaster)
+    // PAPRYKA: 140g = 1 szt
+    if (lowerName.includes('papryk') && (unit === 'g' || unit === 'gram')) {
+      finalVal = Math.round((finalVal / 140) * 2) / 2;
+      unit = 'szt';
+    }
+
+    // SZYNKA: 20g = 1 plaster
     if (lowerName.includes('szynk') && (lowerName.includes('kurczak') || lowerName.includes('indyk') || lowerName.includes('drobiow')) && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round(finalVal / 20);
       unit = 'plaster';
@@ -87,40 +93,29 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
             // --- INTELIGENTNE MAPOWANIE NAZW ---
             
-            // 1. Chleb żytni (ujednolicenie nazwy i jednostki do kromek)
             if (nameKey.includes('chleb') && nameKey.includes('żytn')) {
               nameKey = 'chleb żytni';
               displayName = 'Chleb żytni';
             }
-            // 2. Grahamka (ZOSTAJE JAKO BUŁKA / SZTUKA)
             else if (nameKey.includes('grahamka')) {
               nameKey = 'grahamka';
               displayName = 'Grahamka (bułka)';
             }
-            // 3. Chleb Graham (kromki)
-            else if (nameKey.includes('chleb') && nameKey.includes('graham')) {
-              nameKey = 'chleb graham';
-              displayName = 'Chleb graham';
-            }
-            // 4. Pomidor (ujednolicenie formy pomidora, pomidory itp.)
             else if (nameKey.startsWith('pomidor')) {
               nameKey = 'pomidor';
               displayName = 'Pomidor';
             }
-            // 5. Szynka drobiowa (ujednolicenie kurczaka/indyka/drobiowej do plastrów)
+            else if (nameKey.includes('papryk')) {
+              nameKey = 'papryka';
+              displayName = 'Papryka (mix kolorów)';
+            }
             else if (nameKey.includes('szynk') && (nameKey.includes('kurczak') || nameKey.includes('indyk') || nameKey.includes('drobiow'))) {
               nameKey = 'szynka drobiowa';
               displayName = 'Szynka drobiowa';
             }
-            // 6. Jajka
             else if (nameKey.includes('jaj') || nameKey.includes('jajo')) {
               nameKey = 'jajka';
               displayName = 'Jajka (rozmiar L)';
-            }
-            // 7. Mozzarella
-            else if (nameKey.includes('mozzarella')) {
-              nameKey = 'mozzarella';
-              displayName = 'Ser Mozzarella';
             }
 
             const { val, unit } = parseAmount(ing.amount, nameKey, mMult);
@@ -172,7 +167,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-      alert("Lista skopiowana! Chleby, pomidory i szynka przeliczone na jednostki domowe.");
     } catch (err) { alert("Błąd kopiowania."); }
   };
 
@@ -186,7 +180,7 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="text-center sm:text-left">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">Lista Zakupów</h2>
-            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicone pomidory, chleb, szynka i grahamki.</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-0.5">Ujednolicone pomidory, papryka, chleb i szynka.</p>
           </div>
           <button 
             onClick={handleCopy}

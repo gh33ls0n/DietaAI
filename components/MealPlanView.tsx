@@ -69,18 +69,27 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     let finalVal = val * mult;
     const lowerName = itemName.toLowerCase();
 
+    // JAJKO
     if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round((finalVal / 55) * 2) / 2;
       unit = 'szt';
     }
+    // CHLEB ŻYTNI
     if (lowerName.includes('chleb') && lowerName.includes('żytn') && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round(finalVal / 30);
       unit = 'kromka';
     }
+    // POMIDOR
     if (lowerName === 'pomidor' && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round((finalVal / 160) * 2) / 2;
       unit = 'szt';
     }
+    // PAPRYKA (1 szt = 140g)
+    if (lowerName.includes('papryk') && (unit === 'g' || unit === 'gram')) {
+      finalVal = Math.round((finalVal / 140) * 2) / 2;
+      unit = 'szt';
+    }
+    // SZYNKA
     if (lowerName.includes('szynk') && (lowerName.includes('kurczak') || lowerName.includes('indyk') || lowerName.includes('drobiow')) && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round(finalVal / 20);
       unit = 'plaster';
@@ -102,6 +111,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     if (unit === 'szt' || unit === 'sztuka') {
       if (lowerName.includes('jaj')) return val * 55;
       if (lowerName.includes('pomidor')) return val * 160;
+      if (lowerName.includes('papryk')) return val * 140;
       if (lowerName.includes('grahamka')) return val * 70;
       return val * 100; // default
     }
@@ -161,7 +171,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     );
 
     if (!originalProduct) {
-      alert("Nie mogę obliczyć zamiennika dla tego produktu - brak w bazie.");
+      alert(`Brak produktu "${originalIng.item}" w bazie - nie mogę obliczyć proporcji zamiennika.`);
       setSwappingIngredient(null);
       return;
     }
@@ -351,7 +361,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                   </button>
                 ))
               ) : (
-                <div className="p-8 text-center text-slate-400 italic">Brak pasujących zamienników w tej samej kategorii.</div>
+                <div className="p-8 text-center text-slate-400 italic">Brak pasujących zamienników w tej samej kategorii w bazie.</div>
               )}
             </div>
             <button onClick={() => setSwappingIngredient(null)} className="m-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl text-xs uppercase tracking-widest">Anuluj</button>
