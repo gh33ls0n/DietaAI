@@ -12,6 +12,8 @@ export enum Gender {
   FEMALE = 'FEMALE'
 }
 
+export type ProductCategory = 'PROTEIN' | 'CARB' | 'DAIRY' | 'FRUIT' | 'VEGETABLE' | 'FAT' | 'OTHER';
+
 export interface UserProfile {
   age: number;
   weight: number;
@@ -38,6 +40,7 @@ export interface Product {
   fats: number;     // per 100g
   carbs: number;    // per 100g
   unit: 'g' | 'ml' | 'szt';
+  category: ProductCategory;
 }
 
 export interface Meal {

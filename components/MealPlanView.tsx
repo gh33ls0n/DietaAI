@@ -1,7 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { WeeklyPlan, DayPlan, Meal, Ingredient } from '../types';
+import { WeeklyPlan, DayPlan, Meal, Ingredient, Product, ProductCategory } from '../types';
 import { Icons } from '../constants';
+import { PRODUCT_DATABASE } from '../services/productDatabase';
 
 interface MealPlanViewProps {
   mealPlan: WeeklyPlan;
@@ -19,6 +20,7 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
   const [selectedDay, setSelectedDay] = useState<number>(1);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [swappingMealType, setSwappingMealType] = useState<string | null>(null);
+  const [swappingIngredient, setSwappingIngredient] = useState<{ mealIndex: number, ingIndex: number } | null>(null);
   
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedMealIndices, setSelectedMealIndices] = useState<number[]>([]);
@@ -67,25 +69,18 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
     let finalVal = val * mult;
     const lowerName = itemName.toLowerCase();
 
-    // 1. Specjalna konwersja dla jajek w gramach (1 jajko = 55g)
     if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round((finalVal / 55) * 2) / 2;
       unit = 'szt';
     }
-
-    // 2. Specjalna konwersja dla chleba żytniego w gramach (1 kromka = 30g)
     if (lowerName.includes('chleb') && lowerName.includes('żytn') && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round(finalVal / 30);
       unit = 'kromka';
     }
-
-    // 3. Specjalna konwersja dla pomidorów w gramach (1 szt = 160g)
     if (lowerName === 'pomidor' && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round((finalVal / 160) * 2) / 2;
       unit = 'szt';
     }
-
-    // 4. Specjalna konwersja dla szynki drobiowej w gramach (1 plaster = 20g)
     if (lowerName.includes('szynk') && (lowerName.includes('kurczak') || lowerName.includes('indyk') || lowerName.includes('drobiow')) && (unit === 'g' || unit === 'gram')) {
       finalVal = Math.round(finalVal / 20);
       unit = 'plaster';
@@ -93,6 +88,27 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
     const displayVal = finalVal % 1 === 0 ? finalVal.toString() : finalVal.toFixed(1).replace('.', ',');
     return `${displayVal} ${unit}`;
+  };
+
+  const parseToGrams = (amount: string, itemName: string): number => {
+    const match = amount.match(/^(\d+\/\d+|\d+(?:[.,]\d+)?)\s*(.*)$/);
+    if (!match) return 0;
+    let val = parseFloat(match[1].replace(',', '.'));
+    const unit = match[2].trim().toLowerCase();
+    const lowerName = itemName.toLowerCase();
+
+    if (unit === 'g' || unit === 'gram' || unit === 'ml') return val;
+    if (unit === 'kromka' || unit === 'kromki') return val * 30;
+    if (unit === 'szt' || unit === 'sztuka') {
+      if (lowerName.includes('jaj')) return val * 55;
+      if (lowerName.includes('pomidor')) return val * 160;
+      if (lowerName.includes('grahamka')) return val * 70;
+      return val * 100; // default
+    }
+    if (unit === 'plaster' || unit === 'plastry') return val * 20;
+    if (unit === 'łyżka' || unit === 'łyżki') return val * 15;
+    if (unit === 'łyżeczka' || unit === 'łyżeczki') return val * 5;
+    return val;
   };
 
   const handleApplyCopy = () => {
@@ -131,6 +147,75 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
       onUpdateMeal(selectedDay, mealType, { ...meal, multiplier: newMult });
     }
   };
+
+  const handleIngredientSwap = (substituteProduct: Product) => {
+    if (!swappingIngredient) return;
+    const { mealIndex, ingIndex } = swappingIngredient;
+    const meal = currentDayPlan.meals[mealIndex];
+    const originalIng = meal.ingredients[ingIndex];
+    
+    // Znajdź produkt oryginalny w bazie by znać jego kaloryczność
+    const originalProduct = PRODUCT_DATABASE.find(p => 
+      originalIng.item.toLowerCase().includes(p.name.toLowerCase()) || 
+      p.name.toLowerCase().includes(originalIng.item.toLowerCase())
+    );
+
+    if (!originalProduct) {
+      alert("Nie mogę obliczyć zamiennika dla tego produktu - brak w bazie.");
+      setSwappingIngredient(null);
+      return;
+    }
+
+    const originalWeight = parseToGrams(originalIng.amount, originalIng.item);
+    const originalCals = (originalWeight / 100) * originalProduct.calories;
+
+    // Oblicz nową wagę zamiennika by utrzymać te same kalorie
+    const newWeight = (originalCals * 100) / substituteProduct.calories;
+    const newAmount = `${Math.round(newWeight)}${substituteProduct.unit}`;
+
+    // Stwórz nową listę składników
+    const newIngredients = [...meal.ingredients];
+    newIngredients[ingIndex] = { item: substituteProduct.name, amount: newAmount };
+
+    // Przelicz makra całego posiłku na podstawie składników
+    let totalCals = 0, totalP = 0, totalF = 0, totalC = 0;
+    newIngredients.forEach(ing => {
+      const p = PRODUCT_DATABASE.find(p => ing.item.toLowerCase().includes(p.name.toLowerCase()));
+      const w = parseToGrams(ing.amount, ing.item);
+      if (p) {
+        totalCals += (w / 100) * p.calories;
+        totalP += (w / 100) * p.protein;
+        totalF += (w / 100) * p.fats;
+        totalC += (w / 100) * p.carbs;
+      }
+    });
+
+    const updatedMeal: Meal = {
+      ...meal,
+      ingredients: newIngredients,
+      calories: Math.round(totalCals),
+      protein: Math.round(totalP),
+      fats: Math.round(totalF),
+      carbs: Math.round(totalC)
+    };
+
+    onUpdateMeal(selectedDay, meal.type, updatedMeal);
+    setSwappingIngredient(null);
+  };
+
+  const ingredientSubstituteOptions = useMemo(() => {
+    if (!swappingIngredient) return [];
+    const meal = currentDayPlan.meals[swappingIngredient.mealIndex];
+    const ing = meal.ingredients[swappingIngredient.ingIndex];
+    
+    const matchedProduct = PRODUCT_DATABASE.find(p => 
+      ing.item.toLowerCase().includes(p.name.toLowerCase()) || 
+      p.name.toLowerCase().includes(ing.item.toLowerCase())
+    );
+
+    if (!matchedProduct) return [];
+    return PRODUCT_DATABASE.filter(p => p.category === matchedProduct.category && p.name !== matchedProduct.name);
+  }, [swappingIngredient, currentDayPlan]);
 
   const swappableMeals = useMemo(() => {
     if (!swappingMealType) return [];
@@ -192,12 +277,12 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
 
         {/* LISTA POSIŁKÓW W JADŁOSPISIE */}
         <div className="space-y-4 pb-24 lg:pb-0">
-          {currentDayPlan.meals.map((meal, idx) => {
+          {currentDayPlan.meals.map((meal, mealIdx) => {
             const mMult = meal.multiplier ?? 1;
             return (
-              <div key={idx} onClick={() => isSelectionMode ? toggleMealSelection(idx) : setSelectedMeal(meal)} className={`bg-white rounded-3xl border p-5 shadow-sm transition-all cursor-pointer group ${isSelectionMode && selectedMealIndices.includes(idx) ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-100 hover:border-slate-200'}`}>
+              <div key={mealIdx} onClick={() => isSelectionMode ? toggleMealSelection(mealIdx) : setSelectedMeal(meal)} className={`bg-white rounded-3xl border p-5 shadow-sm transition-all cursor-pointer group ${isSelectionMode && selectedMealIndices.includes(mealIdx) ? 'border-emerald-500 bg-emerald-50/50' : 'border-slate-100 hover:border-slate-200'}`}>
                 <div className="flex items-start gap-4">
-                  {isSelectionMode && <div className={`mt-1 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${selectedMealIndices.includes(idx) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 bg-white'}`}>{selectedMealIndices.includes(idx) && <Icons.Check className="w-4 h-4" />}</div>}
+                  {isSelectionMode && <div className={`mt-1 w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${selectedMealIndices.includes(mealIdx) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-200 bg-white'}`}>{selectedMealIndices.includes(mealIdx) && <Icons.Check className="w-4 h-4" />}</div>}
                   <div className="flex-grow min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-[9px] font-black text-emerald-600 uppercase bg-emerald-50 px-2 py-0.5 rounded-lg">{mealTypeLabels[meal.type]}</span>
@@ -206,10 +291,19 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
                     <h4 className="text-lg font-bold text-slate-800 mb-3">{meal.name}</h4>
                     
                     <div className="flex flex-wrap gap-1.5 mb-4">
-                      {meal.ingredients.map((ing, i) => (
-                        <div key={i} className="bg-slate-50 border border-slate-100 px-2 py-1 rounded-lg flex items-center gap-1.5">
+                      {meal.ingredients.map((ing, ingIdx) => (
+                        <div key={ingIdx} className="bg-slate-50 border border-slate-100 px-2 py-1 rounded-lg flex items-center gap-1.5 group/ing relative">
                           <span className="text-[10px] text-slate-600 font-medium">{ing.item}</span>
                           <span className="text-[10px] font-black text-emerald-600">{formatAmount(ing.amount, ing.item, mMult)}</span>
+                          {!isSelectionMode && (
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setSwappingIngredient({ mealIndex: mealIdx, ingIndex: ingIdx }); }} 
+                              className="ml-1 text-slate-300 hover:text-emerald-500 transition-colors"
+                              title="Zamień składnik"
+                            >
+                              <Icons.Swap className="w-3 h-3" />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -232,7 +326,40 @@ const MealPlanView: React.FC<MealPlanViewProps> = ({
         </div>
       </div>
 
-      {/* MODAL WYMIANY */}
+      {/* MODAL ZAMIANY SKŁADNIKA */}
+      {swappingIngredient && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSwappingIngredient(null)}></div>
+          <div className="relative bg-white w-full max-w-lg rounded-3xl overflow-hidden max-h-[80vh] flex flex-col shadow-2xl animate-in slide-in-from-bottom-4">
+            <div className="p-6 border-b border-slate-100">
+              <h2 className="text-xl font-bold text-slate-800">Czym zastąpić?</h2>
+              <p className="text-xs text-slate-400 mt-1">Zamiennik zostanie automatycznie przeliczony wagowo, by zachować tę samą kaloryczność.</p>
+            </div>
+            <div className="p-4 overflow-y-auto space-y-2">
+              {ingredientSubstituteOptions.length > 0 ? (
+                ingredientSubstituteOptions.map((prod, idx) => (
+                  <button 
+                    key={idx} 
+                    onClick={() => handleIngredientSwap(prod)}
+                    className="w-full flex items-center justify-between p-4 rounded-2xl border border-slate-50 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left"
+                  >
+                    <div>
+                      <span className="block font-bold text-slate-800">{prod.name}</span>
+                      <span className="text-[10px] text-slate-400 font-bold uppercase">{prod.calories} kcal / 100g</span>
+                    </div>
+                    <Icons.Plus className="text-emerald-500" />
+                  </button>
+                ))
+              ) : (
+                <div className="p-8 text-center text-slate-400 italic">Brak pasujących zamienników w tej samej kategorii.</div>
+              )}
+            </div>
+            <button onClick={() => setSwappingIngredient(null)} className="m-4 py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl text-xs uppercase tracking-widest">Anuluj</button>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL WYMIANY CAŁEGO POSIŁKU */}
       {swappingMealType && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setSwappingMealType(null)}></div>
