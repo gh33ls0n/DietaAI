@@ -15,7 +15,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
 
   const dayNames = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota', 'Niedziela'];
 
-  // Normalizacja nazw jednostek dla lepszego sumowania
   const normalizeUnit = (unit: string): string => {
     const u = unit.toLowerCase().trim().replace('.', '');
     if (['szt', 'sztuki', 'sztuka', 'jajko', 'jajka'].includes(u)) return 'szt';
@@ -43,10 +42,8 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
     let unit = normalizeUnit(match[2]);
     let finalVal = val * multiplier;
 
-    // SPECJALNA LOGIKA DLA JAJEK: Jeśli są w gramach, zamień na sztuki (1 jajko = 55g)
     const lowerName = itemName.toLowerCase();
     if ((lowerName.includes('jaj') || lowerName.includes('jajo')) && (unit === 'g' || unit === 'gram')) {
-      // Przelicznik: 1 jajko = 55g, zaokrąglamy do połówek
       finalVal = Math.round((finalVal / 55) * 2) / 2;
       unit = 'szt';
     }
@@ -67,9 +64,9 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
             let nameKey = rawName;
             let displayName = ing.item;
 
-            // --- INTELIGENTNE MAPOWANIE NAZW ---
-            // Ujednolicenie chleba żytniego
-            if (nameKey.includes('chleb żytni')) {
+            // --- INTELIGENTNE MAPOWANIE NAZW (ROZSZERZONE) ---
+            // Ujednolicenie chleba żytniego (obsługa odmiany: chleb, chleba, chlebem + przymiotniki)
+            if (nameKey.includes('chleb') && nameKey.includes('żytn')) {
               nameKey = 'chleb żytni';
               displayName = 'Chleb żytni';
             }
@@ -90,8 +87,6 @@ const ShoppingListView: React.FC<ShoppingListViewProps> = ({ mealPlan }) => {
             }
 
             const { val, unit } = parseAmount(ing.amount, nameKey, mMult);
-
-            // Klucz agregacji uwzględnia nazwę i jednostkę (żeby nie sumować g i szt)
             const aggKey = `${nameKey}_${unit}`;
             
             if (!totals[aggKey]) {

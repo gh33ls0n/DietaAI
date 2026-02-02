@@ -7,7 +7,7 @@ export const BREAKFAST_MEALS: Meal[] = [
     calories: 340, protein: 28, fats: 8, carbs: 42,
     type: "breakfast",
     ingredients: [
-      { item: "Chleb żytni pełnoziarnisty", amount: "2 kromki" },
+      { item: "Chleb żytni", amount: "2 kromki" },
       { item: "Tuńczyk (puszka)", amount: "80g" },
       { item: "Kukurydza konserwowa", amount: "2 łyżki" },
       { item: "Jogurt naturalny", amount: "1 łyżka" }

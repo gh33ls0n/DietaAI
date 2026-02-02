@@ -14,7 +14,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 590, protein: 38, fats: 22, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Indyk mielony", amount: "150g" }, { item: "Ziemniaki", amount: "140g" }, { item: "Cebula czerwona", amount: "80g" }, { item: "Jogurt naturalny", amount: "40g" }, { item: "Majonez light", amount: "20g" }, { item: "Miks sałat", amount: "50g" }],
-    recipe: "1. Ziemniaki pokroić w słupki, piec 25-30 min w 200°C. 2. Mięso wymieszać z posiekaną cebulą, czosnkiem i przyprawą gyros. 3. Formować burgera, smażyć 4-5 min z każdej strony. 4. Surówkę przygotować z marchwi, sałaty, jogurtu i majonezu. 5. Podać razem."
+    recipe: "1. Ziemniaki pokroić in słupki, piec 25-30 min w 200°C. 2. Mięso wymieszać z posiekaną cebulą, czosnkiem i przyprawą gyros. 3. Formować burgera, smażyć 4-5 min z każdej strony. 4. Surówkę przygotować z marchwi, sałaty, jogurtu i majonezu. 5. Podać razem."
   },
   {
     name: "Duszona wołowina z warzywami i kaszą",
@@ -112,7 +112,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 640, protein: 32, fats: 32, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Pinsa", amount: "220g" }, { item: "Sos pomidorowy", amount: "200g" }, { item: "Szynka Serrano", amount: "100g" }, { item: "Burrata", amount: "120g" }, { item: "Mozzarella", amount: "120g" }],
-    recipe: "1. Pinsę smarować sosem, kłaść mozzarellę i cebulę. 2. Piecz 10-12 min w 220°C. 3. Na gorącą położyć szynkę i burratę."
+    recipe: "1. Pinsę smarować sosem, kłaść mozzarellę i cebulę. 2. Piecz 10-12 min in 220°C. 3. Na gorącą położyć szynkę i burratę."
   },
   {
     name: "Polędwica wołowa z sosem balsamicznym i puree",
@@ -133,7 +133,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 560, protein: 36, fats: 22, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Batat", amount: "400g" }, { item: "Pierś indyka", amount: "150g" }, { item: "Miks sałat", amount: "100g" }, { item: "Migdały", amount: "30g" }, { item: "Musztarda", amount: "15g" }],
-    recipe: "1. Bataty piecz 20-25 min w 200°C. 2. Indyka smażyć 5-7 min w kostce. 3. Zrobić sos z musztardy, syropu, cytryny i oliwy. 4. Wszystko wymieszać, sypać migdałami."
+    recipe: "1. Bataty piecz 20-25 min in 200°C. 2. Indyka smażyć 5-7 min in kostce. 3. Zrobić sos z musztardy, syropu, cytryny i oliwy. 4. Wszystko wymieszać, sypać migdałami."
   },
   {
     name: "Schab pieczony z morelami i jabłkiem",
@@ -175,21 +175,21 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 690, protein: 44, fats: 32, carbs: 60,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "300g" }, { item: "Ryż jaśminowy", amount: "60g" }, { item: "Jogurt", amount: "100g" }, { item: "Passata", amount: "200g" }, { item: "Śmietanka 12%", amount: "108g" }, { item: "Masło", amount: "30g" }],
-    recipe: "1. Kurczaka marynować w jogurcie i przyprawach (min 1h). 2. Smażyć cebulę na maśle, dodać passatę i przyprawy. 3. Kurczaka smażyć osobno i dodać do sosu. 4. Wlać śmietankę, dusić 5 min. 5. Podać z ryżem."
+    recipe: "1. Kurczaka marynować in jogurcie i przyprawach (min 1h). 2. Smażyć cebulę na maśle, dodać passatę i przyprawy. 3. Kurczaka smażyć osobno i dodać do sosu. 4. Wlać śmietankę, dusić 5 min. 5. Podać z ryżem."
   },
   {
     name: "Curry z kurczakiem i ziemniakami",
     calories: 630, protein: 40, fats: 28, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "400g" }, { item: "Ziemniaki", amount: "490g" }, { item: "Mleczko kokosowe", amount: "400g" }, { item: "Pomidory puszka", amount: "400g" }, { item: "Pasta curry", amount: "20g" }],
-    recipe: "1. Mięso obsmażyć i odłożyć. 2. Ziemniaki i fasolkę gotować w bulionie i mleczku 20 min. 3. Dodać mięso, szpinak i groszek, gotować 5 min. 4. Posypać kolendrą."
+    recipe: "1. Mięso obsmażyć i odłożyć. 2. Ziemniaki i fasolkę gotować in bulionie i mleczku 20 min. 3. Dodać mięso, szpinak i groszek, gotować 5 min. 4. Posypać kolendrą."
   },
   {
     name: "Grochówka z kurczakiem",
     calories: 550, protein: 42, fats: 14, carbs: 68,
     type: "lunch",
     ingredients: [{ item: "Groch", amount: "200g" }, { item: "Pierś kurczaka", amount: "400g" }, { item: "Ziemniaki", amount: "280g" }, { item: "Cebula", amount: "80g" }, { item: "Bulion", amount: "1000ml" }],
-    recipe: "1. Groch gotować 45 min. 2. Warzywa i mięso w kostkę smażyć na oleju 5 min. 3. Połączyć z grochem, gotować 20 min. 4. Dodać majeranek pod koniec."
+    recipe: "1. Groch gotować 45 min. 2. Warzywa i mięso in kostkę smażyć na oleju 5 min. 3. Połączyć z grochem, gotować 20 min. 4. Dodać majeranek pod koniec."
   },
   {
     name: "Kremowa polenta z kurczakiem i pieczarkami",
@@ -203,14 +203,14 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 580, protein: 38, fats: 26, carbs: 52,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "175g" }, { item: "Ryż basmati", amount: "80g" }, { item: "Orzechy nerkowca", amount: "20g" }, { item: "Papryka czerwona", amount: "85g" }, { item: "Cukinia", amount: "100g" }],
-    recipe: "1. Kurczaka marynować w sosie sojowym. 2. Smażyć mięso, odłożyć. 3. Smażyć warzywa 2 min. 4. Dodać mięso, nerkowce i sos ze skrobią, smażyć do zgęstnienia. 5. Podawać z ryżem."
+    recipe: "1. Kurczaka marynować in sosie sojowym. 2. Smażyć mięso, odłożyć. 3. Smażyć warzywa 2 min. 4. Dodać mięso, nerkowce i sos ze skrobią, smażyć do zgęstnienia. 5. Podawać z ryżem."
   },
   {
     name: "Kurczak na parze z puree z dyni",
     calories: 450, protein: 34, fats: 10, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "200g" }, { item: "Ryż biały", amount: "80g" }, { item: "Dynia", amount: "150g" }, { item: "Masło", amount: "5g" }],
-    recipe: "1. Kurczaka parować 20 min w ziołach. 2. Dynię ugotować w małej wodzie 15 min, rozgnieść z masłem. 3. Podawać z ryżem i natką."
+    recipe: "1. Kurczaka parować 20 min in ziołach. 2. Dynię ugotować in małej wodzie 15 min, rozgnieść z masłem. 3. Podawać z ryżem i natką."
   },
   {
     name: "Kurczak z puree z kalafiora",
@@ -220,7 +220,7 @@ export const LUNCH_MEALS: Meal[] = [
     recipe: "1. Kurczaka parować 20 min. 2. Kalafior i ziemniaki gotować 15 min, zblendować z masłem i jogurtem. 3. Przyprawić gałką muszkatołową."
   },
   {
-    name: "Makaron z kurczakiem i cukinią w śmietance",
+    name: "Makaron z kurczakiem i cukinią in śmietance",
     calories: 570, protein: 38, fats: 18, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Makaron", amount: "150g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Cukinia", amount: "200g" }, { item: "Śmietanka 12%", amount: "144g" }],
@@ -238,7 +238,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 620, protein: 42, fats: 34, carbs: 40,
     type: "lunch",
     ingredients: [{ item: "Udka kurczaka b/s", amount: "320g" }, { item: "Ziemniaki", amount: "490g" }, { item: "Młoda kapusta", amount: "500g" }, { item: "Oliwa", amount: "20g" }],
-    recipe: "1. Mięso marynować w oliwie i papryce, piec 45 min w 200°C. 2. Ziemniaki ugotować. 3. Kapustę dusić z cebulą i koperkiem 20 min. 4. Podawać razem."
+    recipe: "1. Mięso marynować in oliwie i papryce, piec 45 min in 200°C. 2. Ziemniaki ugotować. 3. Kapustę dusić z cebulą i koperkiem 20 min. 4. Podawać razem."
   },
   {
     name: "Kurczak z ryżem i mrożonką meksykańską",
@@ -252,7 +252,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 510, protein: 28, fats: 18, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Indyk mielony", amount: "150g" }, { item: "Batat", amount: "200g" }, { item: "Cukinia", amount: "100g" }, { item: "Passata", amount: "375g" }],
-    recipe: "1. Mięso smażyć do sypkości 7 min. 2. Dodać bataty i cukinię w kostkę. 3. Wlać passatę, dusić 20 min pod przykryciem."
+    recipe: "1. Mięso smażyć do sypkości 7 min. 2. Dodać bataty i cukinię in kostkę. 3. Wlać passatę, dusić 20 min pod przykryciem."
   },
   {
     name: "Risotto z kurkami i indykiem",
@@ -266,10 +266,10 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 480, protein: 34, fats: 14, carbs: 56,
     type: "lunch",
     ingredients: [{ item: "Kasza jaglana", amount: "70g" }, { item: "Pierś kurczaka", amount: "125g" }, { item: "Jogurt naturalny", amount: "80g" }, { item: "Kukurydza", amount: "120g" }],
-    recipe: "1. Kaszę ugotować. 2. Kurczaka parować 20 min, pokroić w kostkę. 3. Wymieszać z warzywami, jogurtem i majonezem."
+    recipe: "1. Kaszę ugotować. 2. Kurczaka parować 20 min, pokroić in kostkę. 3. Wymieszać z warzywami, jogurtem i majonezem."
   },
   {
-    name: "Schab w sosie paprykowym z ryżem",
+    name: "Schab in sosie paprykowym z ryżem",
     calories: 610, protein: 44, fats: 18, carbs: 70,
     type: "lunch",
     ingredients: [{ item: "Ryż basmati", amount: "100g" }, { item: "Schab wieprzowy", amount: "300g" }, { item: "Papryka czerwona", amount: "170g" }, { item: "Cukinia", amount: "200g" }],
@@ -294,28 +294,28 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 460, protein: 38, fats: 14, carbs: 42,
     type: "lunch",
     ingredients: [{ item: "Polędwica wołowa", amount: "150g" }, { item: "Ziemniaki", amount: "140g" }, { item: "Marchewka", amount: "80g" }, { item: "Bulion", amount: "500g" }],
-    recipe: "1. Mięso gotować 30 min w bulionie. 2. Dodać warzywa, gotować 20 min. 3. Dodać koncentrat, gotować 10 min."
+    recipe: "1. Mięso gotować 30 min in bulionie. 2. Dodać warzywa, gotować 20 min. 3. Dodać koncentrat, gotować 10 min."
   },
   {
     name: "Wrapy z kurczakiem i czosnkiem",
     calories: 490, protein: 34, fats: 15, carbs: 55,
     type: "lunch",
     ingredients: [{ item: "Tortilla", amount: "60g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Papryka", amount: "85g" }, { item: "Jogurt", amount: "60g" }],
-    recipe: "1. Kurczaka w przyprawach usmażyć. 2. Zrobić sos z jogurtu i czosnku. 3. Tortillę podgrzać, zawinąć mięso z warzywami i sosem."
+    recipe: "1. Kurczaka in przyprawach usmażyć. 2. Zrobić sos z jogurtu i czosnku. 3. Tortillę podgrzać, zawinąć mięso z warzywami i sosem."
   },
   {
     name: "Zupa krem z kukurydzy i kurczaka",
     calories: 410, protein: 28, fats: 12, carbs: 50,
     type: "lunch",
     ingredients: [{ item: "Kukurydza", amount: "240g" }, { item: "Ziemniaki", amount: "210g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Bulion", amount: "500g" }],
-    recipe: "1. Kurczaka usmażyć. 2. Warzywa gotować w bulionie 15 min. 3. Część zblendować, połączyć z mięsem i resztą zupy."
+    recipe: "1. Kurczaka usmażyć. 2. Warzywa gotować in bulionie 15 min. 3. Część zblendować, połączyć z mięsem i resztą zupy."
   },
   {
-    name: "Hot dogi w cieście francuskim",
+    name: "Hot dogi in cieście francuskim",
     calories: 670, protein: 32, fats: 40, carbs: 48,
     type: "lunch",
     ingredients: [{ item: "Ciasto francuskie", amount: "275g" }, { item: "Frankfurterki", amount: "336g" }, { item: "Mozzarella", amount: "75g" }],
-    recipe: "1. Ciasto smarować ketchupem, sypać serem. 2. Zawijać kiełbaski, piec 15-20 min w 200°C."
+    recipe: "1. Ciasto smarować ketchupem, sypać serem. 2. Zawijać kiełbaski, piec 15-20 min in 200°C."
   },
   {
     name: "Indyk z botwinką i pęczakiem",
@@ -353,11 +353,11 @@ export const LUNCH_MEALS: Meal[] = [
     recipe: "1. Warzywa gotować 20 min, zblendować. 2. Mięso ugotować osobno, pokroić, dodać do kremu."
   },
   {
-    name: "Lekkostrawny kurczak w pomidorach",
+    name: "Lekkostrawny kurczak in pomidorach",
     calories: 410, protein: 34, fats: 10, carbs: 44,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "200g" }, { item: "Passata", amount: "200g" }, { item: "Włoszczyzna", amount: "130g" }],
-    recipe: "1. Mięso i warzywa dusić w bulionie i passacie 20 min. 2. Podawać z pszennym pieczywem."
+    recipe: "1. Mięso i warzywa dusić in bulionie i passacie 20 min. 2. Podawać z pszennym pieczywem."
   },
   {
     name: "Makaron ze szparagami i pesto bazyliowym",
@@ -378,10 +378,10 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 520, protein: 38, fats: 18, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Indyk mielony", amount: "500g" }, { item: "Makaron", amount: "200g" }, { item: "Cukinia", amount: "200g" }],
-    recipe: "1. Robić pulpety, parować 20 min. 2. Cukinię dusić w bulionie, zblendować na sos."
+    recipe: "1. Robić pulpety, parować 20 min. 2. Cukinię dusić in bulionie, zblendować na sos."
   },
   {
-    name: "Pulpety z indyka w sosie koperkowym",
+    name: "Pulpety z indyka in sosie koperkowym",
     calories: 540, protein: 40, fats: 22, carbs: 52,
     type: "lunch",
     ingredients: [{ item: "Kuskus", amount: "150g" }, { item: "Indyk mielony", amount: "500g" }, { item: "Groszek", amount: "150g" }],
@@ -406,14 +406,14 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 450, protein: 34, fats: 12, carbs: 48,
     type: "lunch",
     ingredients: [{ item: "Pierś indyka", amount: "200g" }, { item: "Brokuł", amount: "200g" }, { item: "Marchewka", amount: "160g" }],
-    recipe: "1. Ugotowane składniki pokroić w kostkę. 2. Wymieszać z jogurtem i ziołami."
+    recipe: "1. Ugotowane składniki pokroić in kostkę. 2. Wymieszać z jogurtem i ziołami."
   },
   {
     name: "Tortilla z gotowanym kurczakiem i puree z dyni",
     calories: 510, protein: 32, fats: 14, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Tortilla", amount: "120g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Dynia", amount: "200g" }],
-    recipe: "1. Kurczaka ugotować w bulionie. 2. Zrobić puree z dyni. 3. Zawinąć z sałatą."
+    recipe: "1. Kurczaka ugotować in bulionie. 2. Zrobić puree z dyni. 3. Zawinąć z sałatą."
   },
   {
     name: "Tortilla z kurczakiem i botwinką",
@@ -434,14 +434,14 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 440, protein: 30, fats: 12, carbs: 50,
     type: "lunch",
     ingredients: [{ item: "Seler naciowy", amount: "315g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Jogurt grecki", amount: "100g" }],
-    recipe: "1. Kurczaka usmażyć. 2. Seler dusić w bulionie, zblendować. 3. Podać z grzankami."
+    recipe: "1. Kurczaka usmażyć. 2. Seler dusić in bulionie, zblendować. 3. Podać z grzankami."
   },
   {
     name: "Zupa szpinakowa z kurczakiem",
     calories: 460, protein: 32, fats: 16, carbs: 44,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "200g" }, { item: "Szpinak", amount: "100g" }, { item: "Mleczko kokosowe", amount: "200g" }],
-    recipe: "1. Mięso i marchew gotować w bulionie. 2. Wlać mleczko, dodać szpinak na 2 min."
+    recipe: "1. Mięso i marchew gotować in bulionie. 2. Wlać mleczko, dodać szpinak na 2 min."
   },
   {
     name: "Zupa z młodej kapusty z chorizo",
@@ -455,10 +455,10 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 610, protein: 42, fats: 16, carbs: 72,
     type: "lunch",
     ingredients: [{ item: "Indyk mielony", amount: "300g" }, { item: "Ryż", amount: "100g" }, { item: "Tortilla", amount: "120g" }, { item: "Passata", amount: "350g" }],
-    recipe: "1. Mięso dusić z ryżem i passatą. 2. Zawijać w tortillę z serem, zapiekać."
+    recipe: "1. Mięso dusić z ryżem i passatą. 2. Zawijać in tortillę z serem, zapiekać."
   },
   {
-    name: "Kanapka w stylu Big Mac",
+    name: "Kanapka in stylu Big Mac",
     calories: 680, protein: 48, fats: 34, carbs: 45,
     type: "lunch",
     ingredients: [{ item: "Bułki", amount: "140g" }, { item: "Wołowina mielona", amount: "300g" }, { item: "Kapusta pekińska", amount: "100g" }],
@@ -476,28 +476,28 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 540, protein: 40, fats: 16, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Komosa ryżowa", amount: "100g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Brokuł", amount: "100g" }],
-    recipe: "1. Mięso marynować w teriyaki, smażyć 7 min. 2. Smażyć warzywa 4 min. 3. Podać na komosie."
+    recipe: "1. Mięso marynować in teriyaki, smażyć 7 min. 2. Smażyć warzywa 4 min. 3. Podać na komosie."
   },
   {
     name: "Lekka sałatka ziemniaczana",
     calories: 420, protein: 32, fats: 12, carbs: 46,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "150g" }, { item: "Ziemniaki", amount: "140g" }, { item: "Ogórek", amount: "75g" }],
-    recipe: "1. Ziemniaki ugotować w plastrach. 2. Mięso grillować. 3. Mieszaj z sosem jogurtowym."
+    recipe: "1. Ziemniaki ugotować in plastrach. 2. Mięso grillować. 3. Mieszaj z sosem jogurtowym."
   },
   {
     name: "Lekkostrawna zupa jarzynowa",
     calories: 390, protein: 30, fats: 10, carbs: 44,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "150g" }, { item: "Marchewka", amount: "160g" }, { item: "Ziemniaki", amount: "210g" }],
-    recipe: "1. Gotować wszystko w bulionie 30 min. 2. Dodać cukinię na koniec. 3. Posypać natką."
+    recipe: "1. Gotować wszystko in bulionie 30 min. 2. Dodać cukinię na koniec. 3. Posypać natką."
   },
   {
     name: "Makaron z kurczakiem i cukinią",
     calories: 550, protein: 42, fats: 14, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Makaron", amount: "150g" }, { item: "Pierś kurczaka", amount: "300g" }, { item: "Cukinia", amount: "200g" }],
-    recipe: "1. Mięso i warzywa piec 20 min w 200°C. 2. Mieszaj z makaronem i sosem jogurtowym."
+    recipe: "1. Mięso i warzywa piec 20 min in 200°C. 2. Mieszaj z makaronem i sosem jogurtowym."
   },
   {
     name: "Naleśniki z cukinią i indykiem",
@@ -511,10 +511,10 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 590, protein: 40, fats: 32, carbs: 36,
     type: "lunch",
     ingredients: [{ item: "Udko kurczaka", amount: "200g" }, { item: "Ziemniaki", amount: "210g" }, { item: "Marchewka", amount: "160g" }],
-    recipe: "1. Piec w rękawie 60 min w 190°C z przyprawami i odrobiną wody."
+    recipe: "1. Piec in rękawie 60 min in 190°C z przyprawami i odrobiną wody."
   },
   {
-    name: "Pulpeciki z indyka w sosie marchewkowym",
+    name: "Pulpeciki z indyka in sosie marchewkowym",
     calories: 470, protein: 36, fats: 14, carbs: 50,
     type: "lunch",
     ingredients: [{ item: "Kasza jaglana", amount: "100g" }, { item: "Indyk mielony", amount: "400g" }, { item: "Marchew", amount: "160g" }],
@@ -570,7 +570,7 @@ export const LUNCH_MEALS: Meal[] = [
     recipe: "1. Kluski z tartych ziemniaków i mąki gotować 3 min. 2. Podać z twarogiem i skwarkami."
   },
   {
-    name: "Tortilla w stylu McWrapa",
+    name: "Tortilla in stylu McWrapa",
     calories: 560, protein: 38, fats: 22, carbs: 50,
     type: "lunch",
     ingredients: [{ item: "Tortilla", amount: "120g" }, { item: "Pierś kurczaka", amount: "300g" }, { item: "Mozzarella", amount: "60g" }],
@@ -591,11 +591,11 @@ export const LUNCH_MEALS: Meal[] = [
     recipe: "1. Paprykę upiec i obrać. 2. Gotować z ziemniakami 15 min, zblendować. 3. Podać z kurczakiem i grzankami."
   },
   {
-    name: "Fit Kebab w tortilli",
+    name: "Fit Kebab in tortilli",
     calories: 610, protein: 42, fats: 20, carbs: 64,
     type: "lunch",
     ingredients: [{ item: "Tortilla", amount: "180g" }, { item: "Pierś kurczaka", amount: "250g" }, { item: "Jogurt", amount: "150g" }],
-    recipe: "1. Mięso w przyprawie kebab smażyć. 2. Zawijać z kapustą, cebulą i sosem czosnkowym."
+    recipe: "1. Mięso in przyprawie kebab smażyć. 2. Zawijać z kapustą, cebulą i sosem czosnkowym."
   },
   {
     name: "Gulasz z indyka z dynią i ryżem",
@@ -609,14 +609,14 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 510, protein: 34, fats: 14, carbs: 60,
     type: "lunch",
     ingredients: [{ item: "Makaron", amount: "50g" }, { item: "Ciecierzyca", amount: "120g" }, { item: "Polędwica wołowa", amount: "125g" }],
-    recipe: "1. Smażyć mięso z warzywami. 2. Gotować w bulionie z pomidorami do miękkości. 3. Dodać ciecierzycę na koniec."
+    recipe: "1. Smażyć mięso z warzywami. 2. Gotować in bulionie z pomidorami do miękkości. 3. Dodać ciecierzycę na koniec."
   },
   {
     name: "Zupa grzybowa z kurczakiem",
     calories: 440, protein: 30, fats: 18, carbs: 40,
     type: "lunch",
     ingredients: [{ item: "Grzyby", amount: "200g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Śmietana 18%", amount: "100g" }],
-    recipe: "1. Smażyć grzyby i mięso. 2. Gotować w bulionie 15 min. 3. Hartować śmietanę, podawać z chlebem."
+    recipe: "1. Smażyć grzyby i mięso. 2. Gotować in bulionie 15 min. 3. Hartować śmietanę, podawać z chlebem."
   },
   {
     name: "Makaron szpinakowy z gorgonzolą",
@@ -630,7 +630,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 580, protein: 34, fats: 24, carbs: 60,
     type: "lunch",
     ingredients: [{ item: "Makaron udon", amount: "500g" }, { item: "Indyk mielony", amount: "300g" }, { item: "Sezam", amount: "10g" }],
-    recipe: "1. Mięso smażyć do brązowości. 2. Smażyć warzywa w słupki. 3. Połączyć wszystko z noodle i sosem sojowym."
+    recipe: "1. Mięso smażyć do brązowości. 2. Smażyć warzywa in słupki. 3. Połączyć wszystko z noodle i sosem sojowym."
   },
   {
     name: "Pieczone udka z jabłkami",
@@ -651,17 +651,17 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 540, protein: 44, fats: 18, carbs: 42,
     type: "lunch",
     ingredients: [{ item: "Indyk mielony", amount: "250g" }, { item: "Panierka Panko", amount: "40g" }, { item: "Pesto", amount: "20g" }],
-    recipe: "1. Mięso rozwałkować, nadziać serem i szpinakiem. 2. Posypać Panko, piec w airfryer 15 min."
+    recipe: "1. Mięso rozwałkować, nadziać serem i szpinakiem. 2. Posypać Panko, piec in airfryer 15 min."
   },
   {
     name: "Pulpety drobiowe z suszonymi pomidorami",
     calories: 560, protein: 38, fats: 20, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Kasza jaglana", amount: "200g" }, { item: "Kurczak mielony", amount: "500g" }, { item: "Suszone pomidory", amount: "120g" }],
-    recipe: "1. Robić pulpety z płatkami owsianymi. 2. Piec 30 min w sosie pomidorowym."
+    recipe: "1. Robić pulpety z płatkami owsianymi. 2. Piec 30 min in sosie pomidorowym."
   },
   {
-    name: "Pulpety w sosie z czerwonych warzyw",
+    name: "Pulpety in sosie z czerwonych warzyw",
     calories: 490, protein: 34, fats: 14, carbs: 56,
     type: "lunch",
     ingredients: [{ item: "Kasza jaglana", amount: "100g" }, { item: "Indyk mielony", amount: "175g" }, { item: "Papryka", amount: "170g" }],
@@ -679,7 +679,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 490, protein: 34, fats: 16, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Ryż", amount: "100g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Ogórki konserwowe", amount: "100g" }],
-    recipe: "1. Składniki w kostkę połączyć z majonezem i jogurtem."
+    recipe: "1. Składniki in kostkę połączyć z majonezem i jogurtem."
   },
   {
     name: "Sałatka z burakiem i stekiem",
@@ -693,7 +693,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 580, protein: 40, fats: 22, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Pierś indyka", amount: "150g" }, { item: "Płatki kukurydziane", amount: "24g" }, { item: "Parmezan", amount: "30g" }],
-    recipe: "1. Mięso panierować w płatkach, smażyć. 2. Podać z miksem sałat i serem."
+    recipe: "1. Mięso panierować in płatkach, smażyć. 2. Podać z miksem sałat i serem."
   },
   {
     name: "Sałatka z kurczakiem i makaronem ryżowym",
@@ -714,24 +714,24 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 540, protein: 42, fats: 24, carbs: 40,
     type: "lunch",
     ingredients: [{ item: "Polędwica wołowa", amount: "200g" }, { item: "Kasza jaglana", amount: "100g" }, { item: "Pomidorki", amount: "160g" }],
-    recipe: "1. Stek w plastry smażyć. 2. Kaszę ugotować. 3. Sos syrop klonowy + musztarda."
+    recipe: "1. Stek in plastry smażyć. 2. Kaszę ugotować. 3. Sos syrop klonowy + musztarda."
   },
   {
     name: "Sałatka ziemniaczana z indykiem",
     calories: 495, protein: 34, fats: 18, carbs: 52,
     type: "lunch",
     ingredients: [{ item: "Ziemniaki", amount: "350g" }, { item: "Pierś indyka", amount: "200g" }, { item: "Jabłko", amount: "150g" }],
-    recipe: "1. Ziemniaki, indyk i marchewka ugotowane w kostkę. 2. Sos jogurtowo-koperkowy."
+    recipe: "1. Ziemniaki, indyk i marchewka ugotowane in kostkę. 2. Sos jogurtowo-koperkowy."
   },
   {
     name: "Zupa pho z wołowiną",
     calories: 430, protein: 32, fats: 12, carbs: 50,
     type: "lunch",
     ingredients: [{ item: "Makaron ryżowy", amount: "50g" }, { item: "Rostbef wołowy", amount: "150g" }, { item: "Bulion", amount: "375g" }],
-    recipe: "1. Mięso w cienkie plastry smażyć krótko. 2. Gotować w bulionie z cynamonem i imbirem."
+    recipe: "1. Mięso in cienkie plastry smażyć krótko. 2. Gotować in bulionie z cynamonem i imbirem."
   },
   {
-    name: "Bakłażan i wołowina w miso",
+    name: "Bakłażan i wołowina in miso",
     calories: 560, protein: 38, fats: 26, carbs: 48,
     type: "lunch",
     ingredients: [{ item: "Wołowina mielona", amount: "250g" }, { item: "Bakłażan", amount: "200g" }, { item: "Pasta miso", amount: "30g" }],
@@ -763,10 +763,10 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 510, protein: 32, fats: 24, carbs: 38,
     type: "lunch",
     ingredients: [{ item: "Kapusta", amount: "500g" }, { item: "Indyk mielony", amount: "300g" }, { item: "Passata", amount: "700g" }],
-    recipe: "1. Kapustę w plastrach podsmażyć. 2. Zapiekać z sosem mięsnym 1h w 175°C."
+    recipe: "1. Kapustę in plastrach podsmażyć. 2. Zapiekać z sosem mięsnym 1h in 175°C."
   },
   {
-    name: "Karkówka w sosie grzybowym",
+    name: "Karkówka in sosie grzybowym",
     calories: 580, protein: 34, fats: 32, carbs: 38,
     type: "lunch",
     ingredients: [{ item: "Karkówka", amount: "125g" }, { item: "Ziemniaki", amount: "210g" }, { item: "Grzyby leśne", amount: "100g" }],
@@ -819,7 +819,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 520, protein: 36, fats: 14, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Pęczak", amount: "50g" }, { item: "Polędwiczka wieprzowa", amount: "150g" }, { item: "Pieczarki", amount: "100g" }],
-    recipe: "1. Mięso dusić w sosie pieczarkowym. 2. Podać z kaszą i surówką z buraków."
+    recipe: "1. Mięso dusić in sosie pieczarkowym. 2. Podać z kaszą i surówką z buraków."
   },
   {
     name: "Sałatka orkiszowa z jabłkiem",
@@ -868,7 +868,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 420, protein: 28, fats: 16, carbs: 42,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "150g" }, { item: "Ziemniaki", amount: "210g" }, { item: "Jarmuż", amount: "50g" }],
-    recipe: "1. Gotować warzywa i mięso w bulionie. 2. Hartować śmietanką 12%, dodać jarmuż."
+    recipe: "1. Gotować warzywa i mięso in bulionie. 2. Hartować śmietanką 12%, dodać jarmuż."
   },
   {
     name: "Bowl z kurczakiem na parze",
@@ -889,28 +889,28 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 680, protein: 44, fats: 28, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Grahamka", amount: "70g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Boczek", amount: "15g" }, { item: "Mozzarella", amount: "30g" }],
-    recipe: "1. Kurczaka w płatkach kukurydzianych upiec. 2. Boczek smażyć na chrupko. 3. Sos BBQ-jogurt."
+    recipe: "1. Kurczaka in płatkach kukurydzianych upiec. 2. Boczek smażyć na chrupko. 3. Sos BBQ-jogurt."
   },
   {
     name: "Hot Wings jak z KFC",
     calories: 520, protein: 34, fats: 26, carbs: 32,
     type: "lunch",
     ingredients: [{ item: "Skrzydełka", amount: "200g" }, { item: "Płatki kukurydziane", amount: "20g" }, { item: "Jajko", amount: "56g" }],
-    recipe: "1. Panierować skrzydełka w płatkach, piec 40 min w 200°C."
+    recipe: "1. Panierować skrzydełka in płatkach, piec 40 min in 200°C."
   },
   {
-    name: "Indyk w sosie koperkowym z marchewką",
+    name: "Indyk in sosie koperkowym z marchewką",
     calories: 460, protein: 34, fats: 12, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Ziemniaki", amount: "350g" }, { item: "Pierś indyka", amount: "200g" }, { item: "Marchew", amount: "160g" }],
-    recipe: "1. Mięso dusić w bulionie 20 min. 2. Zagęścić mąką, dodać jogurt i koperek."
+    recipe: "1. Mięso dusić in bulionie 20 min. 2. Zagęścić mąką, dodać jogurt i koperek."
   },
   {
     name: "Kopytka z gulaszem warzywnym",
     calories: 580, protein: 32, fats: 16, carbs: 74,
     type: "lunch",
     ingredients: [{ item: "Kopytka", amount: "500g" }, { item: "Pierś kurczaka", amount: "250g" }, { item: "Cukinia", amount: "200g" }],
-    recipe: "1. Mięso i warzywa dusić w wodzie do miękkości. 2. Podać z kopytkami."
+    recipe: "1. Mięso i warzywa dusić in wodzie do miękkości. 2. Podać z kopytkami."
   },
   {
     name: "Krem z brokuła z grzankami",
@@ -938,10 +938,10 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 680, protein: 46, fats: 28, carbs: 60,
     type: "lunch",
     ingredients: [{ item: "Makaron lasagne", amount: "136g" }, { item: "Kurczak mielony", amount: "250g" }, { item: "Mozzarella", amount: "120g" }],
-    recipe: "1. Robić sos mięsny i beszamel. 2. Układać warstwy, piec 45 min w 180°C."
+    recipe: "1. Robić sos mięsny i beszamel. 2. Układać warstwy, piec 45 min in 180°C."
   },
   {
-    name: "Makaron w sosie dyniowym",
+    name: "Makaron in sosie dyniowym",
     calories: 520, protein: 28, fats: 16, carbs: 64,
     type: "lunch",
     ingredients: [{ item: "Makaron penne", amount: "60g" }, { item: "Indyk mielony", amount: "125g" }, { item: "Dynia", amount: "150g" }],
@@ -966,28 +966,28 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 630, protein: 38, fats: 26, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Tortilla", amount: "60g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Mozzarella", amount: "45g" }, { item: "Sos BBQ", amount: "15g" }],
-    recipe: "1. Kurczaka w płatkach upiec. 2. Tortillę smarować sosem, kłaść mięso i ser, zapiekać."
+    recipe: "1. Kurczaka in płatkach upiec. 2. Tortillę smarować sosem, kłaść mięso i ser, zapiekać."
   },
   {
     name: "Risotto z grzybami leśnymi",
     calories: 540, protein: 32, fats: 20, carbs: 56,
     type: "lunch",
     ingredients: [{ item: "Ryż arborio", amount: "80g" }, { item: "Grzyby", amount: "150g" }, { item: "Parmezan", amount: "50g" }],
-    recipe: "1. Ryż gotować w bulionie. 2. Dodać smażone grzyby i mięso na koniec z serem."
+    recipe: "1. Ryż gotować in bulionie. 2. Dodać smażone grzyby i mięso na koniec z serem."
   },
   {
     name: "Sałatka hawajska z ananasem",
     calories: 490, protein: 34, fats: 14, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Szynka z indyka", amount: "200g" }, { item: "Ananas", amount: "200g" }, { item: "Kukurydza", amount: "120g" }],
-    recipe: "1. Składniki w kostkę wymieszać z sosem jogurtowo-musztardowym."
+    recipe: "1. Składniki in kostkę wymieszać z sosem jogurtowo-musztardowym."
   },
   {
     name: "Sałatka z komosy i mango",
     calories: 460, protein: 30, fats: 16, carbs: 50,
     type: "lunch",
     ingredients: [{ item: "Komosa", amount: "50g" }, { item: "Mango", amount: "100g" }, { item: "Pierś kurczaka", amount: "150g" }],
-    recipe: "1. Kurczaka parować. 2. Mango i ogórek w kostkę. 3. Sos cytrynowy z natką."
+    recipe: "1. Kurczaka parować. 2. Mango i ogórek in kostkę. 3. Sos cytrynowy z natką."
   },
   {
     name: "Szaszłyki z kiełbasy i warzyw",
@@ -1001,7 +1001,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 530, protein: 38, fats: 18, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "200g" }, { item: "Fasola biała", amount: "100g" }, { item: "Kukurydza", amount: "120g" }],
-    recipe: "1. Smażyć mięso z cebulą i chilli. 2. Gotować w bulionie z fasolą 15 min. 3. Dodać śmietanę 18%."
+    recipe: "1. Smażyć mięso z cebulą i chilli. 2. Gotować in bulionie z fasolą 15 min. 3. Dodać śmietanę 18%."
   },
   {
     name: "Burgery wołowe Wagyu",
@@ -1022,7 +1022,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 510, protein: 36, fats: 14, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Makaron pełnoziarnisty", amount: "100g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Ananas", amount: "150g" }],
-    recipe: "1. Kurczaka smażyć w przyprawie gyros. 2. Połączyć z makaronem i warzywami."
+    recipe: "1. Kurczaka smażyć in przyprawie gyros. 2. Połączyć z makaronem i warzywami."
   },
   {
     name: "Krewetki z kukurydzą i ryżem",
@@ -1043,7 +1043,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 530, protein: 34, fats: 18, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Gnocchi", amount: "225g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Ogórek", amount: "150g" }],
-    recipe: "1. Mięso i gnocchi piec 15 min w 200°C. 2. Podać z sosem jogurtowym i warzywami."
+    recipe: "1. Mięso i gnocchi piec 15 min in 200°C. 2. Podać z sosem jogurtowym i warzywami."
   },
   {
     name: "Makaron azjatycki z wołowiną i kapustą",
@@ -1057,7 +1057,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 520, protein: 36, fats: 18, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Ziemniaki", amount: "350g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Ogórki małosolne", amount: "100g" }],
-    recipe: "1. Ziemniaki ugotować. 2. Mięso panierować w bułce, smażyć."
+    recipe: "1. Ziemniaki ugotować. 2. Mięso panierować in bułce, smażyć."
   },
   {
     name: "Pinsa z szynką i rukolą",
@@ -1078,10 +1078,10 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 540, protein: 38, fats: 22, carbs: 48,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "200g" }, { item: "Kapusta czerwona", amount: "200g" }, { item: "Chleb żytni", amount: "120g" }],
-    recipe: "1. Kurczaka smażyć w gyrosie. 2. Mieszaj z warzywami, podawaj z grzankami."
+    recipe: "1. Kurczaka smażyć in gyrosie. 2. Mieszaj z warzywami, podawaj z grzankami."
   },
   {
-    name: "Stek z ziemniakami i ogórkiem małosolnym",
+    name: "Stek wołowy z ziemniakami i ogórkiem małosolnym",
     calories: 590, protein: 44, fats: 26, carbs: 46,
     type: "lunch",
     ingredients: [{ item: "Ziemniaki", amount: "560g" }, { item: "Polędwica wołowa", amount: "300g" }, { item: "Ogórki małosolne", amount: "200g" }],
@@ -1099,21 +1099,21 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 650, protein: 40, fats: 38, carbs: 42,
     type: "lunch",
     ingredients: [{ item: "Karkówka", amount: "500g" }, { item: "Ziemniaki", amount: "700g" }, { item: "Ogórek", amount: "450g" }],
-    recipe: "1. Mięso piec 1.5h w 190°C. 2. Podać z ziemniakami i mizerią."
+    recipe: "1. Mięso piec 1.5h in 190°C. 2. Podać z ziemniakami i mizerią."
   },
   {
-    name: "Surf and Turf w papilotach",
+    name: "Surf and Turf in papilotach",
     calories: 580, protein: 44, fats: 18, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Polędwica wołowa", amount: "250g" }, { item: "Krewetki tygrysie", amount: "250g" }, { item: "Ryż", amount: "200g" }],
-    recipe: "1. Mięso i krewetki piec w folii 12-15 min. 2. Podać z ryżem i kukurydzą."
+    recipe: "1. Mięso i krewetki piec in folii 12-15 min. 2. Podać z ryżem i kukurydzą."
   },
   {
-    name: "Szynka w sosie chrzanowym",
+    name: "Szynka in sosie chrzanowym",
     calories: 520, protein: 38, fats: 20, carbs: 48,
     type: "lunch",
     ingredients: [{ item: "Szynka wieprzowa", amount: "150g" }, { item: "Ziemniaki", amount: "140g" }, { item: "Fasolka", amount: "150g" }],
-    recipe: "1. Mięso dusić 40-50 min w bulionie z chrzanem. 2. Podać z puree i fasolką."
+    recipe: "1. Mięso dusić 40-50 min in bulionie z chrzanem. 2. Podać z puree i fasolką."
   },
   {
     name: "Tortilla z jajkiem i szynką",
@@ -1127,49 +1127,49 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 610, protein: 44, fats: 28, carbs: 46,
     type: "lunch",
     ingredients: [{ item: "Wołowina", amount: "500g" }, { item: "Ogórek kiszony", amount: "100g" }, { item: "Ziemniaki", amount: "560g" }],
-    recipe: "1. Roladki z mięsa dusić 2h w bulionie. 2. Podawać z ziemniakami."
+    recipe: "1. Roladki z mięsa dusić 2h in bulionie. 2. Podawać z ziemniakami."
   },
   {
     name: "Zupa tajska Tom Yum z kurczakiem",
     calories: 490, protein: 34, fats: 22, carbs: 40,
     type: "lunch",
     ingredients: [{ item: "Makaron ryżowy", amount: "100g" }, { item: "Pierś kurczaka", amount: "250g" }, { item: "Mleczko kokosowe", amount: "200g" }],
-    recipe: "1. Smażyć mięso i grzyby. 2. Gotować w bulionie z pastą Tom Yum 15 min."
+    recipe: "1. Smażyć mięso i grzyby. 2. Gotować in bulionie z pastą Tom Yum 15 min."
   },
   {
     name: "Burgery z grilla z cheddarem",
     calories: 590, protein: 36, fats: 28, carbs: 46,
     type: "lunch",
     ingredients: [{ item: "Grahamka", amount: "70g" }, { item: "Kurczak mielony", amount: "125g" }, { item: "Cheddar", amount: "15g" }],
-    recipe: "1. Smażyć burgera 10 min. 2. Podawać w bułce z sosem miodowo-musztardowym."
+    recipe: "1. Smażyć burgera 10 min. 2. Podawać in bułce z sosem miodowo-musztardowym."
   },
   {
     name: "Delikatny kurczak z mizerią",
     calories: 460, protein: 32, fats: 18, carbs: 42,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "125g" }, { item: "Ziemniaki", amount: "140g" }, { item: "Ogórek", amount: "150g" }],
-    recipe: "1. Mięso i ziemniaki piec w rękawie 30 min. 2. Podać z mizerią."
+    recipe: "1. Mięso i ziemniaki piec in rękawie 30 min. 2. Podać z mizerią."
   },
   {
-    name: "Pulpeciki w sosie marchewkowym z kopytkami",
+    name: "Pulpeciki in sosie marchewkowym z kopytkami",
     calories: 510, protein: 32, fats: 14, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Indyk mielony", amount: "125g" }, { item: "Kopytka", amount: "100g" }, { item: "Marchewka", amount: "160g" }],
     recipe: "1. Pulpety gotować 20 min. 2. Zblendować marchew na sos, podać z kopytkami."
   },
   {
-    name: "Kebab z grilla w tortilli",
+    name: "Kebab z grilla in tortilli",
     calories: 495, protein: 34, fats: 16, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Tortilla", amount: "60g" }, { item: "Pierś kurczaka", amount: "125g" }, { item: "Sos BBQ", amount: "20g" }],
-    recipe: "1. Mięso grillować 15 min. 2. Zawinąć w tortillę z warzywami i ketchupem."
+    recipe: "1. Mięso grillować 15 min. 2. Zawinąć in tortillę z warzywami i ketchupem."
   },
   {
     name: "Krem z białych szparagów",
     calories: 410, protein: 28, fats: 14, carbs: 42,
     type: "lunch",
     ingredients: [{ item: "Szparagi białe", amount: "500g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Ziemniaki", amount: "140g" }],
-    recipe: "1. Gotować warzywa w bulionie, zblendować. 2. Dodać smażonego kurczaka."
+    recipe: "1. Gotować warzywa in bulionie, zblendować. 2. Dodać smażonego kurczaka."
   },
   {
     name: "Makaron z pesto pietruszkowym",
@@ -1193,11 +1193,11 @@ export const LUNCH_MEALS: Meal[] = [
     recipe: "1. Pulpety piec 25 min. 2. Podać z tłuczonymi ziemniakami i mizerią."
   },
   {
-    name: "Indyk w sosie koperkowym z surówką",
+    name: "Indyk in sosie koperkowym z surówką",
     calories: 490, protein: 34, fats: 12, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Pierś indyka", amount: "125g" }, { item: "Kuskus", amount: "50g" }, { item: "Marchew", amount: "80g" }],
-    recipe: "1. Mięso piec 20 min w sosie koperkowym. 2. Podać z kuskusem i surówką."
+    recipe: "1. Mięso piec 20 min in sosie koperkowym. 2. Podać z kuskusem i surówką."
   },
   {
     name: "Pizza na spodzie z tortilli z gruszką",
@@ -1253,7 +1253,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 470, protein: 32, fats: 20, carbs: 40,
     type: "lunch",
     ingredients: [{ item: "Indyk mielony", amount: "125g" }, { item: "Koperek", amount: "28g" }, { item: "Chleb pszenny", amount: "30g" }],
-    recipe: "1. Pulpety dusić w bulionie koperkowym ze śmietaną 18%."
+    recipe: "1. Pulpety dusić in bulionie koperkowym ze śmietaną 18%."
   },
   {
     name: "Zupa krem z batatów i pomidorów",
@@ -1288,7 +1288,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 590, protein: 44, fats: 20, carbs: 56,
     type: "lunch",
     ingredients: [{ item: "Wołowina", amount: "400g" }, { item: "Marchew", amount: "160g" }, { item: "Ziemniaki", amount: "420g" }],
-    recipe: "1. Mięso dusić 1.5h w bulionie. 2. Dodać ziemniaki i marchew na 30 min."
+    recipe: "1. Mięso dusić 1.5h in bulionie. 2. Dodać ziemniaki i marchew na 30 min."
   },
   {
     name: "Jednogarnkowe danie z ryżem i pesto",
@@ -1302,21 +1302,21 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 610, protein: 42, fats: 22, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Wołowina mielona", amount: "400g" }, { item: "Batat", amount: "400g" }, { item: "Pomidory puszka", amount: "400g" }],
-    recipe: "1. Mięso i warzywa dusić 25 min w pomidorach pod przykryciem."
+    recipe: "1. Mięso i warzywa dusić 25 min in pomidorach pod przykryciem."
   },
   {
     name: "Kapuśniak z młodej kapusty",
     calories: 450, protein: 34, fats: 14, carbs: 48,
     type: "lunch",
     ingredients: [{ item: "Młoda kapusta", amount: "400g" }, { item: "Ziemniaki", amount: "350g" }, { item: "Pierś kurczaka", amount: "200g" }],
-    recipe: "1. Gotować warzywa 20 min w bulionie, dodać wcześniej usmażone mięso."
+    recipe: "1. Gotować warzywa 20 min in bulionie, dodać wcześniej usmażone mięso."
   },
   {
     name: "Klopsiki z puree selerowym",
     calories: 480, protein: 36, fats: 14, carbs: 50,
     type: "lunch",
     ingredients: [{ item: "Kurczak mielony", amount: "150g" }, { item: "Seler", amount: "100g" }, { item: "Buraki", amount: "200g" }],
-    recipe: "1. Pulpety gotować w bulionie. 2. Seler i ziemniaki ugnieść na puree z masłem."
+    recipe: "1. Pulpety gotować in bulionie. 2. Seler i ziemniaki ugnieść na puree z masłem."
   },
   {
     name: "Kurczak na parze z brokułem i ryżem",
@@ -1330,7 +1330,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 490, protein: 36, fats: 14, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "150g" }, { item: "Ziemniaki", amount: "140g" }, { item: "Marchewka", amount: "160g" }],
-    recipe: "1. Piec wszystko w rękawie 30 min w 180°C z ziołami."
+    recipe: "1. Piec wszystko in rękawie 30 min in 180°C z ziołami."
   },
   {
     name: "Lekkostrawne Spaghetti Bolognese",
@@ -1351,7 +1351,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 460, protein: 32, fats: 14, carbs: 52,
     type: "lunch",
     ingredients: [{ item: "Pierś indyka", amount: "150g" }, { item: "Marchewka", amount: "200g" }, { item: "Ziemniaki", amount: "140g" }],
-    recipe: "1. Indyk z warzywami pieczony w rękawie 40 min w bulionie. 2. Podać z puree."
+    recipe: "1. Indyk z warzywami pieczony in rękawie 40 min in bulionie. 2. Podać z puree."
   },
   {
     name: "Pieczony kurczak z puree z batata",
@@ -1386,7 +1386,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 540, protein: 34, fats: 26, carbs: 42,
     type: "lunch",
     ingredients: [{ item: "Cukinia", amount: "400g" }, { item: "Wieprzowina mielona", amount: "300g" }, { item: "Ryż", amount: "50g" }],
-    recipe: "1. Mięso dusić w pomidorach. 2. Układać warstwami z cukinią i ryżem, piec 30 min."
+    recipe: "1. Mięso dusić in pomidorach. 2. Układać warstwami z cukinią i ryżem, piec 30 min."
   },
   {
     name: "Zielone pulpeciki z jarmużem",
@@ -1407,21 +1407,21 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 410, protein: 26, fats: 14, carbs: 44,
     type: "lunch",
     ingredients: [{ item: "Dynia", amount: "500g" }, { item: "Indyk mielony", amount: "200g" }, { item: "Jogurt grecki", amount: "60g" }],
-    recipe: "1. Pulpety gotować w bulionie. 2. Dynię upiec, zblendować z bulionem i olejem na krem."
+    recipe: "1. Pulpety gotować in bulionie. 2. Dynię upiec, zblendować z bulionem i olejem na krem."
   },
   {
     name: "Zupa z mlekiem kokosowym i kurczakiem",
     calories: 460, protein: 28, fats: 22, carbs: 38,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "100g" }, { item: "Makaron Chow Mein", amount: "60g" }, { item: "Mleczko kokosowe", amount: "100g" }],
-    recipe: "1. Gotować warzywa i mięso w bulionie 20 min. 2. Dodać mleczko i szpinak."
+    recipe: "1. Gotować warzywa i mięso in bulionie 20 min. 2. Dodać mleczko i szpinak."
   },
   {
     name: "Bowl z szarpanym kurczakiem BBQ",
     calories: 520, protein: 36, fats: 18, carbs: 52,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "200g" }, { item: "Awokado", amount: "70g" }, { item: "Fasola czerwona", amount: "120g" }],
-    recipe: "1. Mięso piec w sosie BBQ, poszarpać widelcem. 2. Podać z kukurydzą i awokado."
+    recipe: "1. Mięso piec in sosie BBQ, poszarpać widelcem. 2. Podać z kukurydzą i awokado."
   },
   {
     name: "Burger Bowl z ryżem",
@@ -1435,21 +1435,21 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 590, protein: 44, fats: 22, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Ziemniaki", amount: "350g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Płatki kukurydziane", amount: "24g" }],
-    recipe: "1. Ziemniaki piec 30 min. 2. Kurczaka w płatkach piec kolejne 20 min."
+    recipe: "1. Ziemniaki piec 30 min. 2. Kurczaka in płatkach piec kolejne 20 min."
   },
   {
-    name: "Chrupiący kurczak w sosie teriyaki",
+    name: "Chrupiący kurczak in sosie teriyaki",
     calories: 530, protein: 36, fats: 14, carbs: 64,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "150g" }, { item: "Ryż basmati", amount: "50g" }, { item: "Brokuł", amount: "150g" }],
-    recipe: "1. Mięso piec w sosie teriyaki 25 min. 2. Podać z ryżem i brokułem."
+    recipe: "1. Mięso piec in sosie teriyaki 25 min. 2. Podać z ryżem i brokułem."
   },
   {
     name: "Frytki z batata z kurczakiem",
     calories: 560, protein: 34, fats: 18, carbs: 65,
     type: "lunch",
     ingredients: [{ item: "Batat", amount: "200g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Miks sałat", amount: "25g" }],
-    recipe: "1. Bataty w słupkach i kurczaka piec 30 min w 200°C."
+    recipe: "1. Bataty in słupkach i kurczaka piec 30 min in 200°C."
   },
   {
     name: "Frytki z batatów z sałatką",
@@ -1463,7 +1463,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 550, protein: 42, fats: 18, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Kasza jaglana", amount: "100g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Cukinia", amount: "200g" }],
-    recipe: "1. Kaszę gotować w bulionie. 2. Mięso i warzywa piec 20 min."
+    recipe: "1. Kaszę gotować in bulionie. 2. Mięso i warzywa piec 20 min."
   },
   {
     name: "Krupnik z koperkiem i oliwą",
@@ -1487,7 +1487,7 @@ export const LUNCH_MEALS: Meal[] = [
     recipe: "1. Mięso smażyć 15 min, posmarować sosem sriracha-mayo i podpiec."
   },
   {
-    name: "Kurczak w kremowym sosie pesto z parmezanem",
+    name: "Kurczak in kremowym sosie pesto z parmezanem",
     calories: 610, protein: 42, fats: 32, carbs: 38,
     type: "lunch",
     ingredients: [{ item: "Makaron", amount: "100g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Pesto zielone", amount: "30g" }, { item: "Parmezan", amount: "15g" }],
@@ -1561,52 +1561,52 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 490, protein: 34, fats: 16, carbs: 52,
     type: "lunch",
     ingredients: [{ item: "Ziemniaki", amount: "420g" }, { item: "Kurczak", amount: "200g" }, { item: "Kukurydza", amount: "240g" }],
-    recipe: "1. Mięso smażyć. 2. Gotować ziemniaki w bulionie. 3. Zagęścić mlekiem z mąką, dodać ser cheddar."
+    recipe: "1. Mięso smażyć. 2. Gotować ziemniaki in bulionie. 3. Zagęścić mlekiem z mąką, dodać ser cheddar."
   },
   {
     name: "Fasola po bretońsku z polędwicą",
     calories: 530, protein: 32, fats: 14, carbs: 68,
     type: "lunch",
     ingredients: [{ item: "Fasola biała", amount: "120g" }, { item: "Polędwica wieprzowa", amount: "100g" }, { item: "Chleb żytni", amount: "60g" }],
-    recipe: "1. Mięso smażyć w kostkę. 2. Dusić z warzywami, fasolą i pomidorami."
+    recipe: "1. Mięso smażyć in kostkę. 2. Dusić z warzywami, fasolą i pomidorami."
   },
   {
     name: "Gulasz wołowy z kaszą pęczak",
     calories: 560, protein: 38, fats: 14, carbs: 70,
     type: "lunch",
     ingredients: [{ item: "Rostbef", amount: "125g" }, { item: "Kasza pęczak", amount: "40g" }, { item: "Papryka", amount: "170g" }],
-    recipe: "1. Mięso w mące smażyć. 2. Dusić z warzywami i koncentratem 25 min."
+    recipe: "1. Mięso in mące smażyć. 2. Dusić z warzywami i koncentratem 25 min."
   },
   {
     name: "Gyros Bowl z frytkami",
     calories: 595, protein: 38, fats: 22, carbs: 61,
     type: "lunch",
     ingredients: [{ item: "Frytki", amount: "100g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Miks sałat", amount: "100g" }],
-    recipe: "1. Mięso i frytki piec 20 min w 200°C. 2. Sos jogurt-tymianek-czosnek."
+    recipe: "1. Mięso i frytki piec 20 min in 200°C. 2. Sos jogurt-tymianek-czosnek."
   },
   {
     name: "Indyk po seczuańsku",
     calories: 650, protein: 44, fats: 18, carbs: 78,
     type: "lunch",
     ingredients: [{ item: "Ryż", amount: "200g" }, { item: "Pierś indyka", amount: "300g" }, { item: "Seler naciowy", amount: "90g" }],
-    recipe: "1. Ryż ugotować. 2. Smażyć indyka w paski 6 min. 3. Dodać warzywa, sos sojowy i koncentrat."
+    recipe: "1. Ryż ugotować. 2. Smażyć indyka in paski 6 min. 3. Dodać warzywa, sos sojowy i koncentrat."
   },
   {
     name: "Jednogarnkowy kurczak z ryżem",
     calories: 480, protein: 34, fats: 12, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "200g" }, { item: "Ryż", amount: "50g" }, { item: "Batat", amount: "200g" }],
-    recipe: "1. Warzywa i mięso dusić w bulionie z ryżem do miękkości."
+    recipe: "1. Warzywa i mięso dusić in bulionie z ryżem do miękkości."
   },
   {
-    name: "Kurczak w sosie śliwkowym",
+    name: "Kurczak in sosie śliwkowym",
     calories: 550, protein: 38, fats: 14, carbs: 68,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "200g" }, { item: "Powidła", amount: "45g" }, { item: "Kopytka", amount: "250g" }],
-    recipe: "1. Piec kurczaka w sosie z powideł i soi. 2. Podać z kopytkami i marchwią."
+    recipe: "1. Piec kurczaka in sosie z powideł i soi. 2. Podać z kopytkami i marchwią."
   },
   {
-    name: "Kurczak w sosie szpinakowym z masłem",
+    name: "Kurczak in sosie szpinakowym z masłem",
     calories: 510, protein: 32, fats: 26, carbs: 36,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "125g" }, { item: "Szpinak", amount: "75g" }, { item: "Makaron", amount: "50g" }],
@@ -1630,29 +1630,29 @@ export const LUNCH_MEALS: Meal[] = [
     name: "Marchwianka z pulpecikami",
     calories: 410, protein: 28, fats: 12, carbs: 48,
     type: "lunch",
-    ingredients: [{ item: "Marchewka", amount: "240g" }, { item: "Ryż biały", amount: "40g" }, { item: "Kurczak mielony", amount: "125g" }],
-    recipe: "1. Zupę z ryżem i marchwią zblendować. 2. Podać z ugotowanymi pulpetami."
+    ingredients: [{ item: "Marchewka", amount: "320g" }, { item: "Ryż biały", amount: "40g" }, { item: "Kurczak mielony", amount: "125g" }],
+    recipe: "1. Gotować warzywa i ryż 20 min. 2. Zblendować na krem. 3. Podać z ugotowanymi pulpetami."
   },
   {
     name: "Pieczona pierś z kurczaka z kaszą",
     calories: 490, protein: 36, fats: 14, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Kasza jaglana", amount: "50g" }, { item: "Pierś kurczaka", amount: "125g" }, { item: "Cukinia", amount: "200g" }],
-    recipe: "1. Mięso i warzywa piec 25 min w marynacie cytrynowo-ziołowej."
+    recipe: "1. Mięso i warzywa piec 25 min in marynacie cytrynowo-ziołowej."
   },
   {
-    name: "Pieczone pulpety w kremowym sosie",
+    name: "Pieczone pulpety in kremowym sosie",
     calories: 630, protein: 42, fats: 26, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Kurczak mielony", amount: "400g" }, { item: "Makaron orzo", amount: "200g" }, { item: "Śmietanka 12%", amount: "72g" }],
-    recipe: "1. Pulpety piec 30 min. 2. Orzo gotować w bulionie ze szpinakiem i śmietanką."
+    recipe: "1. Pulpety piec 30 min. 2. Orzo gotować in bulionie ze szpinakiem i śmietanką."
   },
   {
     name: "Kurczak zapiekany z mozzarellą",
     calories: 520, protein: 40, fats: 22, carbs: 40,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "150g" }, { item: "Mozzarella", amount: "60g" }, { item: "Passata", amount: "350g" }],
-    recipe: "1. Mięso podsmażyć, piec w sosie pomidorowym 15 min + 5 min z serem."
+    recipe: "1. Mięso podsmażyć, piec in sosie pomidorowym 15 min + 5 min z serem."
   },
   {
     name: "Tradycyjna potrawka z kurczaka",
@@ -1662,11 +1662,11 @@ export const LUNCH_MEALS: Meal[] = [
     recipe: "1. Gotować wszystko 30 min. 2. Mięso rozdrobnić, podać z tłuczonymi ziemniakami."
   },
   {
-    name: "Wieprzowina w sosie paprykowym",
+    name: "Wieprzowina in sosie paprykowym",
     calories: 590, protein: 42, fats: 18, carbs: 64,
     type: "lunch",
     ingredients: [{ item: "Schab wieprzowy", amount: "175g" }, { item: "Ziemniaki", amount: "140g" }, { item: "Papryka", amount: "85g" }],
-    recipe: "1. Sos: duszona papryka zblendowana z passatą i bulionem. 2. Mięso dusić w sosie."
+    recipe: "1. Sos: duszona papryka zblendowana z passatą i bulionem. 2. Mięso dusić in sosie."
   },
   {
     name: "Zapiekanka z fasolką szparagową",
@@ -1694,7 +1694,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 440, protein: 32, fats: 12, carbs: 51,
     type: "lunch",
     ingredients: [{ item: "Mąka pszenna", amount: "60g" }, { item: "Jajko", amount: "56g" }, { item: "Pierś kurczaka", amount: "125g" }],
-    recipe: "1. Zrobić domowe zacierki. 2. Gotować w bulionie z mięsem i warzywami 15 min."
+    recipe: "1. Zrobić domowe zacierki. 2. Gotować in bulionie z mięsem i warzywami 15 min."
   },
   {
     name: "Aromatyczny kurczak parowany z puree",
@@ -1708,35 +1708,35 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 590, protein: 36, fats: 28, carbs: 48,
     type: "lunch",
     ingredients: [{ item: "Ryż basmati", amount: "60g" }, { item: "Indyk mielony", amount: "125g" }, { item: "Awokado", amount: "70g" }],
-    recipe: "1. Ryż ugotować. 2. Mięso usmażyć w gyrosie. 3. Podać z kukurydzą, fasolą i pomidorkami."
+    recipe: "1. Ryż ugotować. 2. Mięso usmażyć in gyrosie. 3. Podać z kukurydzą, fasolą i pomidorkami."
   },
   {
     name: "Krem marchewkowy z parowanym kurczakiem",
     calories: 410, protein: 28, fats: 12, carbs: 47,
     type: "lunch",
     ingredients: [{ item: "Marchewka", amount: "320g" }, { item: "Pierś kurczaka", amount: "125g" }, { item: "Bulion", amount: "250g" }],
-    recipe: "1. Zupę zblendować. 2. Mięso parować osobno, podać w zupie z kleksem jogurtu."
+    recipe: "1. Zupę zblendować. 2. Mięso parować osobno, podać in zupie z kleksem jogurtu."
   },
   {
     name: "Gołąbki bez zawijania z ziemniakami",
     calories: 650, protein: 44, fats: 28, carbs: 56,
     type: "lunch",
     ingredients: [{ item: "Kapusta", amount: "150g" }, { item: "Indyk mielony", amount: "500g" }, { item: "Ziemniaki", amount: "420g" }],
-    recipe: "1. Klopsiki z ryżem i kapustą dusić w sosie pomidorowym 20 min."
+    recipe: "1. Klopsiki z ryżem i kapustą dusić in sosie pomidorowym 20 min."
   },
   {
     name: "Grillowana pierś kurczaka z sałatką",
     calories: 440, protein: 36, fats: 16, carbs: 38,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "200g" }, { item: "Chleb żytni", amount: "120g" }, { item: "Pomidor", amount: "160g" }],
-    recipe: "1. Mięso marynować w occie balsamicznym, grillować. 2. Podać z dużą sałatką."
+    recipe: "1. Mięso marynować in occie balsamicznym, grillować. 2. Podać z dużą sałatką."
   },
   {
     name: "Karkówka z grilla z szaszłykami",
     calories: 620, protein: 34, fats: 38, carbs: 35,
     type: "lunch",
     ingredients: [{ item: "Karkówka", amount: "200g" }, { item: "Pieczarki", amount: "100g" }, { item: "Chleb żytni", amount: "120g" }],
-    recipe: "1. Mięso marynować w musztardzie i ketchupie. 2. Grillować z szaszłykami warzywnymi."
+    recipe: "1. Mięso marynować in musztardzie i ketchupie. 2. Grillować z szaszłykami warzywnymi."
   },
   {
     name: "Kurczak parowany z kapustą zasmażaną",
@@ -1764,7 +1764,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 560, protein: 38, fats: 18, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Makaron", amount: "100g" }, { item: "Pierś kurczaka", amount: "150g" }, { item: "Cukinia", amount: "200g" }],
-    recipe: "1. Mięso smażyć. 2. Dodać cukinię w paski i pomidorki. 3. Sypać parmezanem."
+    recipe: "1. Mięso smażyć. 2. Dodać cukinię in paski i pomidorki. 3. Sypać parmezanem."
   },
   {
     name: "Makaron z kurczakiem po włosku",
@@ -1785,10 +1785,10 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 610, protein: 44, fats: 22, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "500g" }, { item: "Płatki kukurydziane", amount: "100g" }, { item: "Majonez", amount: "100g" }],
-    recipe: "1. Mięso w płatkach piec 20 min w 220°C. 2. Sos: BBQ + miód."
+    recipe: "1. Mięso in płatkach piec 20 min in 220°C. 2. Sos: BBQ + miód."
   },
   {
-    name: "Pulpeciki w sosie pomidorowym z masłem",
+    name: "Pulpeciki in sosie pomidorowym z masłem",
     calories: 490, protein: 34, fats: 18, carbs: 48,
     type: "lunch",
     ingredients: [{ item: "Kurczak mielony", amount: "150g" }, { item: "Ziemniaki", amount: "140g" }, { item: "Passata", amount: "350g" }],
@@ -1799,28 +1799,28 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 420, protein: 36, fats: 12, carbs: 42,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "150g" }, { item: "Jogurt", amount: "150g" }, { item: "Miód", amount: "12g" }],
-    recipe: "1. Mięso grillować w marynacie gyros. 2. Podać z warzywami i sosem ziołowym."
+    recipe: "1. Mięso grillować in marynacie gyros. 2. Podać z warzywami i sosem ziołowym."
   },
   {
     name: "Pieczona wieprzowina z bagietką",
     calories: 640, protein: 40, fats: 32, carbs: 48,
     type: "lunch",
     ingredients: [{ item: "Schab", amount: "300g" }, { item: "Bagietka", amount: "140g" }, { item: "Miód", amount: "12g" }],
-    recipe: "1. Schab piec ok. 1h w 190°C. 2. Podać z sałatką i sosem miodowo-musztardowym."
+    recipe: "1. Schab piec ok. 1h in 190°C. 2. Podać z sałatką i sosem miodowo-musztardowym."
   },
   {
     name: "Tortilla z burgerem i frytkami",
     calories: 680, protein: 38, fats: 34, carbs: 56,
     type: "lunch",
     ingredients: [{ item: "Tortilla", amount: "120g" }, { item: "Frytki", amount: "140g" }, { item: "Kurczak mielony", amount: "200g" }],
-    recipe: "1. Frytki piec. 2. Burger usmażyć. 3. Wszystko zawinąć w tortillę z sosem jogurtowym."
+    recipe: "1. Frytki piec. 2. Burger usmażyć. 3. Wszystko zawinąć in tortillę z sosem jogurtowym."
   },
   {
     name: "Warzywny gulasz wołowy z pieczywem",
     calories: 460, protein: 32, fats: 18, carbs: 42,
     type: "lunch",
     ingredients: [{ item: "Polędwica wołowa", amount: "125g" }, { item: "Marchewka", amount: "160g" }, { item: "Chleb pszenny", amount: "60g" }],
-    recipe: "1. Mięso i marchew dusić w bulionie do miękkości, zagęścić skrobią."
+    recipe: "1. Mięso i marchew dusić in bulionie do miękkości, zagęścić skrobią."
   },
   {
     name: "Drobiowa zapiekanka z brokułem",
@@ -1841,14 +1841,14 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 640, protein: 40, fats: 18, carbs: 78,
     type: "lunch",
     ingredients: [{ item: "Tortilla", amount: "180g" }, { item: "Ryż", amount: "100g" }, { item: "Indyk mielony", amount: "300g" }],
-    recipe: "1. Sos mięsny z fasolą i kukurydzą dusić. 2. Mieszać z ryżem, zawijać w tortillę."
+    recipe: "1. Sos mięsny z fasolą i kukurydzą dusić. 2. Mieszać z ryżem, zawijać in tortillę."
   },
   {
     name: "Kurczak z porem i zieloną fasolką",
     calories: 510, protein: 38, fats: 16, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "300g" }, { item: "Por", amount: "140g" }, { item: "Ziemniaki", amount: "490g" }],
-    recipe: "1. Ziemniaki piec. 2. Kurczaka dusić na porze w naczyniu 25 min."
+    recipe: "1. Ziemniaki piec. 2. Kurczaka dusić na porze in naczyniu 25 min."
   },
   {
     name: "Gnocchi z indykiem i groszkiem",
@@ -1862,14 +1862,14 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 520, protein: 36, fats: 14, carbs: 62,
     type: "lunch",
     ingredients: [{ item: "Pierś kurczaka", amount: "300g" }, { item: "Ziemniaki", amount: "420g" }, { item: "Jabłko", amount: "150g" }],
-    recipe: "1. Ziemniaki i kurczaka piec w 180°C. 2. Podawać z tartą marchwią i jabłkiem."
+    recipe: "1. Ziemniaki i kurczaka piec in 180°C. 2. Podawać z tartą marchwią i jabłkiem."
   },
   {
     name: "Gulasz z indyka z pęczakiem",
     calories: 540, protein: 38, fats: 14, carbs: 66,
     type: "lunch",
     ingredients: [{ item: "Pierś indyka", amount: "300g" }, { item: "Kasza pęczak", amount: "100g" }, { item: "Cukinia", amount: "200g" }],
-    recipe: "1. Mięso i warzywa dusić w pomidorach. 2. Połączyć z ugotowaną kaszą i jogurtem."
+    recipe: "1. Mięso i warzywa dusić in pomidorach. 2. Połączyć z ugotowaną kaszą i jogurtem."
   },
   {
     name: "Kotlety mielone z mizerią i koperkiem",
@@ -1897,21 +1897,21 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 590, protein: 38, fats: 20, carbs: 64,
     type: "lunch",
     ingredients: [{ item: "Naleśniki", amount: "540g" }, { item: "Kurczak mielony", amount: "400g" }, { item: "Papryka", amount: "170g" }],
-    recipe: "1. Farsz mięsno-warzywny dusić w pomidorach 8 min. 2. Zawijać w naleśniki."
+    recipe: "1. Farsz mięsno-warzywny dusić in pomidorach 8 min. 2. Zawijać in naleśniki."
   },
   {
     name: "Wołowina po azjatycku z ryżem",
     calories: 580, protein: 40, fats: 22, carbs: 56,
     type: "lunch",
     ingredients: [{ item: "Rostbef", amount: "400g" }, { item: "Ryż basmati", amount: "200g" }, { item: "Brokuł", amount: "200g" }],
-    recipe: "1. Wołowinę smażyć krótko w sosie sojowym. 2. Warzywa dusić 7 min, podać z ryżem."
+    recipe: "1. Wołowinę smażyć krótko in sosie sojowym. 2. Warzywa dusić 7 min, podać z ryżem."
   },
   {
-    name: "Sałatka z makaronem i kurczakiem BBQ",
-    calories: 510, protein: 34, fats: 16, carbs: 58,
+    name: "Sałatka ryżowa z kurczakiem",
+    calories: 460, protein: 32, fats: 12, carbs: 52,
     type: "lunch",
-    ingredients: [{ item: "Makaron", amount: "400g" }, { item: "Pierś kurczaka", amount: "400g" }, { item: "Masło orzechowe", amount: "30g" }],
-    recipe: "1. Kurczaka usmażyć. 2. Sos: masło orzechowe, soja, miód, cytryna. 3. Wymieszać z makaronem."
+    ingredients: [{ item: "Ryż biały", amount: "100g" }, { item: "Pierś kurczaka", amount: "200g" }, { item: "Ogórek", amount: "150g" }],
+    recipe: "1. Ryż ugotować. 2. Kurczaka gotować 15 min. 3. Wymieszać z sosem jogurtowym."
   },
   {
     name: "Stek wołowy z kaszą pęczak",
@@ -1928,7 +1928,7 @@ export const LUNCH_MEALS: Meal[] = [
     recipe: "1. Smażyć warzywa i mięso. 2. Zalać bulionem i passatą, gotować 30 min. 3. Podać z ryżem."
   },
   {
-    name: "Lasagne w papryce",
+    name: "Lasagne in papryce",
     calories: 510, protein: 36, fats: 26, carbs: 32,
     type: "lunch",
     ingredients: [{ item: "Papryka", amount: "510g" }, { item: "Wołowina mielona", amount: "400g" }, { item: "Ricotta", amount: "240g" }],
@@ -1946,7 +1946,7 @@ export const LUNCH_MEALS: Meal[] = [
     calories: 490, protein: 32, fats: 14, carbs: 58,
     type: "lunch",
     ingredients: [{ item: "Pęczak", amount: "50g" }, { item: "Pierś indyka", amount: "150g" }, { item: "Botwinka", amount: "100g" }],
-    recipe: "1. Kaszę i mięso dusić w bulionie. 2. Dodać buraczki i liście botwiny pod koniec."
+    recipe: "1. Kaszę i mięso dusić in bulionie. 2. Dodać buraczki i liście botwiny pod koniec."
   },
   {
     name: "Białkowe babeczki z mięsem",
@@ -1956,7 +1956,7 @@ export const LUNCH_MEALS: Meal[] = [
     recipe: "1. Z masy brokułowej piec koszyczki 30 min. 2. Nadziewać sosem mięsnym i ricottą, zapiec."
   },
   {
-    name: "Schab w sosie z porem i marchewką",
+    name: "Schab in sosie z porem i marchewką",
     calories: 520, protein: 38, fats: 16, carbs: 54,
     type: "lunch",
     ingredients: [{ item: "Ziemniaki", amount: "280g" }, { item: "Schab", amount: "200g" }, { item: "Por", amount: "280g" }],
